@@ -1,0 +1,41 @@
+{
+  "name": "jest-image-snapshot",
+  "version": "0.1.0",
+  "description": "Jest matcher for screenshot comparisons. Most commonly used for browser visual testing.",
+  "main": "src/index.js",
+  "scripts": {
+    "lint": "eslint ./ --ignore-path .gitignore --ext .js",
+    "test": "jest",
+    "posttest": "npm run lint"
+  },
+  "keywords": [
+    "test",
+    "amex",
+    "visual testing",
+    "css",
+    "jest",
+    "browser testing"
+  ],
+  "jest": {
+    "preset": "amex-jest-preset"
+  },
+  "author": "Andres Escobar <andres.escobar@aexp.com> (https://github.com/anescobar1991)",
+  "license": "Apache-2.0",
+  "devDependencies": {
+    "amex-jest-preset": "^3.1.0",
+    "eslint": "^3.19.0",
+    "eslint-config-amex": "^4.0.0",
+    "jest": "^20.0.0"
+  },
+  "dependencies": {
+    "blink-diff": "^1.0.13",
+    "chalk": "^1.1.3",
+    "lodash": "^4.17.4"
+  },
+  "peerDependencies": {
+    "jest": "^20.0.0"
+  },
+  "publishConfig": {
+    "registry": "****.com/artifactory/api/npm/npm-virtual"
+  }
+}
