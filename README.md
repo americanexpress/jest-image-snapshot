@@ -1,0 +1,1 @@
+# jest-image-snapshot
