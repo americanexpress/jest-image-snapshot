@@ -44,18 +44,17 @@ Jest matcher that performs image comparisons using [Blink-diff](https://github.c
 
   ### Optional configuration:
 
-  `toMatchImageSnapshot()` takes an optional [blink-diff configuration parameter](http://yahoo.github.io/blink-diff/#object-usage):
+  `toMatchImageSnapshot()` takes an optional options object where you can provide your own [blink-diff configuration parameters](http://yahoo.github.io/blink-diff/#object-usage) and/or a custom snapshot identifier string:
 
   ```javascript
     it('should demonstrate this matcher`s usage with a custom blink-diff config', () => {
       ...
       const blinkDiffConfig = { perceptual: true };
-      expect(image).toMatchImageSnapshot(blinkDiffConfig);
+      expect(image).toMatchImageSnapshot({ customDiffConfig: blinkDiffConfig, customSnapshotIdentifier: 'customSnapshotName' });
     });  
   ```
 
-  A blink-diff custom configuration can be provided so long as the values for `imageAPath`, `imageA`, `imageBPath`, `imageB`, or `imageOutputPath` are not changed as these are used internally.
-
+  Any blink-diff custom configuration can be provided so long as the values for `imageAPath`, `imageA`, `imageBPath`, `imageB`, or `imageOutputPath` are not changed as these are used internally.
 
   ## Contributing
   We welcome Your interest in the American Express Open Source Community on Github.

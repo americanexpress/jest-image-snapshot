@@ -74,6 +74,7 @@ describe('toMatchImageSnapshot', () => {
       currentTestName: 'test1',
       isNot: false,
       snapshotState: {
+        _index: 0,
         _updateSnapshot: 'none',
         updated: undefined,
         added: true,
@@ -86,7 +87,7 @@ describe('toMatchImageSnapshot', () => {
     const matcherAtTest = toMatchImageSnapshot.bind(mockTestContext);
 
     const customDiffConfig = { threshold: 0.3 };
-    matcherAtTest('pretendthisisanimagebuffer', customDiffConfig);
+    matcherAtTest('pretendthisisanimagebuffer', { customDiffConfig });
     const { diffImageToSnapshot } = require('../../src/diff-snapshot');
     expect(diffImageToSnapshot.mock.calls[0][0].customDiffConfig).toBe(customDiffConfig);
   });
@@ -94,9 +95,10 @@ describe('toMatchImageSnapshot', () => {
   it('passes diffImageToSnapshot everything it needs to create a snapshot and compare if needed', () => {
     const mockTestContext = {
       testPath: 'path/to/test.spec.js',
-      currentTestName: 'test1',
+      currentTestName: 'test',
       isNot: false,
       snapshotState: {
+        _index: 0,
         _updateSnapshot: 'none',
         updated: undefined,
         added: true,
@@ -108,11 +110,34 @@ describe('toMatchImageSnapshot', () => {
     const { toMatchImageSnapshot } = require('../../src/index');
     const matcherAtTest = toMatchImageSnapshot.bind(mockTestContext);
 
-    const customDiffConfig = { threshold: 0.3 };
-    matcherAtTest('pretendthisisanimagebuffer', customDiffConfig);
+    matcherAtTest('pretendthisisanimagebuffer');
     const { diffImageToSnapshot } = require('../../src/diff-snapshot');
 
     expect(diffImageToSnapshot.mock.calls[0][0]).toMatchSnapshot();
+  });
+
+  it('passes uses user passed snapshot name if given', () => {
+    const mockTestContext = {
+      testPath: 'path/to/test.spec.js',
+      currentTestName: 'test',
+      isNot: false,
+      snapshotState: {
+        _index: 0,
+        _updateSnapshot: 'none',
+        updated: undefined,
+        added: true,
+      },
+    };
+    const mockDiffResult = { updated: true, code: 7 };
+
+    setupMock(mockDiffResult);
+    const { toMatchImageSnapshot } = require('../../src/index');
+    const matcherAtTest = toMatchImageSnapshot.bind(mockTestContext);
+
+    matcherAtTest('pretendthisisanimagebuffer', { customSnapshotIdentifier: 'custom-name' });
+    const { diffImageToSnapshot } = require('../../src/diff-snapshot');
+
+    expect(diffImageToSnapshot.mock.calls[0][0].snapshotIdentifier).toBe('custom-name');
   });
 
   it('attempts to update snapshots if snapshotState has updateSnapshot flag set', () => {
@@ -121,6 +146,7 @@ describe('toMatchImageSnapshot', () => {
       currentTestName: 'test1',
       isNot: false,
       snapshotState: {
+        _index: 0,
         _updateSnapshot: 'all',
         updated: undefined,
         added: true,
@@ -144,6 +170,7 @@ describe('toMatchImageSnapshot', () => {
       currentTestName: 'test1',
       isNot: false,
       snapshotState: {
+        _index: 0,
         update: false,
         updated: undefined,
         added: true,
@@ -163,6 +190,7 @@ describe('toMatchImageSnapshot', () => {
       currentTestName: 'test1',
       isNot: false,
       snapshotState: {
+        _index: 0,
         update: true,
         updated: undefined,
         added: undefined,
