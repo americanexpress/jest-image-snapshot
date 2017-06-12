@@ -1,3 +1,17 @@
+/*
+ * Copyright (c) 2017 American Express Travel Related Services Company, Inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
+ * in compliance with the License. You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software distributed under the License
+ * is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
+ * or implied. See the License for the specific language governing permissions and limitations under
+ * the License.
+ */
+
 const kebabCase = require('lodash/kebabCase');
 const merge = require('lodash/merge');
 const path = require('path');
@@ -17,7 +31,7 @@ const toMatchImageSnapshot = function toMatchImageSnapshot(received, customDiffC
   const result = diffImageToSnapshot({
     imageData: received,
     snapshotIdentifier,
-    snapshotsDir: `${path.dirname(testPath)}/__image_snapshots__`,
+    snapshotsDir: path.join(path.dirname(testPath), '/__image_snapshots__'),
     updateSnapshot: snapshotState._updateSnapshot === 'all', // eslint-disable-line no-underscore-dangle
     customDiffConfig,
   });
@@ -28,6 +42,7 @@ const toMatchImageSnapshot = function toMatchImageSnapshot(received, customDiffC
     snapshotState = updateSnapshotState(snapshotState, { updated: snapshotState.updated += 1 });
   } else if (result.added) {
     snapshotState = updateSnapshotState(snapshotState, { added: snapshotState.added += 1 });
+    // see https://github.com/yahoo/blink-diff/blob/master/index.js#L251-L285 for result codes
   } else if (result.code === 0 || result.code === 1) {
     pass = false;
   }

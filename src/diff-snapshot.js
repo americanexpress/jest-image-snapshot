@@ -1,6 +1,22 @@
+/*
+ * Copyright (c) 2017 American Express Travel Related Services Company, Inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
+ * in compliance with the License. You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software distributed under the License
+ * is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
+ * or implied. See the License for the specific language governing permissions and limitations under
+ * the License.
+ */
+
 const fs = require('fs');
 const BlinkDiff = require('blink-diff');
 const intersection = require('lodash/intersection');
+const mkdirp = require('mkdirp');
+const path = require('path');
 
 const unsupportedDiffConfigKeys = [
   'imageAPath',
@@ -36,10 +52,10 @@ function diffImageToSnapshot(options) {
   }
 
   let result = {};
-  const baselineSnapshotPath = `${snapshotsDir}/${snapshotIdentifier}-snap.png`;
+  const baselineSnapshotPath = path.join(snapshotsDir, `${snapshotIdentifier}-snap.png`);
   if (fs.existsSync(baselineSnapshotPath) && !updateSnapshot) {
-    const outputDir = `${snapshotsDir}/__diff_output__`;
-    const diffOutputPath = `${outputDir}/${snapshotIdentifier}-diff.png`;
+    const outputDir = path.join(snapshotsDir, '__diff_output__');
+    const diffOutputPath = path.join(outputDir, `${snapshotIdentifier}-diff.png`);
     const defaultBlinkDiffConfig = {
       imageA: imageData,
       imageBPath: baselineSnapshotPath,
@@ -48,7 +64,7 @@ function diffImageToSnapshot(options) {
       imageOutputPath: diffOutputPath,
     };
 
-    if (!fs.existsSync(outputDir)) { fs.mkdirSync(outputDir); }
+    mkdirp.sync(outputDir);
     const diffConfig = Object.assign({}, defaultBlinkDiffConfig, customDiffConfig);
     const diff = new BlinkDiff(diffConfig);
     const unformattedDiffResult = diff.runSync();
@@ -59,11 +75,10 @@ function diffImageToSnapshot(options) {
       { diffOutputPath }
     );
   } else {
-    if (!fs.existsSync(snapshotsDir)) { fs.mkdirSync(snapshotsDir); }
-    fs.writeFileSync(`${snapshotsDir}/${snapshotIdentifier}-snap.png`, imageData);
+    mkdirp.sync(snapshotsDir);
+    fs.writeFileSync(baselineSnapshotPath, imageData);
 
-    // eslint-disable-next-line no-unused-expressions
-    updateSnapshot ? result = { updated: true } : result = { added: true };
+    result = updateSnapshot ? { updated: true } : { added: true };
   }
   return result;
 }

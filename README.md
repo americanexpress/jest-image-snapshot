@@ -1,6 +1,6 @@
 # jest-image-snapshot
 
-This is a Jest matcher that performs image comparisons using [Blink-diff](https://github.com/yahoo/blink-diff) and behaves just like [Jest snapshots](https://facebook.github.io/jest/docs/snapshot-testing.html) do! Very useful for browser visual comparison testing.
+Jest matcher that performs image comparisons using [Blink-diff](https://github.com/yahoo/blink-diff) and behaves just like [Jest snapshots](https://facebook.github.io/jest/docs/snapshot-testing.html) do! Very useful for browser visual comparison testing.
 
 ## Installation:
 1. Install:
@@ -70,8 +70,8 @@ This is a Jest matcher that performs image comparisons using [Blink-diff](https:
 
   ## License
   Any contributions made under this project will be governed by the [Apache License
-  2.0](https://github.com/americanexpress/amex-jest-preset/blob/master/LICENSE.txt).
+  2.0](https://github.com/americanexpress/jest-image-snapshot/blob/master/LICENSE.txt).
 
   ## Code of Conduct
-  This project adheres to the [American Express Community Guidelines](https://github.com/americanexpress/amex-jest-preset/wiki/Code-of-Conduct).
+  This project adheres to the [American Express Community Guidelines](https://github.com/americanexpress/jest-image-snapshot/wiki/Code-of-Conduct).
   By participating, you are expected to honor these guidelines.
