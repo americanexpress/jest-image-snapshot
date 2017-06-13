@@ -27,11 +27,7 @@ const unsupportedDiffConfigKeys = [
 ];
 
 function isDiffConfigValid(customDiffConfig) {
-  let isValid = true;
-  if (intersection(unsupportedDiffConfigKeys, Object.keys(customDiffConfig)).length !== 0) {
-    isValid = false;
-  }
-  return isValid;
+  return intersection(unsupportedDiffConfigKeys, Object.keys(customDiffConfig)).length === 0;
 }
 
 function diffImageToSnapshot(options) {

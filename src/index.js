@@ -22,7 +22,7 @@ function updateSnapshotState(oldSnapshotState, newSnapshotState) {
   return merge({}, oldSnapshotState, newSnapshotState);
 }
 
-const toMatchImageSnapshot = function toMatchImageSnapshot(received, options = { customSnapshotIdentifier: '', customDiffConfig: {} }) {
+function toMatchImageSnapshot(received, { customSnapshotIdentifier = '', customDiffConfig = {} } = {}) {
   const { testPath, currentTestName, isNot } = this;
   let { snapshotState } = this;
   if (isNot) { throw new Error('Jest: `.not` cannot be used with `.toMatchImageSnapshot()`.'); }
@@ -32,14 +32,14 @@ const toMatchImageSnapshot = function toMatchImageSnapshot(received, options = {
   );
 
   // eslint-disable-next-line no-underscore-dangle
-  const snapshotIdentifier = options.customSnapshotIdentifier ? options.customSnapshotIdentifier : kebabCase(`${path.basename(testPath)}-${currentTestName}-${snapshotState._index}`);
+  const snapshotIdentifier = customSnapshotIdentifier || kebabCase(`${path.basename(testPath)}-${currentTestName}-${snapshotState._index}`);
 
   const result = diffImageToSnapshot({
     imageData: received,
     snapshotIdentifier,
-    snapshotsDir: path.join(path.dirname(testPath), '/__image_snapshots__'),
+    snapshotsDir: path.join(path.dirname(testPath), '__image_snapshots__'),
     updateSnapshot: snapshotState._updateSnapshot === 'all', // eslint-disable-line no-underscore-dangle
-    customDiffConfig: options.customDiffConfig,
+    customDiffConfig,
   });
   let pass = true;
   if (result.updated) {
@@ -60,7 +60,7 @@ const toMatchImageSnapshot = function toMatchImageSnapshot(received, options = {
     message,
     pass,
   };
-};
+}
 
 module.exports = {
   toMatchImageSnapshot,
