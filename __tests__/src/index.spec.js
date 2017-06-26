@@ -74,7 +74,7 @@ describe('toMatchImageSnapshot', () => {
       currentTestName: 'test1',
       isNot: false,
       snapshotState: {
-        _index: 0,
+        _counters: new Map(),
         _updateSnapshot: 'none',
         updated: undefined,
         added: true,
@@ -98,7 +98,7 @@ describe('toMatchImageSnapshot', () => {
       currentTestName: 'test',
       isNot: false,
       snapshotState: {
-        _index: 0,
+        _counters: new Map(),
         _updateSnapshot: 'none',
         updated: undefined,
         added: true,
@@ -122,7 +122,7 @@ describe('toMatchImageSnapshot', () => {
       currentTestName: 'test',
       isNot: false,
       snapshotState: {
-        _index: 0,
+        _counters: new Map(),
         _updateSnapshot: 'none',
         updated: undefined,
         added: true,
@@ -146,7 +146,7 @@ describe('toMatchImageSnapshot', () => {
       currentTestName: 'test1',
       isNot: false,
       snapshotState: {
-        _index: 0,
+        _counters: new Map(),
         _updateSnapshot: 'all',
         updated: undefined,
         added: true,
@@ -170,7 +170,7 @@ describe('toMatchImageSnapshot', () => {
       currentTestName: 'test1',
       isNot: false,
       snapshotState: {
-        _index: 0,
+        _counters: new Map(),
         update: false,
         updated: undefined,
         added: true,
@@ -190,7 +190,7 @@ describe('toMatchImageSnapshot', () => {
       currentTestName: 'test1',
       isNot: false,
       snapshotState: {
-        _index: 0,
+        _counters: new Map(),
         update: true,
         updated: undefined,
         added: undefined,

@@ -10,12 +10,12 @@ Object {
 }
 `;
 
-exports[`toMatchImageSnapshot should fail when diff result is unknown 1`] = `
+exports[`toMatchImageSnapshot should fail when diff result is unknown 2`] = `
 "Expected image to match or be a close match to snapshot.
 [1m[31mSee diff for details:[39m[22m [31mpath/to/result.png[39m"
 `;
 
-exports[`toMatchImageSnapshot should fail when snapshot has a difference beyond allowed threshold 1`] = `
+exports[`toMatchImageSnapshot should fail when snapshot has a difference beyond allowed threshold 2`] = `
 "Expected image to match or be a close match to snapshot.
 [1m[31mSee diff for details:[39m[22m [31mpath/to/result.png[39m"
 `;

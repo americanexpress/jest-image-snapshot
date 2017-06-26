@@ -11,7 +11,7 @@
  * or implied. See the License for the specific language governing permissions and limitations under
  * the License.
  */
-
+/* eslint-disable no-underscore-dangle */
 const kebabCase = require('lodash/kebabCase');
 const merge = require('lodash/merge');
 const path = require('path');
@@ -27,18 +27,14 @@ function toMatchImageSnapshot(received, { customSnapshotIdentifier = '', customD
   let { snapshotState } = this;
   if (isNot) { throw new Error('Jest: `.not` cannot be used with `.toMatchImageSnapshot()`.'); }
 
-  updateSnapshotState(
-    snapshotState, { _index: snapshotState._index += 1 } // eslint-disable-line no-underscore-dangle
-  );
-
-  // eslint-disable-next-line no-underscore-dangle
-  const snapshotIdentifier = customSnapshotIdentifier || kebabCase(`${path.basename(testPath)}-${currentTestName}-${snapshotState._index}`);
+  updateSnapshotState(snapshotState, { _counters: snapshotState._counters.set(currentTestName, (snapshotState._counters.get(currentTestName) || 0) + 1) }); // eslint-disable-line max-len
+  const snapshotIdentifier = customSnapshotIdentifier || kebabCase(`${path.basename(testPath)}-${currentTestName}-${snapshotState._counters.get(currentTestName)}`);
 
   const result = diffImageToSnapshot({
     imageData: received,
     snapshotIdentifier,
     snapshotsDir: path.join(path.dirname(testPath), '__image_snapshots__'),
-    updateSnapshot: snapshotState._updateSnapshot === 'all', // eslint-disable-line no-underscore-dangle
+    updateSnapshot: snapshotState._updateSnapshot === 'all',
     customDiffConfig,
   });
   let pass = true;
