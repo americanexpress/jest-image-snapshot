@@ -65,7 +65,7 @@ Jest matcher that performs image comparisons using [Blink-diff](https://github.c
   right, title, and interest, if any, in and to Your Contributions. Please [fill
   out the Agreement](http://goo.gl/forms/mIHWH1Dcuy).
 
-  Please open pull requests against `develop` branch and see `CONTRIBUTING.md` for commit formatting details.
+  Please feel free to open pull requests and see `CONTRIBUTING.md` for commit formatting details.
 
   ## License
   Any contributions made under this project will be governed by the [Apache License
