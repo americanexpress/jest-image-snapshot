@@ -18,12 +18,19 @@ const path = require('path');
 const chalk = require('chalk');
 const { diffImageToSnapshot } = require('./diff-snapshot');
 
+// see https://github.com/yahoo/blink-diff/blob/master/index.js#L251-L285 for result codes
+const BLINK_RESULTCODE_IDENTICAL = 5;
+const BLINK_RESULTCODE_SIMILAR = 7;
+const BLINK_RESULTCODE_UNKNOWN = 0;
+const BLINK_RESULTCODE_DIFFERENT = 1;
+
 function updateSnapshotState(oldSnapshotState, newSnapshotState) {
   return merge({}, oldSnapshotState, newSnapshotState);
 }
 
 function toMatchImageSnapshot(received, { customSnapshotIdentifier = '', customDiffConfig = {} } = {}) {
   const { testPath, currentTestName, isNot } = this;
+  // SnapshotState structure can be found here: https://github.com/facebook/jest/blob/master/packages/jest-snapshot/src/State.js
   let { snapshotState } = this;
   if (isNot) { throw new Error('Jest: `.not` cannot be used with `.toMatchImageSnapshot()`.'); }
 
@@ -34,7 +41,7 @@ function toMatchImageSnapshot(received, { customSnapshotIdentifier = '', customD
     imageData: received,
     snapshotIdentifier,
     snapshotsDir: path.join(path.dirname(testPath), '__image_snapshots__'),
-    updateSnapshot: snapshotState._updateSnapshot === 'all',
+    updateSnapshot: snapshotState.update,
     customDiffConfig,
   });
   let pass = true;
@@ -44,8 +51,14 @@ function toMatchImageSnapshot(received, { customSnapshotIdentifier = '', customD
     snapshotState = updateSnapshotState(snapshotState, { updated: snapshotState.updated += 1 });
   } else if (result.added) {
     snapshotState = updateSnapshotState(snapshotState, { added: snapshotState.added += 1 });
-    // see https://github.com/yahoo/blink-diff/blob/master/index.js#L251-L285 for result codes
-  } else if (result.code === 0 || result.code === 1) {
+  } else if (
+    result.code === BLINK_RESULTCODE_IDENTICAL || result.code === BLINK_RESULTCODE_SIMILAR
+  ) {
+    snapshotState = updateSnapshotState(snapshotState, { matched: snapshotState.matched += 1 });
+  } else if (
+    result.code === BLINK_RESULTCODE_UNKNOWN || result.code === BLINK_RESULTCODE_DIFFERENT
+  ) {
+    snapshotState = updateSnapshotState(snapshotState, { unmatched: snapshotState.unmatched += 1 });
     pass = false;
   }
 

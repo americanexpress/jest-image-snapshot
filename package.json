@@ -24,6 +24,12 @@
     "url": "https://github.com/americanexpress/jest-image-snapshot.git"
   },
   "author": "Andres Escobar <andres.escobar@aexp.com> (https://github.com/anescobar1991)",
+  "contributors": [
+    { "name" : "Andreas Wolf"
+    , "email" : "andreas.wolf@diva-e.com"
+    , "url" : "https://github.com/NeroCor"
+    }
+  ],
   "license": "Apache-2.0",
   "devDependencies": {
     "amex-jest-preset": "^3.1.0",

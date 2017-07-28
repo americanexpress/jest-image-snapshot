@@ -1,3 +1,5 @@
+/* eslint global-require: 0 */  // --> OFF
+
 /*
  * Copyright (c) 2017 American Express Travel Related Services Company, Inc.
  *
