@@ -18,6 +18,10 @@ const intersection = require('lodash/intersection');
 const mkdirp = require('mkdirp');
 const path = require('path');
 
+// see https://github.com/yahoo/blink-diff/blob/master/index.js#L251-L285 for result codes
+const BLINK_RESULTCODE_UNKNOWN = 0;
+const BLINK_RESULTCODE_DIFFERENT = 1;
+
 const unsupportedDiffConfigKeys = [
   'imageAPath',
   'imageA',
@@ -35,7 +39,7 @@ function diffImageToSnapshot(options) {
     imageData,
     snapshotIdentifier,
     snapshotsDir,
-    updateSnapshot = false,
+    updateSnapshot,
     customDiffConfig = {},
    } = options;
 
@@ -49,7 +53,7 @@ function diffImageToSnapshot(options) {
 
   let result = {};
   const baselineSnapshotPath = path.join(snapshotsDir, `${snapshotIdentifier}-snap.png`);
-  if (fs.existsSync(baselineSnapshotPath) && !updateSnapshot) {
+  if (fs.existsSync(baselineSnapshotPath)) {
     const outputDir = path.join(snapshotsDir, '__diff_output__');
     const diffOutputPath = path.join(outputDir, `${snapshotIdentifier}-diff.png`);
     const defaultBlinkDiffConfig = {
@@ -65,11 +69,22 @@ function diffImageToSnapshot(options) {
     const diff = new BlinkDiff(diffConfig);
     const unformattedDiffResult = diff.runSync();
 
-    result = Object.assign(
-      {},
-      unformattedDiffResult,
-      { diffOutputPath }
-    );
+    if (
+      updateSnapshot
+      && (unformattedDiffResult.code === BLINK_RESULTCODE_UNKNOWN
+        || unformattedDiffResult.code === BLINK_RESULTCODE_DIFFERENT
+      )
+    ) {
+      mkdirp.sync(snapshotsDir);
+      fs.writeFileSync(baselineSnapshotPath, imageData);
+      result = { updated: true };
+    } else {
+      result = Object.assign(
+        {},
+        unformattedDiffResult,
+        { diffOutputPath }
+      );
+    }
   } else {
     mkdirp.sync(snapshotsDir);
     fs.writeFileSync(baselineSnapshotPath, imageData);
