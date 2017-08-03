@@ -68,6 +68,18 @@ describe('toMatchImageSnapshot', () => {
       .toThrowErrorMatchingSnapshot();
   });
 
+  it('should use noColors options if passed as true and not style error message', () => {
+    // code 1 is result too different: https://github.com/yahoo/blink-diff/blob/master/index.js#L267
+    const mockDiffResult = { updated: false, code: 1, diffOutputPath: 'path/to/result.png' };
+    setupMock(mockDiffResult);
+    const { toMatchImageSnapshot } = require('../../src/index');
+    expect.extend({ toMatchImageSnapshot });
+
+
+    expect(() => expect('pretendthisisanimagebuffer').toMatchImageSnapshot({ noColors: true }))
+      .toThrowErrorMatchingSnapshot();
+  });
+
   it('should use custom blink-diff configuration if passed in', () => {
     const mockTestContext = {
       testPath: 'path/to/test.spec.js',
