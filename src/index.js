@@ -22,7 +22,7 @@ function updateSnapshotState(oldSnapshotState, newSnapshotState) {
   return merge({}, oldSnapshotState, newSnapshotState);
 }
 
-function toMatchImageSnapshot(received, { customSnapshotIdentifier = '', customDiffConfig = {} } = {}) {
+function toMatchImageSnapshot(received, { customSnapshotIdentifier = '', customDiffConfig = {}, noColors = false } = {}) {
   const { testPath, currentTestName, isNot } = this;
   let { snapshotState } = this;
   if (isNot) { throw new Error('Jest: `.not` cannot be used with `.toMatchImageSnapshot()`.'); }
@@ -49,8 +49,11 @@ function toMatchImageSnapshot(received, { customSnapshotIdentifier = '', customD
     pass = false;
   }
 
-  const message = 'Expected image to match or be a close match to snapshot.\n'
-                  + `${chalk.bold.red('See diff for details:')} ${chalk.red(result.diffOutputPath)}`;
+  const message = noColors
+    ? 'Expected image to match or be a close match to snapshot.\n'
+      + `See diff for details: ${result.diffOutputPath}`
+    : 'Expected image to match or be a close match to snapshot.\n'
+      + `${chalk.bold.red('See diff for details:')} ${chalk.red(result.diffOutputPath)}`;
 
   return {
     message,
