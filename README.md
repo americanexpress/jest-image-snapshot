@@ -81,7 +81,7 @@ Any blink-diff custom configuration can be provided so long as the values for `i
   terms below. Except for the rights granted in this Agreement to American Express
   and to recipients of software distributed by American Express, You reserve all
   right, title, and interest, if any, in and to Your Contributions. Please [fill
-  out the Agreement](http://goo.gl/forms/mIHWH1Dcuy).
+  out the Agreement](https://cla-assistant.io/americanexpress/).
 
   Please feel free to open pull requests and see `CONTRIBUTING.md` for commit formatting details.
 
