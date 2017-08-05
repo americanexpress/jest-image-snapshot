@@ -15,7 +15,7 @@
 const kebabCase = require('lodash/kebabCase');
 const merge = require('lodash/merge');
 const path = require('path');
-const chalk = require('chalk');
+const Chalk = require('chalk').constructor;
 const { diffImageToSnapshot } = require('./diff-snapshot');
 
 function updateSnapshotState(oldSnapshotState, newSnapshotState) {
@@ -24,6 +24,8 @@ function updateSnapshotState(oldSnapshotState, newSnapshotState) {
 
 function toMatchImageSnapshot(received, { customSnapshotIdentifier = '', customDiffConfig = {}, noColors = false } = {}) {
   const { testPath, currentTestName, isNot } = this;
+  const chalk = new Chalk({ enabled: !noColors });
+
   let { snapshotState } = this;
   if (isNot) { throw new Error('Jest: `.not` cannot be used with `.toMatchImageSnapshot()`.'); }
 
@@ -49,11 +51,8 @@ function toMatchImageSnapshot(received, { customSnapshotIdentifier = '', customD
     pass = false;
   }
 
-  const message = noColors
-    ? 'Expected image to match or be a close match to snapshot.\n'
-      + `See diff for details: ${result.diffOutputPath}`
-    : 'Expected image to match or be a close match to snapshot.\n'
-      + `${chalk.bold.red('See diff for details:')} ${chalk.red(result.diffOutputPath)}`;
+  const message = 'Expected image to match or be a close match to snapshot.\n'
+                  + `${chalk.bold.red('See diff for details:')} ${chalk.red(result.diffOutputPath)}`;
 
   return {
     message,
