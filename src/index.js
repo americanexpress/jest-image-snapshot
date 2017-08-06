@@ -15,15 +15,17 @@
 const kebabCase = require('lodash/kebabCase');
 const merge = require('lodash/merge');
 const path = require('path');
-const chalk = require('chalk');
+const Chalk = require('chalk').constructor;
 const { diffImageToSnapshot } = require('./diff-snapshot');
 
 function updateSnapshotState(oldSnapshotState, newSnapshotState) {
   return merge({}, oldSnapshotState, newSnapshotState);
 }
 
-function toMatchImageSnapshot(received, { customSnapshotIdentifier = '', customDiffConfig = {} } = {}) {
+function toMatchImageSnapshot(received, { customSnapshotIdentifier = '', customDiffConfig = {}, noColors = false } = {}) {
   const { testPath, currentTestName, isNot } = this;
+  const chalk = new Chalk({ enabled: !noColors });
+
   let { snapshotState } = this;
   if (isNot) { throw new Error('Jest: `.not` cannot be used with `.toMatchImageSnapshot()`.'); }
 

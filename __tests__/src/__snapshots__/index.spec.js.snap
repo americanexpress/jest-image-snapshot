@@ -21,3 +21,8 @@ exports[`toMatchImageSnapshot should fail when snapshot has a difference beyond 
 `;
 
 exports[`toMatchImageSnapshot should throw an error if used with .not matcher 1`] = `"Jest: \`.not\` cannot be used with \`.toMatchImageSnapshot()\`."`;
+
+exports[`toMatchImageSnapshot should use noColors options if passed as true and not style error message 2`] = `
+"Expected image to match or be a close match to snapshot.
+See diff for details: path/to/result.png"
+`;
