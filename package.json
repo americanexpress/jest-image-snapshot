@@ -26,7 +26,7 @@
   "author": "Andres Escobar <andres.escobar@aexp.com> (https://github.com/anescobar1991)",
   "license": "Apache-2.0",
   "devDependencies": {
-    "amex-jest-preset": "^3.1.0",
+    "amex-jest-preset": "^4.0.2",
     "eslint": "^3.19.0",
     "eslint-config-amex": "^6.0.0",
     "jest": "^20.0.0"
