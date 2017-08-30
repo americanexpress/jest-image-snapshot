@@ -51,7 +51,7 @@ function toMatchImageSnapshot(received, { customSnapshotIdentifier = '', customD
     pass = false;
   }
 
-  const message = 'Expected image to match or be a close match to snapshot.\n'
+  const message = () => 'Expected image to match or be a close match to snapshot.\n'
                   + `${chalk.bold.red('See diff for details:')} ${chalk.red(result.diffOutputPath)}`;
 
   return {
