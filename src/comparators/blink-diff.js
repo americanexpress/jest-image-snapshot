@@ -82,5 +82,7 @@ function diffImageToSnapshot(options) {
 }
 
 module.exports = {
-  diffImageToSnapshot
+  unsupportedDiffConfigKeys,
+  diffImageToSnapshot,
+  isDiffConfigValid,
 };

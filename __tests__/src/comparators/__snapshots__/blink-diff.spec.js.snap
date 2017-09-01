@@ -1,0 +1,13 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`blink-diff diffImageToSnapshot should throw if an unsupported configuration is passed 1`] = `"Passing in options: imageAPath,imageA,imageBPath,imageB,imageOutputPath via Blink-Diff configuration is not supported as those option are internally used. Instead pass your image data as first argument to this function!"`;
+
+exports[`blink-diff should have a list of unsupported blink diff custom configurations 1`] = `
+Array [
+  "imageAPath",
+  "imageA",
+  "imageBPath",
+  "imageB",
+  "imageOutputPath",
+]
+`;

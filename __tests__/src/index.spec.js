@@ -125,7 +125,11 @@ describe('toMatchImageSnapshot', () => {
     matcherAtTest('pretendthisisanimagebuffer');
     const { diffImageToSnapshot } = require('../../src/diff-snapshot');
 
-    expect(diffImageToSnapshot.mock.calls[0][0]).toMatchSnapshot();
+    const dataArg = diffImageToSnapshot.mock.calls[0][0];
+    // This is to make the test work on windows
+    dataArg.snapshotsDir = dataArg.snapshotsDir.replace(/\\/g, "/");
+
+    expect(dataArg).toMatchSnapshot();
   });
 
   it('passes uses user passed snapshot name if given', () => {

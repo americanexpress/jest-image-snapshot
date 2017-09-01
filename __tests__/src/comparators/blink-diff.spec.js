@@ -13,6 +13,7 @@
  */
 
 const fs = require('fs');
+const path = require('path');
 
 const mockRunSync = jest.fn(() => {});
 
@@ -20,20 +21,20 @@ jest.mock('blink-diff', () => jest.fn(() => ({
   runSync: mockRunSync,
 })));
 
-describe('diff-snapshot', () => {
+describe('blink-diff', () => {
   beforeEach(() => {
     jest.resetModules();
     jest.resetAllMocks();
   });
 
   it('should have a list of unsupported blink diff custom configurations', () => {
-    const { unsupportedDiffConfigKeys } = require('../../src/diff-snapshot');
+    const { unsupportedDiffConfigKeys } = require('../../../src/comparators/blink-diff');
 
     expect(unsupportedDiffConfigKeys).toMatchSnapshot();
   });
 
   describe('isDiffConfigValid', () => {
-    const { isDiffConfigValid } = require('../../src/diff-snapshot');
+    const { isDiffConfigValid } = require('../../../src/comparators/blink-diff');
 
     it('returns false if any configuration passed is included in the list of unsupported configurations', () => {
       expect(isDiffConfigValid({ imageOutputPath: 'path/to/output.png' })).toBe(false);
@@ -45,7 +46,7 @@ describe('diff-snapshot', () => {
   });
 
   describe('diffImageToSnapshot', () => {
-    const mockSnapshotsDir = '/path/to/snapshots';
+    const mockSnapshotsDir = path.normalize('/path/to/snapshots');
     const mockSnapshotIdentifier = 'id1';
     const mockImageBuffer = 'pretendthisisimagebufferandnotjustastring';
     const mockMkdirSync = jest.fn();
@@ -65,13 +66,13 @@ describe('diff-snapshot', () => {
       });
       jest.mock('fs', () => mockFs);
       jest.mock('mkdirp', () => ({ sync: mockMkdirpSync }));
-      const { diffImageToSnapshot } = require('../../src/diff-snapshot');
+      const { diffImageToSnapshot } = require('../../../src/comparators/blink-diff');
 
-      mockFs.existsSync.mockImplementation((path) => {
-        switch (path) {
-          case `${mockSnapshotsDir}/${mockSnapshotIdentifier}-snap.png`:
+      mockFs.existsSync.mockImplementation((p) => {
+        switch (p) {
+          case path.join(mockSnapshotsDir, '${mockSnapshotIdentifier}-snap.png'):
             return snapshotExists;
-          case `${mockSnapshotsDir}/__diff_output__`:
+          case path.join(mockSnapshotsDir, '__diff_output__'):
             return !!outputDirExists;
           case mockSnapshotsDir:
             return !!snapshotDirExists;
@@ -91,7 +92,7 @@ describe('diff-snapshot', () => {
           snapshotIdentifier: mockSnapshotIdentifier,
           snapshotsDir: mockSnapshotsDir,
           customDiffConfig: {
-            imageOutputPath: 'path/to/output/dir',
+            imageOutputPath: path.normalize('path/to/output/dir')
           },
         })
       ).toThrowErrorMatchingSnapshot();
@@ -121,9 +122,9 @@ describe('diff-snapshot', () => {
 
       expect(mockBlinkDiff).toHaveBeenCalledWith({
         imageA: mockImageBuffer,
-        imageBPath: `${mockSnapshotsDir}/${mockSnapshotIdentifier}-snap.png`,
+        imageBPath: path.join(mockSnapshotsDir, `${mockSnapshotIdentifier}-snap.png`),
         threshold: 0.01,
-        imageOutputPath: `${mockSnapshotsDir}/__diff_output__/${mockSnapshotIdentifier}-diff.png`,
+        imageOutputPath: path.join(mockSnapshotsDir, '__diff_output__', `${mockSnapshotIdentifier}-diff.png`),
         thresholdType: 'percent',
       });
     });
@@ -137,7 +138,7 @@ describe('diff-snapshot', () => {
         updateSnapshot: false,
       });
 
-      expect(mockMkdirpSync).toHaveBeenCalledWith(`${mockSnapshotsDir}/__diff_output__`);
+      expect(mockMkdirpSync).toHaveBeenCalledWith(path.join(mockSnapshotsDir, '__diff_output__'));
     });
 
     it('should not create diff output directory if there is one there already', () => {
@@ -149,7 +150,7 @@ describe('diff-snapshot', () => {
         updateSnapshot: false,
       });
 
-      expect(mockMkdirSync).not.toHaveBeenCalledWith(`${mockSnapshotsDir}/__diff_output__`);
+      expect(mockMkdirSync).not.toHaveBeenCalledWith(path.join(mockSnapshotsDir, '__diff_output__'));
     });
 
     it('should create snapshots directory is there is not one already', () => {
@@ -185,7 +186,7 @@ describe('diff-snapshot', () => {
         updateSnapshot: false,
       });
 
-      expect(mockWriteFileSync).toHaveBeenCalledWith(`${mockSnapshotsDir}/${mockSnapshotIdentifier}-snap.png`, mockImageBuffer);
+      expect(mockWriteFileSync).toHaveBeenCalledWith(path.join(mockSnapshotsDir, `${mockSnapshotIdentifier}-snap.png`), mockImageBuffer);
     });
 
     it('should return updated flag is snapshot was updated', () => {
@@ -221,7 +222,7 @@ describe('diff-snapshot', () => {
         updateSnapshot: false,
       });
 
-      expect(diffResult).toHaveProperty('diffOutputPath', `${mockSnapshotsDir}/__diff_output__/${mockSnapshotIdentifier}-diff.png`);
+      expect(diffResult).toHaveProperty('diffOutputPath', path.join(mockSnapshotsDir, '__diff_output__', `${mockSnapshotIdentifier}-diff.png`));
     });
   });
 });
