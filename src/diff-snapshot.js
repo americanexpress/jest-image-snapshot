@@ -12,71 +12,33 @@
  * the License.
  */
 
+const optional = require("optional");
 const fs = require('fs');
-const BlinkDiff = require('blink-diff');
-const intersection = require('lodash/intersection');
-const mkdirp = require('mkdirp');
 const path = require('path');
 
-const unsupportedDiffConfigKeys = [
-  'imageAPath',
-  'imageA',
-  'imageBPath',
-  'imageB',
-  'imageOutputPath',
-];
-
-function isDiffConfigValid(customDiffConfig) {
-  return intersection(unsupportedDiffConfigKeys, Object.keys(customDiffConfig)).length === 0;
-}
-
 function diffImageToSnapshot(options) {
-  const {
-    imageData,
-    snapshotIdentifier,
-    snapshotsDir,
-    updateSnapshot = false,
-    customDiffConfig = {},
-   } = options;
+  const comparator = options["comparator"] || "blink-diff";
 
-  if (!isDiffConfigValid(customDiffConfig)) {
-    throw new Error(
-      `Passing in options: ${unsupportedDiffConfigKeys} via Blink-Diff configuration `
-      + 'is not supported as those option are internally used. '
-      + 'Instead pass your image data as first argument to this function!'
-    );
+  var comparatorModule = null;
+
+  switch(comparator) {
+    case "pixelmatch":
+      comparatorModule = optional("./comparators/pixelmatch");    
+    break;
+    case "blink-diff":
+      comparatorModule = optional("./comparators/blink-diff");    
+    break;
+    default:
+      throw Error("Unknown comparator: " + comparator);
+    break;
   }
 
-  let result = {};
-  const baselineSnapshotPath = path.join(snapshotsDir, `${snapshotIdentifier}-snap.png`);
-  if (fs.existsSync(baselineSnapshotPath) && !updateSnapshot) {
-    const outputDir = path.join(snapshotsDir, '__diff_output__');
-    const diffOutputPath = path.join(outputDir, `${snapshotIdentifier}-diff.png`);
-    const defaultBlinkDiffConfig = {
-      imageA: imageData,
-      imageBPath: baselineSnapshotPath,
-      thresholdType: 'percent',
-      threshold: 0.01,
-      imageOutputPath: diffOutputPath,
-    };
-
-    mkdirp.sync(outputDir);
-    const diffConfig = Object.assign({}, defaultBlinkDiffConfig, customDiffConfig);
-    const diff = new BlinkDiff(diffConfig);
-    const unformattedDiffResult = diff.runSync();
-
-    result = Object.assign(
-      {},
-      unformattedDiffResult,
-      { diffOutputPath }
-    );
-  } else {
-    mkdirp.sync(snapshotsDir);
-    fs.writeFileSync(baselineSnapshotPath, imageData);
-
-    result = updateSnapshot ? { updated: true } : { added: true };
+  if (comparatorModule) {
+    return comparatorModule.diffImageToSnapshot(options);
+  } 
+  else {
+    throw Error("Unable to load comparator: " + comparator);
   }
-  return result;
 }
 
 module.exports = {
