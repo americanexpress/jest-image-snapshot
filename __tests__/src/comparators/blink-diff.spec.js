@@ -27,7 +27,7 @@ describe('blink-diff', () => {
     jest.resetAllMocks();
   });
 
-  it('should have a list of unsupported blink diff custom configurations', () => {
+  test('should have a list of unsupported blink diff custom configurations', () => {
     const { unsupportedDiffConfigKeys } = require('../../../src/comparators/blink-diff');
 
     expect(unsupportedDiffConfigKeys).toMatchSnapshot();
@@ -36,11 +36,11 @@ describe('blink-diff', () => {
   describe('isDiffConfigValid', () => {
     const { isDiffConfigValid } = require('../../../src/comparators/blink-diff');
 
-    it('returns false if any configuration passed is included in the list of unsupported configurations', () => {
+    test('returns false if any configuration passed is included in the list of unsupported configurations', () => {
       expect(isDiffConfigValid({ imageOutputPath: 'path/to/output.png' })).toBe(false);
     });
 
-    it('returns true if no configuration passed is included in the list of unsupported configurations', () => {
+    test('returns true if no configuration passed is included in the list of unsupported configurations', () => {
       expect(isDiffConfigValid({ supportedConfiguration: true })).toBe(true);
     });
   });
@@ -70,7 +70,7 @@ describe('blink-diff', () => {
 
       mockFs.existsSync.mockImplementation((p) => {
         switch (p) {
-          case path.join(mockSnapshotsDir, '${mockSnapshotIdentifier}-snap.png'):
+          case path.join(mockSnapshotsDir, `${mockSnapshotIdentifier}-snap.png`):
             return snapshotExists;
           case path.join(mockSnapshotsDir, '__diff_output__'):
             return !!outputDirExists;
@@ -84,7 +84,7 @@ describe('blink-diff', () => {
       return diffImageToSnapshot;
     }
 
-    it('should throw if an unsupported configuration is passed', () => {
+    test('should throw if an unsupported configuration is passed', () => {
       const diffImageToSnapshot = setupTest({});
       expect(() =>
         diffImageToSnapshot({
@@ -98,7 +98,7 @@ describe('blink-diff', () => {
       ).toThrowErrorMatchingSnapshot();
     });
 
-    it('should run comparison if there is already a snapshot stored and updateSnapshot flag is not set', () => {
+    test('should run comparison if there is already a snapshot stored and updateSnapshot flag is not set', () => {
       const diffImageToSnapshot = setupTest({ snapshotExists: true });
       diffImageToSnapshot({
         imageData: mockImageBuffer,
@@ -110,7 +110,7 @@ describe('blink-diff', () => {
       expect(mockRunSync).toHaveBeenCalled();
     });
 
-    it('should merge custom configuration with default configuration if custom config is passed', () => {
+    test('should merge custom configuration with default configuration if custom config is passed', () => {
       const mockBlinkDiff = require('blink-diff');
       const diffImageToSnapshot = setupTest({ snapshotExists: true });
       diffImageToSnapshot({
@@ -129,7 +129,7 @@ describe('blink-diff', () => {
       });
     });
 
-    it('should create diff output directory if there is not one already', () => {
+    test('should create diff output directory if there is not one already', () => {
       const diffImageToSnapshot = setupTest({ snapshotExists: true, outputDirExists: false });
       diffImageToSnapshot({
         imageData: mockImageBuffer,
@@ -141,7 +141,7 @@ describe('blink-diff', () => {
       expect(mockMkdirpSync).toHaveBeenCalledWith(path.join(mockSnapshotsDir, '__diff_output__'));
     });
 
-    it('should not create diff output directory if there is one there already', () => {
+    test('should not create diff output directory if there is one there already', () => {
       const diffImageToSnapshot = setupTest({ snapshotExists: true, outputDirExists: true });
       diffImageToSnapshot({
         imageData: mockImageBuffer,
@@ -153,7 +153,7 @@ describe('blink-diff', () => {
       expect(mockMkdirSync).not.toHaveBeenCalledWith(path.join(mockSnapshotsDir, '__diff_output__'));
     });
 
-    it('should create snapshots directory is there is not one already', () => {
+    test('should create snapshots directory is there is not one already', () => {
       const diffImageToSnapshot = setupTest({ snapshotExists: true, snapshotDirExists: false });
       diffImageToSnapshot({
         imageData: mockImageBuffer,
@@ -165,7 +165,7 @@ describe('blink-diff', () => {
       expect(mockMkdirpSync).toHaveBeenCalledWith(mockSnapshotsDir);
     });
 
-    it('should not create snapshots directory if there already is one', () => {
+    test('should not create snapshots directory if there already is one', () => {
       const diffImageToSnapshot = setupTest({ snapshotExists: true, snapshotDirExists: true });
       diffImageToSnapshot({
         imageData: mockImageBuffer,
@@ -177,7 +177,7 @@ describe('blink-diff', () => {
       expect(mockMkdirSync).not.toHaveBeenCalledWith(mockSnapshotsDir);
     });
 
-    it('should create snapshot in __image_snapshots__ directory if there is not a snapshot created yet', () => {
+    test('should create snapshot in __image_snapshots__ directory if there is not a snapshot created yet', () => {
       const diffImageToSnapshot = setupTest({ snapshotExists: false, snapshotDirExists: false });
       diffImageToSnapshot({
         imageData: mockImageBuffer,
@@ -189,7 +189,7 @@ describe('blink-diff', () => {
       expect(mockWriteFileSync).toHaveBeenCalledWith(path.join(mockSnapshotsDir, `${mockSnapshotIdentifier}-snap.png`), mockImageBuffer);
     });
 
-    it('should return updated flag is snapshot was updated', () => {
+    test('should return updated flag is snapshot was updated', () => {
       const diffImageToSnapshot = setupTest({ snapshotExists: true });
       const diffResult = diffImageToSnapshot({
         imageData: mockImageBuffer,
@@ -201,7 +201,7 @@ describe('blink-diff', () => {
       expect(diffResult).toHaveProperty('updated', true);
     });
 
-    it('should return added flag is snapshot was added', () => {
+    test('should return added flag is snapshot was added', () => {
       const diffImageToSnapshot = setupTest({ snapshotExists: false });
       const diffResult = diffImageToSnapshot({
         imageData: mockImageBuffer,
@@ -213,7 +213,7 @@ describe('blink-diff', () => {
       expect(diffResult).toHaveProperty('added', true);
     });
 
-    it('should return path to comparison output image if a comparison was performed', () => {
+    test('should return path to comparison output image if a comparison was performed', () => {
       const diffImageToSnapshot = setupTest({ snapshotExists: true });
       const diffResult = diffImageToSnapshot({
         imageData: mockImageBuffer,
