@@ -12,7 +12,6 @@
  * the License.
  */
 
-const BlinkDiff = require('blink-diff');
 const fs = require('fs');
 const intersection = require('lodash/intersection');
 const mkdirp = require('mkdirp');
@@ -31,6 +30,8 @@ function isDiffConfigValid(customDiffConfig) {
 }
 
 function diffImageToSnapshot(options) {
+  const BlinkDiff = require('blink-diff');
+
   const {
     imageData,
     snapshotIdentifier,

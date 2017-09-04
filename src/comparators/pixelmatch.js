@@ -12,59 +12,60 @@
  * the License.
  */
 
-const optional = require("optional");
-const pixelmatch = optional('pixelmatch');
+// const optional = require("optional");
 const fs = require('fs');
-const intersection = require('lodash/intersection');
-const mkdirp = require('mkdirp');
-const path = require('path');
-const PNG = require('pngjs').PNG;
+// const intersection = require('lodash/intersection');
+// const mkdirp = require('mkdirp');
+// const path = require('path');
+// const PNG = require('pngjs').PNG;
+// const pixelmatch = optional('pixelmatch');
 
 function diffImageToSnapshot(options) {
-  const {
-    imageData,
-    snapshotIdentifier,
-    snapshotsDir,
-    updateSnapshot = false,
-    customDiffConfig = {},
-   } = options;
 
-  let result = {};
-  const baselineSnapshotPath = path.join(snapshotsDir, `${snapshotIdentifier}-snap.png`);
-  if (fs.existsSync(baselineSnapshotPath) && !updateSnapshot) {
-    const outputDir = path.join(snapshotsDir, '__diff_output__');
-    const diffOutputPath = path.join(outputDir, `${snapshotIdentifier}-diff.png`);
+  // const {
+  //   imageData,
+  //   snapshotIdentifier,
+  //   snapshotsDir,
+  //   updateSnapshot = false,
+  //   customDiffConfig = {},
+  //  } = options;
 
-    const defaultDiffConfig = {
-      threshold: 0.01,
-    };
+  // let result = {};
+  // const baselineSnapshotPath = path.join(snapshotsDir, `${snapshotIdentifier}-snap.png`);
+  // if (fs.existsSync(baselineSnapshotPath) && !updateSnapshot) {
+  //   const outputDir = path.join(snapshotsDir, '__diff_output__');
+  //   const diffOutputPath = path.join(outputDir, `${snapshotIdentifier}-diff.png`);
 
-    var img1 = PNG.sync.read(imageData);
-    var img2 = PNG.sync.read(fs.readFileSync('img2.png'));
+  //   const defaultDiffConfig = {
+  //     threshold: 0.01,
+  //   };
 
-    mkdirp.sync(outputDir);
-    const diffConfig = Object.assign({}, defaultDiffConfig, customDiffConfig);
+  //   var img1 = PNG.sync.read(imageData);
+  //   var img2 = PNG.sync.read(fs.readFileSync('img2.png'));
 
-    var diffImg = new PNG({width: img1.width, height: img1.height});    
-    pixelmatch(img1.data, img2.data, diffImg.data, img1.width, img1.height, diffConfig);
+  //   mkdirp.sync(outputDir);
+  //   const diffConfig = Object.assign({}, defaultDiffConfig, customDiffConfig);
 
-    const unformattedDiffResult = diff.runSync();
+  //   var diffImg = new PNG({width: img1.width, height: img1.height});    
+  //   pixelmatch(img1.data, img2.data, diffImg.data, img1.width, img1.height, diffConfig);
 
-    diffImg.pack().pipe(fs.createWriteStream(diffOutputPath));
+  //   const unformattedDiffResult = diff.runSync();
+
+  //   diffImg.pack().pipe(fs.createWriteStream(diffOutputPath));
     
 
-    result = Object.assign(
-      {},
-      unformattedDiffResult,
-      { diffOutputPath }
-    );
-  } else {
-    mkdirp.sync(snapshotsDir);
-    fs.writeFileSync(baselineSnapshotPath, imageData);
+  //   result = Object.assign(
+  //     {},
+  //     unformattedDiffResult,
+  //     { diffOutputPath }
+  //   );
+  // } else {
+  //   mkdirp.sync(snapshotsDir);
+  //   fs.writeFileSync(baselineSnapshotPath, imageData);
 
-    result = updateSnapshot ? { updated: true } : { added: true };
-  }
-  return result;
+  //   result = updateSnapshot ? { updated: true } : { added: true };
+  // }
+  // return result;
 }
 
 module.exports = {

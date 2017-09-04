@@ -13,6 +13,8 @@
  */
 
 const optional = require("optional");
+const blinkDiffComparator = require("./comparators/blink-diff");
+const pixelmatchComparator = require("./comparators/pixelmatch");
 
 function diffImageToSnapshot(options) {
   const comparator = options["comparator"] || "blink-diff";
@@ -21,10 +23,10 @@ function diffImageToSnapshot(options) {
 
   switch(comparator) {
     case "pixelmatch":
-      comparatorModule = require("./comparators/pixelmatch");    
+      comparatorModule = pixelmatchComparator;
     break;
     case "blink-diff":
-      comparatorModule = require("./comparators/blink-diff");   
+      comparatorModule = blinkDiffComparator
     break;
     default:
       throw Error("Unknown comparator: " + comparator);
