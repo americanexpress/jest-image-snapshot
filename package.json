@@ -1,6 +1,6 @@
 {
   "name": "jest-image-snapshot",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Jest matcher for screenshot comparisons. Most commonly used for browser visual testing.",
   "main": "src/index.js",
   "engines": { "node": ">=6.0.0" },
