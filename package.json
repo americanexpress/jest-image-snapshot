@@ -3,7 +3,9 @@
   "version": "1.0.1",
   "description": "Jest matcher for screenshot comparisons. Most commonly used for browser visual testing.",
   "main": "src/index.js",
-  "engines": { "node": ">=6.0.0" },
+  "engines": {
+    "node": ">=6.0.0"
+  },
   "scripts": {
     "lint": "eslint ./ --ignore-path .gitignore --ext .js",
     "test": "jest",
