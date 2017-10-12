@@ -19,7 +19,7 @@ const toMatchImageSnapshot = require('../../src').toMatchImageSnapshot;
 expect.extend({ toMatchImageSnapshot });
 
 describe('integration tests', () => {
-  const imagePath = path.resolve(__dirname, 'TestImage.png');
+  const imagePath = path.resolve(__dirname, '../stubs', 'TestImage.png');
   const data = fs.readFileSync(imagePath);
 
   it('matches an identical (byte-for-byte) snapshot.', () => {
