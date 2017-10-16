@@ -34,6 +34,8 @@ function diffImageToSnapshot(options) {
   let result = new ComparatorResult(ResultTypes.FAIL);
 
   const baselineSnapshotPath = path.join(snapshotsDir, `${snapshotIdentifier}-snap.png`);
+
+  //console.log(baselineSnapshotPath, fs.existsSync(baselineSnapshotPath));
   if (fs.existsSync(baselineSnapshotPath) && !updateSnapshot) 
   {
     const defaultDiffConfig = {

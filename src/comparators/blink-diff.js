@@ -56,7 +56,7 @@ function diffImageToSnapshot(options) {
     const diffOutputPath = path.join(outputDir, `${snapshotIdentifier}-diff.png`);
     const defaultBlinkDiffConfig = {
       imageA: imageData,
-      imageB: baselineSnapshotPath,
+      imageBPath: baselineSnapshotPath,
       thresholdType: 'percent',
       threshold: 0.01,
       imageOutputPath: diffOutputPath,
@@ -64,28 +64,30 @@ function diffImageToSnapshot(options) {
 
     mkdirp.sync(outputDir);
     const diffConfig = Object.assign({}, defaultBlinkDiffConfig, customDiffConfig);
+    //console.log(diffConfig);
     const diff = new BlinkDiff(diffConfig);
     const unformattedDiffResult = diff.runSync();
-
     
-    result = new ComparatorResult(
-      diffPixels > 0 ? ResultTypes.FAIL : ResultTypes.PASS,
-      img1,
-      img2,
-      diffImg);
+    // result = new ComparatorResult(
+    //   // diffPixels > 0 ? ResultTypes.FAIL : ResultTypes.PASS,
+    //   ResultTypes.PASS,
+    //   img1,
+    //   img2,
+    //   diffImg);
 
-
-    result = Object.assign(
-      {},
-      unformattedDiffResult,
-      { diffOutputPath }
-    );
-
-    result = new ComparatorResult(
-      unformattedDiffResult.code === 0 || unformattedDiffResult.code === 1 ? ResultTypes.FAIL : ResultTypes.PASS,
-      imageData,
-      null,
-      diff._imageOutput);
+    if (unformattedDiffResult) {
+      result = new ComparatorResult(
+        unformattedDiffResult.code === 0 || unformattedDiffResult.code === 1 ? ResultTypes.FAIL : ResultTypes.PASS,
+        imageData,
+        null,
+        diff._imageOutput);
+    } else {
+      result = new ComparatorResult(
+        ResultTypes.FAIL,
+        imageData,
+        null,
+        diff._imageOutput);
+    }
 
   } else {
     result = new ComparatorResult(
