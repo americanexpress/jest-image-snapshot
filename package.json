@@ -29,7 +29,8 @@
     "amex-jest-preset": "^3.1.0",
     "eslint": "^3.19.0",
     "eslint-config-amex": "^6.0.0",
-    "jest": "^20.0.0"
+    "jest": "^20.0.0",
+    "pixelmatch": "^4.0.2"
   },
   "dependencies": {
     "blink-diff": "^1.0.13",

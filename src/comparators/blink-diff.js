@@ -16,6 +16,7 @@ const fs = require('fs');
 const intersection = require('lodash/intersection');
 const mkdirp = require('mkdirp');
 const path = require('path');
+const { ResultTypes, ComparatorResult } = require('../comparator-result');
 
 const unsupportedDiffConfigKeys = [
   'imageAPath',
@@ -55,7 +56,7 @@ function diffImageToSnapshot(options) {
     const diffOutputPath = path.join(outputDir, `${snapshotIdentifier}-diff.png`);
     const defaultBlinkDiffConfig = {
       imageA: imageData,
-      imageBPath: baselineSnapshotPath,
+      imageB: baselineSnapshotPath,
       thresholdType: 'percent',
       threshold: 0.01,
       imageOutputPath: diffOutputPath,
@@ -66,20 +67,35 @@ function diffImageToSnapshot(options) {
     const diff = new BlinkDiff(diffConfig);
     const unformattedDiffResult = diff.runSync();
 
+    
+    result = new ComparatorResult(
+      diffPixels > 0 ? ResultTypes.FAIL : ResultTypes.PASS,
+      img1,
+      img2,
+      diffImg);
+
+
     result = Object.assign(
       {},
       unformattedDiffResult,
       { diffOutputPath }
     );
+
+    result = new ComparatorResult(
+      unformattedDiffResult.code === 0 || unformattedDiffResult.code === 1 ? ResultTypes.FAIL : ResultTypes.PASS,
+      imageData,
+      null,
+      diff._imageOutput);
+
   } else {
-    mkdirp.sync(snapshotsDir);
-    fs.writeFileSync(baselineSnapshotPath, imageData);
-
-    result = updateSnapshot ? { updated: true } : { added: true };
+    result = new ComparatorResult(
+      updateSnapshot ? ResultTypes.UPDATE : ResultTypes.ADD,
+      imageData,
+      null,
+      imageData);
   }
+
   return result;
-
-
 }
 
 module.exports = {

@@ -12,61 +12,60 @@
  * the License.
  */
 
-// const optional = require("optional");
+const optional = require("optional");
 const fs = require('fs');
-// const intersection = require('lodash/intersection');
-// const mkdirp = require('mkdirp');
-// const path = require('path');
-// const PNG = require('pngjs').PNG;
-// const pixelmatch = optional('pixelmatch');
+const intersection = require('lodash/intersection');
+const mkdirp = require('mkdirp');
+const path = require('path');
+const PNG = require('pngjs').PNG;
+const pixelmatch = optional('pixelmatch');
+const { ResultTypes, ComparatorResult } = require('../comparator-result');
 
 function diffImageToSnapshot(options) {
 
-  // const {
-  //   imageData,
-  //   snapshotIdentifier,
-  //   snapshotsDir,
-  //   updateSnapshot = false,
-  //   customDiffConfig = {},
-  //  } = options;
+  const {
+    imageData,
+    snapshotIdentifier,
+    snapshotsDir,
+    updateSnapshot = false,
+    customDiffConfig = {},
+   } = options;
 
-  // let result = {};
-  // const baselineSnapshotPath = path.join(snapshotsDir, `${snapshotIdentifier}-snap.png`);
-  // if (fs.existsSync(baselineSnapshotPath) && !updateSnapshot) {
-  //   const outputDir = path.join(snapshotsDir, '__diff_output__');
-  //   const diffOutputPath = path.join(outputDir, `${snapshotIdentifier}-diff.png`);
+  let result = new ComparatorResult(ResultTypes.FAIL);
 
-  //   const defaultDiffConfig = {
-  //     threshold: 0.01,
-  //   };
+  const baselineSnapshotPath = path.join(snapshotsDir, `${snapshotIdentifier}-snap.png`);
+  if (fs.existsSync(baselineSnapshotPath) && !updateSnapshot) 
+  {
+    const defaultDiffConfig = {
+      threshold: 0.01,
+    };
 
-  //   var img1 = PNG.sync.read(imageData);
-  //   var img2 = PNG.sync.read(fs.readFileSync('img2.png'));
+    var img1 = PNG.sync.read(imageData);
+    var img2 = PNG.sync.read(fs.readFileSync(baselineSnapshotPath));
 
-  //   mkdirp.sync(outputDir);
-  //   const diffConfig = Object.assign({}, defaultDiffConfig, customDiffConfig);
+    const diffConfig = Object.assign({}, defaultDiffConfig, customDiffConfig);
 
-  //   var diffImg = new PNG({width: img1.width, height: img1.height});    
-  //   pixelmatch(img1.data, img2.data, diffImg.data, img1.width, img1.height, diffConfig);
-
-  //   const unformattedDiffResult = diff.runSync();
-
-  //   diffImg.pack().pipe(fs.createWriteStream(diffOutputPath));
+    var diffImg = new PNG({width: img1.width, height: img1.height});    
+    let diffPixels = pixelmatch(img1.data, img2.data, diffImg.data, img1.width, img1.height, diffConfig);
     
+    result = new ComparatorResult(
+      diffPixels > 0 ? ResultTypes.FAIL : ResultTypes.PASS,
+      img1,
+      img2,
+      diffImg);
+  } 
+  else 
+  {
+    result = new ComparatorResult(
+      updateSnapshot ? ResultTypes.UPDATE : ResultTypes.ADD,
+      imageData,
+      null,
+      imageData);
+  }
 
-  //   result = Object.assign(
-  //     {},
-  //     unformattedDiffResult,
-  //     { diffOutputPath }
-  //   );
-  // } else {
-  //   mkdirp.sync(snapshotsDir);
-  //   fs.writeFileSync(baselineSnapshotPath, imageData);
-
-  //   result = updateSnapshot ? { updated: true } : { added: true };
-  // }
-  // return result;
+  return result;
 }
+
 
 module.exports = {
   diffImageToSnapshot

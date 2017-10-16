@@ -14,183 +14,138 @@
 
 const fs = require('fs');
 const path = require('path');
-
-const mockRunSync = jest.fn(() => {});
-
-jest.mock('pixelmatch', () => jest.fn(() => ({
-  runSync: mockRunSync,
-})));
+const { ResultTypes } = require('../../../src/comparator-result'); 
 
 describe('pixelmatch', () => {
+
   beforeEach(() => {
     jest.resetModules();
     jest.resetAllMocks();
   });
 
   describe('diffImageToSnapshot', () => {
-    const mockSnapshotsDir = path.normalize('/path/to/snapshots');
-    const mockSnapshotIdentifier = 'id1';
-    const mockImageBuffer = 'pretendthisisimagebufferandnotjustastring';
-    const mockMkdirSync = jest.fn();
+    const mockSnapshotsDir = path.normalize('./path/to/snapshots');
+    const mockImageBuffer = fs.readFileSync('./__tests__/assets/sample.png');
+    const mockPassImageBuffer = fs.readFileSync('./__tests__/assets/sample.png');
+    const mockFailImageBuffer = fs.readFileSync('./__tests__/assets/fail.png');
+
     const mockMkdirpSync = jest.fn();
-    const mockWriteFileSync = jest.fn();
 
-    function setupTest({
-      snapshotDirExists,
-      snapshotExists,
-      outputDirExists,
-      defaultExists = true,
-    }) {
-      const mockFs = Object.assign({}, fs, {
-        existsSync: jest.fn(),
-        mkdirSync: mockMkdirSync,
-        writeFileSync: mockWriteFileSync,
-      });
-      jest.mock('fs', () => mockFs);
-      jest.mock('mkdirp', () => ({ sync: mockMkdirpSync }));
-      const { diffImageToSnapshot } = require('../../../src/comparators/pixelmatch');
+    const mockFs = Object.assign({}, fs, {
+      existsSync: jest.fn(),
+      readFileSync: jest.fn(),
+      mkdirSync: jest.fn(),
+      writeFileSync: jest.fn(),
+    });
 
-      mockFs.existsSync.mockImplementation((p) => {
-        switch (p) {
-          case path.join(mockSnapshotsDir, `${mockSnapshotIdentifier}-snap.png`):
-            return snapshotExists;
-          case path.join(mockSnapshotsDir, '__diff_output__'):
-            return !!outputDirExists;
-          case mockSnapshotsDir:
-            return !!snapshotDirExists;
-          default:
-            return !!defaultExists;
-        }
-      });
+    jest.mock('fs', () => mockFs);
+    jest.mock('mkdirp', () => ({ sync: mockMkdirpSync }));
 
-      return diffImageToSnapshot;
-    }
+    mockFs.existsSync.mockImplementation((p) => {
+      let bn = path.basename(p);
 
-    test.only('should run comparison if there is already a snapshot stored and updateSnapshot flag is not set', () => {
-      const diffImageToSnapshot = setupTest({ snapshotExists: true });
-      diffImageToSnapshot({
+      switch(bn) {
+        case "pass-snap.png":
+          return true;
+        break;
+        case "fail-snap.png":
+          return true;
+        break;
+        case "not-exist-snap.png":
+          return false;
+        break;
+      }
+
+      switch (p) {
+        case path.join(mockSnapshotsDir, '__diff_output__'):
+          return !!outputDirExists;
+        case mockSnapshotsDir:
+          return !!snapshotDirExists;
+        default:
+          return !!defaultExists;
+      }
+    });
+    mockFs.readFileSync.mockImplementation((p) => {
+      let bn = path.basename(p);
+
+      switch(bn) {
+        case "pass-snap.png":
+          return mockPassImageBuffer;
+        break;
+        case "fail-snap.png":
+          return mockFailImageBuffer;
+        break;
+      }
+
+      return null;
+    });
+
+    const { diffImageToSnapshot } = require('../../../src/comparators/pixelmatch');
+
+    test('Should pass based on an exisiting snapshot', () => {
+      const result = diffImageToSnapshot({
         imageData: mockImageBuffer,
-        snapshotIdentifier: mockSnapshotIdentifier,
+        snapshotIdentifier: 'pass',
         snapshotsDir: mockSnapshotsDir,
         updateSnapshot: false,
       });
 
-      expect(mockRunSync).toHaveBeenCalled();
+      expect(result.result).toEqual(ResultTypes.PASS);
     });
 
-    test('should merge custom configuration with default configuration if custom config is passed', () => {
-      const mockBlinkDiff = require('pixelmatch');
-      const diffImageToSnapshot = setupTest({ snapshotExists: true });
-      diffImageToSnapshot({
+    test('Should fail based on an exisiting snapshot', () => {
+      const result = diffImageToSnapshot({
         imageData: mockImageBuffer,
-        snapshotIdentifier: mockSnapshotIdentifier,
+        snapshotIdentifier: 'fail',
         snapshotsDir: mockSnapshotsDir,
         updateSnapshot: false,
       });
 
-      expect(mockBlinkDiff).toHaveBeenCalledWith({
-        imageA: mockImageBuffer,
-        imageBPath: path.join(mockSnapshotsDir, `${mockSnapshotIdentifier}-snap.png`),
-        threshold: 0.01,
-        imageOutputPath: path.join(mockSnapshotsDir, '__diff_output__', `${mockSnapshotIdentifier}-diff.png`),
-        thresholdType: 'percent',
-      });
+      expect(result.result).toEqual(ResultTypes.FAIL);
     });
 
-    test('should create diff output directory if there is not one already', () => {
-      const diffImageToSnapshot = setupTest({ snapshotExists: true, outputDirExists: false });
-      diffImageToSnapshot({
+    test('Should request an update a failing snapshot', () => {
+      const result = diffImageToSnapshot({
         imageData: mockImageBuffer,
-        snapshotIdentifier: mockSnapshotIdentifier,
-        snapshotsDir: mockSnapshotsDir,
-        updateSnapshot: false,
-      });
-
-      expect(mockMkdirpSync).toHaveBeenCalledWith(path.join(mockSnapshotsDir, '__diff_output__'));
-    });
-
-    test('should not create diff output directory if there is one there already', () => {
-      const diffImageToSnapshot = setupTest({ snapshotExists: true, outputDirExists: true });
-      diffImageToSnapshot({
-        imageData: mockImageBuffer,
-        snapshotIdentifier: mockSnapshotIdentifier,
-        snapshotsDir: mockSnapshotsDir,
-        updateSnapshot: false,
-      });
-
-      expect(mockMkdirSync).not.toHaveBeenCalledWith(path.join(mockSnapshotsDir, '__diff_output__'));
-    });
-
-    test('should create snapshots directory is there is not one already', () => {
-      const diffImageToSnapshot = setupTest({ snapshotExists: true, snapshotDirExists: false });
-      diffImageToSnapshot({
-        imageData: mockImageBuffer,
-        snapshotIdentifier: mockSnapshotIdentifier,
+        snapshotIdentifier: 'fail',
         snapshotsDir: mockSnapshotsDir,
         updateSnapshot: true,
       });
 
-      expect(mockMkdirpSync).toHaveBeenCalledWith(mockSnapshotsDir);
+      expect(result.result).toEqual(ResultTypes.UPDATE);
     });
 
-    test('should not create snapshots directory if there already is one', () => {
-      const diffImageToSnapshot = setupTest({ snapshotExists: true, snapshotDirExists: true });
-      diffImageToSnapshot({
+    test('Should request an update a failing snapshot', () => {
+      const result = diffImageToSnapshot({
         imageData: mockImageBuffer,
-        snapshotIdentifier: mockSnapshotIdentifier,
+        snapshotIdentifier: 'fail',
         snapshotsDir: mockSnapshotsDir,
         updateSnapshot: true,
       });
 
-      expect(mockMkdirSync).not.toHaveBeenCalledWith(mockSnapshotsDir);
+      expect(result.result).toEqual(ResultTypes.UPDATE);
     });
 
-    test('should create snapshot in __image_snapshots__ directory if there is not a snapshot created yet', () => {
-      const diffImageToSnapshot = setupTest({ snapshotExists: false, snapshotDirExists: false });
-      diffImageToSnapshot({
+    test('Should request an update a passing snapshot', () => {
+      const result = diffImageToSnapshot({
         imageData: mockImageBuffer,
-        snapshotIdentifier: mockSnapshotIdentifier,
-        snapshotsDir: mockSnapshotsDir,
-        updateSnapshot: false,
-      });
-
-      expect(mockWriteFileSync).toHaveBeenCalledWith(path.join(mockSnapshotsDir, `${mockSnapshotIdentifier}-snap.png`), mockImageBuffer);
-    });
-
-    test('should return updated flag is snapshot was updated', () => {
-      const diffImageToSnapshot = setupTest({ snapshotExists: true });
-      const diffResult = diffImageToSnapshot({
-        imageData: mockImageBuffer,
-        snapshotIdentifier: mockSnapshotIdentifier,
+        snapshotIdentifier: 'pass',
         snapshotsDir: mockSnapshotsDir,
         updateSnapshot: true,
       });
 
-      expect(diffResult).toHaveProperty('updated', true);
+      expect(result.result).toEqual(ResultTypes.UPDATE);
     });
 
-    test('should return added flag is snapshot was added', () => {
-      const diffImageToSnapshot = setupTest({ snapshotExists: false });
-      const diffResult = diffImageToSnapshot({
+    test('Should request add a new snapshot', () => {
+      const result = diffImageToSnapshot({
         imageData: mockImageBuffer,
-        snapshotIdentifier: mockSnapshotIdentifier,
+        snapshotIdentifier: 'not-exist',
         snapshotsDir: mockSnapshotsDir,
         updateSnapshot: false,
       });
 
-      expect(diffResult).toHaveProperty('added', true);
-    });
-
-    test('should return path to comparison output image if a comparison was performed', () => {
-      const diffImageToSnapshot = setupTest({ snapshotExists: true });
-      const diffResult = diffImageToSnapshot({
-        imageData: mockImageBuffer,
-        snapshotIdentifier: mockSnapshotIdentifier,
-        snapshotsDir: mockSnapshotsDir,
-        updateSnapshot: false,
-      });
-
-      expect(diffResult).toHaveProperty('diffOutputPath', path.join(mockSnapshotsDir, '__diff_output__', `${mockSnapshotIdentifier}-diff.png`));
+      expect(result.result).toEqual(ResultTypes.ADD);
     });
   });
 });
