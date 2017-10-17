@@ -56,10 +56,13 @@ function diffImageToSnapshot(options) {
   const diff = new BlinkDiff(diffConfig);
   const unformattedDiffResult = diff.runSync();
   const resultCode = unformattedDiffResult.code;
+  const diffPercentage = unformattedDiffResult.differences / unformattedDiffResult.dimension;
 
   return new ComparatorResult(
     resultCode === 0 || resultCode === 1 ? ResultTypes.FAIL : ResultTypes.PASS,
-    1);
+    diffPercentage,
+    unformattedDiffResult.differences,
+    diffOutputPath);
 }
 
 module.exports = {

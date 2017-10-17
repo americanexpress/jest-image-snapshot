@@ -17,12 +17,14 @@ const merge = require('lodash/merge');
 const path = require('path');
 const Chalk = require('chalk').constructor;
 const { diffImageToSnapshot } = require('./diff-snapshot');
+const { ResultTypes } = require('./comparator-result');
+const fs = require('fs');
 
 function updateSnapshotState(oldSnapshotState, newSnapshotState) {
   return merge({}, oldSnapshotState, newSnapshotState);
 }
 
-function toMatchImageSnapshot(received, { customSnapshotIdentifier = '', customDiffConfig = {}, noColors = false } = {}) {
+function toMatchImageSnapshot(received, { customSnapshotIdentifier = '', customDiffConfig = {}, noColors = false, cleanPassingDiffs = false } = {}) {
   const { testPath, currentTestName, isNot } = this;
   const chalk = new Chalk({ enabled: !noColors });
 
@@ -40,19 +42,26 @@ function toMatchImageSnapshot(received, { customSnapshotIdentifier = '', customD
     customDiffConfig,
   });
   let pass = true;
-  if (result.updated) {
+  let message = '';
+  if (result.result === ResultTypes.UPDATE) {
     // once transition away from jasmine is done this will be a lot more elegant and pure
     // https://github.com/facebook/jest/pull/3668
     snapshotState = updateSnapshotState(snapshotState, { updated: snapshotState.updated += 1 });
-  } else if (result.added) {
+  } else if (result.result === ResultTypes.ADD) {
     snapshotState = updateSnapshotState(snapshotState, { added: snapshotState.added += 1 });
     // see https://github.com/yahoo/blink-diff/blob/master/index.js#L251-L285 for result codes
-  } else if (result.code === 0 || result.code === 1) {
-    pass = false;
-  }
+  } else {
+    pass = result.result === ResultTypes.PASS;
 
-  const message = 'Expected image to match or be a close match to snapshot.\n'
-                  + `${chalk.bold.red('See diff for details:')} ${chalk.red(result.diffOutputPath)}`;
+    if (!pass) {
+      message = `Expected image to match or be a close match to snapshot. ${result.differencePercentage} different.\n`
+        + `${chalk.bold.red('See diff for details:')} ${chalk.red(result.diffOutputPath)}`;
+    } else if (cleanPassingDiffs) {
+      if (result.diffOutputPath && fs.existsSync(result.diffOutputPath)) {
+        fs.unlinkSync(result.diffOutputPath);
+      }
+    }
+  }
 
   return {
     message,

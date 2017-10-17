@@ -50,7 +50,7 @@ describe('toMatchImageSnapshot', () => {
     }
   });
 
-  const { diffImageToSnapshot } = require('../../src/diff-snapshot');
+  const { diffImageToSnapshot } = require('../../src/diff-snapshot'); // eslint-disable-line global-require
 
   test('It should use blink-diff by default', () => {
     diffImageToSnapshot({
@@ -58,7 +58,7 @@ describe('toMatchImageSnapshot', () => {
       snapshotIdentifier: 'foo',
     });
 
-    const comparator = require('../../src/comparators/blink-diff');
+    const comparator = require('../../src/comparators/blink-diff'); // eslint-disable-line global-require
     expect(comparator.diffImageToSnapshot).toHaveBeenCalled();
 
     const diffImageToSnapshotConfig = comparator.diffImageToSnapshot.mock.calls[0][0];
@@ -75,7 +75,7 @@ describe('toMatchImageSnapshot', () => {
       comparator: 'blink-diff',
     });
 
-    const comparator = require('../../src/comparators/blink-diff');
+    const comparator = require('../../src/comparators/blink-diff'); // eslint-disable-line global-require
     expect(comparator.diffImageToSnapshot).toHaveBeenCalled();
 
     const diffImageToSnapshotConfig = comparator.diffImageToSnapshot.mock.calls[0][0];
@@ -92,7 +92,7 @@ describe('toMatchImageSnapshot', () => {
       comparator: 'pixelmatch',
     });
 
-    const comparator = require('../../src/comparators/pixelmatch');
+    const comparator = require('../../src/comparators/pixelmatch'); // eslint-disable-line global-require
     expect(comparator.diffImageToSnapshot).toHaveBeenCalled();
   });
 
@@ -113,7 +113,7 @@ describe('toMatchImageSnapshot', () => {
       comparator: 'pixelmatch',
     });
 
-    const comparator = require('../../src/comparators/pixelmatch');
+    const comparator = require('../../src/comparators/pixelmatch'); // eslint-disable-line global-require
     expect(comparator.diffImageToSnapshot).not.toHaveBeenCalled();
 
     expect(mockMkdirpSync).toHaveBeenCalled();

@@ -12,9 +12,9 @@
  * the License.
  */
 
-describe('blink-diff', () => {
-  const { diffImageToSnapshot } = require('../../../src/comparators/blink-diff');
+const { diffImageToSnapshot } = require('../../../src/comparators/blink-diff');
 
+describe('blink-diff', () => {
   test('Should throw based on invalid config', () => {
     expect(() => {
       diffImageToSnapshot({

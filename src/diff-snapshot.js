@@ -17,6 +17,7 @@ const pixelmatchComparator = require('./comparators/pixelmatch');
 const mkdirp = require('mkdirp');
 const path = require('path');
 const fs = require('fs');
+const { ResultTypes, ComparatorResult } = require('./comparator-result');
 
 function diffImageToSnapshot(options) {
   const {
@@ -60,7 +61,11 @@ function diffImageToSnapshot(options) {
   mkdirp.sync(snapshotsDir);
   fs.writeFileSync(baselineSnapshotPath, imageData);
 
-  return null;
+  if (fs.existsSync(baselineSnapshotPath) && updateSnapshot) {
+    return new ComparatorResult(ResultTypes.UPDATE);
+  }
+
+  return new ComparatorResult(ResultTypes.ADD);
 }
 
 module.exports = {

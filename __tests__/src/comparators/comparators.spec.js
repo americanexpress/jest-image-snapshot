@@ -74,6 +74,8 @@ describe('Comparators', () => {
 
         // expect(mockFs.writeFileSync).toHaveBeenCalled();
         expect(result.result).toEqual(ResultTypes.PASS);
+        expect(result.differencePercentage).toBeLessThan(0.05);
+        expect(result.differencePixels).toBeLessThan(10);
         expect(mockFs.writeFileSync).toHaveBeenCalled();
       });
 
@@ -86,6 +88,8 @@ describe('Comparators', () => {
 
         // expect(mockFs.writeFileSync).toHaveBeenCalled();
         expect(result.result).toEqual(ResultTypes.FAIL);
+        expect(result.differencePercentage).toBeGreaterThan(0.05);
+        expect(result.differencePixels).toBeGreaterThan(10000);
         expect(mockFs.writeFileSync).toHaveBeenCalled();
       });
     });

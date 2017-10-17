@@ -44,9 +44,14 @@ function diffImageToSnapshot(options) {
   const buffer = PNG.sync.write(diffImg);
   fs.writeFileSync(diffOutputPath, buffer);
 
+  const totalPixels = img1.width * img1.height;
+  const diffPercentage = diffPixels / totalPixels;
+
   return new ComparatorResult(
     diffPixels > 0 ? ResultTypes.FAIL : ResultTypes.PASS,
-    1);
+    diffPercentage,
+    diffPixels,
+    diffOutputPath);
 }
 
 module.exports = {
