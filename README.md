@@ -1,6 +1,10 @@
 # jest-image-snapshot
 
-[![npm version](https://badge.fury.io/js/jest-image-snapshot.svg)](https://badge.fury.io/js/jest-image-snapshot)
+[
+  ![npm version](https://badge.fury.io/js/jest-image-snapshot.svg)](https://badge.fury.io/js/jest-image-snapshot
+) [
+  ![Build Status](https://travis-ci.org/americanexpress/jest-image-snapshot.svg?branch=master)](https://travis-ci.org/americanexpress/jest-image-snapshot
+)
 
 Jest matcher that performs image comparisons using [Blink-diff](https://github.com/yahoo/blink-diff) and behaves just like [Jest snapshots](https://facebook.github.io/jest/docs/snapshot-testing.html) do! Very useful for browser visual comparison testing.
 
@@ -44,6 +48,8 @@ Jest matcher that performs image comparisons using [Blink-diff](https://github.c
 ```
 
 Any blink-diff custom configuration can be provided so long as the values for `imageAPath`, `imageA`, `imageBPath`, `imageB`, or `imageOutputPath` are not changed as these are used internally.
+
+By default, we have set [these values](https://github.com/americanexpress/jest-image-snapshot/blob/master/src/diff-snapshot.js#L55) for `thresholdType` and `threshold`.
 
 ## How it works
   Given an image (should be either a PNGImage instance or a Buffer instance with PNG data) the `toMatchImageSnapshot()` matcher will create a `__image_snapshots__` directory in the directory the test is in and will store the baseline snapshot image there on the first run.

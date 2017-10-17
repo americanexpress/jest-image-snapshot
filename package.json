@@ -1,8 +1,9 @@
 {
   "name": "jest-image-snapshot",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Jest matcher for screenshot comparisons. Most commonly used for browser visual testing.",
   "main": "src/index.js",
+  "engines": { "node": ">=6.0.0" },
   "scripts": {
     "lint": "eslint ./ --ignore-path .gitignore --ext .js",
     "test": "jest",
@@ -26,7 +27,7 @@
   "author": "Andres Escobar <andres.escobar@aexp.com> (https://github.com/anescobar1991)",
   "license": "Apache-2.0",
   "devDependencies": {
-    "amex-jest-preset": "^3.1.0",
+    "amex-jest-preset": "^4.0.2",
     "eslint": "^3.19.0",
     "eslint-config-amex": "^6.0.0",
     "jest": "^20.0.0"
@@ -40,6 +41,6 @@
     "pixelmatch": "^4.0.2"
   },
   "peerDependencies": {
-    "jest": "^20.0.0"
+    "jest": "^20.0.0 || ^21.0.0"
   }
 }
