@@ -120,4 +120,20 @@ describe('toMatchImageSnapshot', () => {
     const mockMkdirpSyncPath = mockMkdirpSync.mock.calls[0][0];
     expect(mockMkdirpSyncPath).toEqual(mockSnapshotsDir);
   });
+
+  test('It should try to write a snapshot when the baseline doesn\'t exist', () => {
+    diffImageToSnapshot({
+      snapshotsDir: mockSnapshotsDir,
+      snapshotIdentifier: 'fail',
+      comparator: 'pixelmatch',
+      updateSnapshot: true
+    });
+
+    const comparator = require('../../src/comparators/pixelmatch'); // eslint-disable-line global-require
+    expect(comparator.diffImageToSnapshot).not.toHaveBeenCalled();
+
+    expect(mockMkdirpSync).toHaveBeenCalled();
+    const mockMkdirpSyncPath = mockMkdirpSync.mock.calls[0][0];
+    expect(mockMkdirpSyncPath).toEqual(mockSnapshotsDir);
+  });
 });

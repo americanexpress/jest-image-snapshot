@@ -11,12 +11,35 @@
  * or implied. See the License for the specific language governing permissions and limitations under
  * the License.
  */
+const fs = require('fs');
+const path = require('path');
+const { ResultTypes, ComparatorResult } = require('../../src/comparator-result');
 
 describe('toMatchImageSnapshot', () => {
   function setupMock(diffImageToSnapshotResult) {
     jest.doMock('../../src/diff-snapshot', () => ({
       diffImageToSnapshot: jest.fn(() => diffImageToSnapshotResult),
     }));
+
+    const mockFs = Object.assign({}, fs, {
+      readFileSync: jest.fn(),
+      writeFileSync: jest.fn(),
+      unlinkSync: jest.fn(),
+      existsSync: jest.fn(),
+    });
+
+    mockFs.existsSync.mockImplementation((p) => {
+      const bn = path.basename(p);
+
+      switch (bn) {
+        case 'result.png':
+          return true;
+        default:
+          return false;
+      }
+    });
+  
+    jest.mock('fs', () => mockFs);
   }
 
   beforeEach(() => {
@@ -25,9 +48,9 @@ describe('toMatchImageSnapshot', () => {
   });
 
   it('should throw an error if used with .not matcher', () => {
-    const mockDiffResult = { updated: false, code: 7 };
+    const mockDiffResult = new ComparatorResult(ResultTypes.PASS);
     setupMock(mockDiffResult);
-    const { toMatchImageSnapshot } = require('../../src/index'); // eslint-disable-line global-require
+    const { toMatchImageSnapshot } = require('../../src/index');
     expect.extend({ toMatchImageSnapshot });
 
     expect(() => expect('pretendthisisanimagebuffer').not.toMatchImageSnapshot())
@@ -35,9 +58,9 @@ describe('toMatchImageSnapshot', () => {
   });
 
   it('should pass when snapshot is similar enough or same as baseline snapshot', () => {
-    const mockDiffResult = { updated: false, code: 7 };
+    const mockDiffResult = new ComparatorResult(ResultTypes.PASS, 0, 0, 'path/to/result.png');
     setupMock(mockDiffResult);
-    const { toMatchImageSnapshot } = require('../../src/index'); // eslint-disable-line global-require
+    const { toMatchImageSnapshot } = require('../../src/index');
     expect.extend({ toMatchImageSnapshot });
 
     expect(() => expect('pretendthisisanimagebuffer').toMatchImageSnapshot())
@@ -46,23 +69,10 @@ describe('toMatchImageSnapshot', () => {
 
   it('should fail when snapshot has a difference beyond allowed threshold', () => {
     // code 1 is result too different: https://github.com/yahoo/blink-diff/blob/master/index.js#L267
-    const mockDiffResult = { updated: false, code: 1, diffOutputPath: 'path/to/result.png' };
+    const mockDiffResult = new ComparatorResult(ResultTypes.FAIL, 0.40231, 3524, 'path/to/result.png');
     setupMock(mockDiffResult);
-    const { toMatchImageSnapshot } = require('../../src/index'); // eslint-disable-line global-require
+    const { toMatchImageSnapshot } = require('../../src/index');
     expect.extend({ toMatchImageSnapshot });
-
-
-    expect(() => expect('pretendthisisanimagebuffer').toMatchImageSnapshot())
-      .toThrowErrorMatchingSnapshot();
-  });
-
-  it('should fail when diff result is unknown', () => {
-    // code 0 is unknown result: https://github.com/yahoo/blink-diff/blob/master/index.js#L258
-    const mockDiffResult = { updated: false, code: 0, diffOutputPath: 'path/to/result.png' };
-    setupMock(mockDiffResult);
-    const { toMatchImageSnapshot } = require('../../src/index'); // eslint-disable-line global-require
-    expect.extend({ toMatchImageSnapshot });
-
 
     expect(() => expect('pretendthisisanimagebuffer').toMatchImageSnapshot())
       .toThrowErrorMatchingSnapshot();
@@ -70,90 +80,14 @@ describe('toMatchImageSnapshot', () => {
 
   it('should use noColors options if passed as true and not style error message', () => {
     // code 1 is result too different: https://github.com/yahoo/blink-diff/blob/master/index.js#L267
-    const mockDiffResult = { updated: false, code: 1, diffOutputPath: 'path/to/result.png' };
+    const mockDiffResult = new ComparatorResult(ResultTypes.FAIL, 0.6, 35624, 'path/to/result.png');
     setupMock(mockDiffResult);
-    const { toMatchImageSnapshot } = require('../../src/index'); // eslint-disable-line global-require
+    const { toMatchImageSnapshot } = require('../../src/index');
     expect.extend({ toMatchImageSnapshot });
 
 
     expect(() => expect('pretendthisisanimagebuffer').toMatchImageSnapshot({ noColors: true }))
       .toThrowErrorMatchingSnapshot();
-  });
-
-  it('should use custom blink-diff configuration if passed in', () => {
-    const mockTestContext = {
-      testPath: 'path/to/test.spec.js',
-      currentTestName: 'test1',
-      isNot: false,
-      snapshotState: {
-        _counters: new Map(),
-        _updateSnapshot: 'none',
-        updated: undefined,
-        added: true,
-      },
-    };
-    const mockDiffResult = { updated: true, code: 7 };
-
-    setupMock(mockDiffResult);
-    const { toMatchImageSnapshot } = require('../../src/index'); // eslint-disable-line global-require
-    const matcherAtTest = toMatchImageSnapshot.bind(mockTestContext);
-
-    const customDiffConfig = { threshold: 0.3 };
-    matcherAtTest('pretendthisisanimagebuffer', { customDiffConfig });
-    const { diffImageToSnapshot } = require('../../src/diff-snapshot'); // eslint-disable-line global-require
-    expect(diffImageToSnapshot.mock.calls[0][0].customDiffConfig).toBe(customDiffConfig);
-  });
-
-  it('passes diffImageToSnapshot everything it needs to create a snapshot and compare if needed', () => {
-    const mockTestContext = {
-      testPath: 'path/to/test.spec.js',
-      currentTestName: 'test',
-      isNot: false,
-      snapshotState: {
-        _counters: new Map(),
-        _updateSnapshot: 'none',
-        updated: undefined,
-        added: true,
-      },
-    };
-    const mockDiffResult = { updated: true, code: 7 };
-
-    setupMock(mockDiffResult);
-    const { toMatchImageSnapshot } = require('../../src/index'); // eslint-disable-line global-require
-    const matcherAtTest = toMatchImageSnapshot.bind(mockTestContext);
-
-    matcherAtTest('pretendthisisanimagebuffer');
-    const { diffImageToSnapshot } = require('../../src/diff-snapshot'); // eslint-disable-line global-require
-
-    const dataArg = diffImageToSnapshot.mock.calls[0][0];
-    // This is to make the test work on windows
-    dataArg.snapshotsDir = dataArg.snapshotsDir.replace(/\\/g, '/');
-
-    expect(dataArg).toMatchSnapshot();
-  });
-
-  it('passes uses user passed snapshot name if given', () => {
-    const mockTestContext = {
-      testPath: 'path/to/test.spec.js',
-      currentTestName: 'test',
-      isNot: false,
-      snapshotState: {
-        _counters: new Map(),
-        _updateSnapshot: 'none',
-        updated: undefined,
-        added: true,
-      },
-    };
-    const mockDiffResult = { updated: true, code: 7 };
-
-    setupMock(mockDiffResult);
-    const { toMatchImageSnapshot } = require('../../src/index'); // eslint-disable-line global-require
-    const matcherAtTest = toMatchImageSnapshot.bind(mockTestContext);
-
-    matcherAtTest('pretendthisisanimagebuffer', { customSnapshotIdentifier: 'custom-name' });
-    const { diffImageToSnapshot } = require('../../src/diff-snapshot'); // eslint-disable-line global-require
-
-    expect(diffImageToSnapshot.mock.calls[0][0].snapshotIdentifier).toBe('custom-name');
   });
 
   it('attempts to update snapshots if snapshotState has updateSnapshot flag set', () => {
@@ -164,59 +98,54 @@ describe('toMatchImageSnapshot', () => {
       snapshotState: {
         _counters: new Map(),
         _updateSnapshot: 'all',
-        updated: undefined,
-        added: true,
+        updated: 0,
+        added: 0,
       },
     };
-    const mockDiffResult = { updated: true, code: 7 };
-
+    const mockDiffResult = new ComparatorResult(ResultTypes.UPDATE, 0.6, 35624, 'path/to/result.png');
+    
     setupMock(mockDiffResult);
-    const { toMatchImageSnapshot } = require('../../src/index'); // eslint-disable-line global-require
+    const { toMatchImageSnapshot } = require('../../src/index');
     const matcherAtTest = toMatchImageSnapshot.bind(mockTestContext);
 
     matcherAtTest('pretendthisisanimagebuffer');
-    const { diffImageToSnapshot } = require('../../src/diff-snapshot'); // eslint-disable-line global-require
-
-    expect(diffImageToSnapshot.mock.calls[0][0].updateSnapshot).toBe(true);
+    expect(mockTestContext.snapshotState.updated).toBe(1);
+    expect(mockTestContext.snapshotState.added).toBe(0);
   });
 
-  it('should work when a new snapshot is added', () => {
+  it('attempts to add snapshots if missing', () => {
     const mockTestContext = {
       testPath: 'path/to/test.spec.js',
-      currentTestName: 'test1',
+      currentTestName: 'test2',
       isNot: false,
       snapshotState: {
         _counters: new Map(),
-        update: false,
-        updated: undefined,
-        added: true,
+        _updateSnapshot: 'all',
+        updated: 0,
+        added: 0,
       },
     };
-    const mockDiffResult = { added: true, code: 7 };
-
+    const mockDiffResult = new ComparatorResult(ResultTypes.ADD, 0.6, 35624, 'path/to/result.png');
+    
     setupMock(mockDiffResult);
-    const { toMatchImageSnapshot } = require('../../src/index'); // eslint-disable-line global-require
+    const { toMatchImageSnapshot } = require('../../src/index');
     const matcherAtTest = toMatchImageSnapshot.bind(mockTestContext);
-    expect(() => matcherAtTest('pretendthisisanimagebuffer')).not.toThrow();
+
+    matcherAtTest('pretendthisisanimagebuffer');
+    expect(mockTestContext.snapshotState.updated).toBe(0);
+    expect(mockTestContext.snapshotState.added).toBe(1);
   });
 
-  it('should work when a snapshot is updated', () => {
-    const mockTestContext = {
-      testPath: 'path/to/test.spec.js',
-      currentTestName: 'test1',
-      isNot: false,
-      snapshotState: {
-        _counters: new Map(),
-        update: true,
-        updated: undefined,
-        added: undefined,
-      },
-    };
-    const mockDiffResult = { updated: true, code: 7 };
-
+  it('should attempt to delete the diffs of passing snapshots', () => {
+    const mockDiffResult = new ComparatorResult(ResultTypes.PASS, 0, 0, 'path/to/result.png');
     setupMock(mockDiffResult);
-    const { toMatchImageSnapshot } = require('../../src/index'); // eslint-disable-line global-require
-    const matcherAtTest = toMatchImageSnapshot.bind(mockTestContext);
-    expect(() => matcherAtTest('pretendthisisanimagebuffer')).not.toThrow();
+    const { toMatchImageSnapshot } = require('../../src/index');
+    expect.extend({ toMatchImageSnapshot });
+
+    expect(() => expect('pretendthisisanimagebuffer').toMatchImageSnapshot({ cleanPassingDiffs: true }))
+      .not.toThrow();
+
+    const fs = require('fs');
+    expect(fs.unlinkSync).toHaveBeenCalled();
   });
 });
