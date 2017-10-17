@@ -12,21 +12,16 @@
  * the License.
  */
 
-const ResultTypes = Object.freeze({
-  PASS: 'PASS',
-  FAIL: 'FAIL',
-  UPDATE: 'UPDATE',
-  ADD: 'ADD',
+describe('blink-diff', () => {
+  const { diffImageToSnapshot } = require('../../../src/comparators/blink-diff');
+
+  test('Should throw based on invalid config', () => {
+    expect(() => {
+      diffImageToSnapshot({
+        customDiffConfig: {
+          imageAPath: 'foo',
+        },
+      });
+    }).toThrow();
+  });
 });
-
-class ComparatorResult {
-  constructor(result, difference) {
-    this.result = result;
-    this.difference = difference;
-  }
-}
-
-module.exports = {
-  ResultTypes,
-  ComparatorResult,
-};
