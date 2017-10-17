@@ -22,11 +22,7 @@ describe('integration tests', () => {
   const imagePath = path.resolve(__dirname, '../stubs', 'TestImage.png');
   const data = fs.readFileSync(imagePath);
 
-  it('matches an identical (byte-for-byte) snapshot.', () => {
-    expect(data).toMatchImageSnapshot();
-  });
-
-  it('matches an identical (pixel-for-pixel) snapshot.', () => {
+  it('matches an identical snapshot.', () => {
     expect(data).toMatchImageSnapshot();
   });
 });
