@@ -54,14 +54,12 @@ function toMatchImageSnapshot(received, { customSnapshotIdentifier = '', customD
     pass = result.result === ResultTypes.PASS;
 
     if (!pass) {
-      const dp = parseInt(result.differencePercentage * 100);
+      const dp = parseInt(result.differencePercentage * 100, 10);
 
       message = `Expected image to match or be a close match to snapshot. ${dp}% different.\n`
         + `${chalk.bold.red('See diff for details:')} ${chalk.red(result.diffOutputPath)}`;
-    } else if (cleanPassingDiffs) {
-      if (result.diffOutputPath && fs.existsSync(result.diffOutputPath)) {
-        fs.unlinkSync(result.diffOutputPath);
-      }
+    } else if (cleanPassingDiffs && result.diffOutputPath && fs.existsSync(result.diffOutputPath)) {
+      fs.unlinkSync(result.diffOutputPath);
     }
   }
 
