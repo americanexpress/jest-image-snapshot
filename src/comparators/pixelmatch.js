@@ -29,29 +29,31 @@ function diffImageToSnapshot(options) {
     threshold: 0.01,
   };
 
-  const img1 = PNG.sync.read(imageData);
-  const img2 = PNG.sync.read(fs.readFileSync(baselineSnapshotPath));
+  const comparisonImg = PNG.sync.read(imageData);
+  const baselineImg = PNG.sync.read(fs.readFileSync(baselineSnapshotPath));
 
   const diffConfig = Object.assign({}, defaultDiffConfig, customDiffConfig);
 
-  const diffImg = new PNG({ width: img1.width, height: img1.height });
+  const diffImg = new PNG({ width: comparisonImg.width, height: comparisonImg.height });
   const diffPixels = pixelmatch(
-    img1.data, img2.data,
+    comparisonImg.data, baselineImg.data,
     diffImg.data,
-    img1.width, img1.height,
-    diffConfig);
+    comparisonImg.width, comparisonImg.height,
+    diffConfig
+  );
 
   const buffer = PNG.sync.write(diffImg);
   fs.writeFileSync(diffOutputPath, buffer);
 
-  const totalPixels = img1.width * img1.height;
+  const totalPixels = comparisonImg.width * comparisonImg.height;
   const diffPercentage = diffPixels / totalPixels;
 
   return new ComparatorResult(
     diffPixels > 0 ? ResultTypes.FAIL : ResultTypes.PASS,
     diffPercentage,
     diffPixels,
-    diffOutputPath);
+    diffOutputPath
+  );
 }
 
 module.exports = {

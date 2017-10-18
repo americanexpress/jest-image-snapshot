@@ -1,13 +1,13 @@
 /*
  * Copyright (c) 2017 American Express Travel Related Services Company, Inc.
  *
- * Licensed under the Apache License, Version 2.0 (the 'License'); you may not use this file except
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
  * in compliance with the License. You may obtain a copy of the License at
  *
  * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software distributed under the License
- * is distributed on an 'AS IS' BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
+ * is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
  * or implied. See the License for the specific language governing permissions and limitations under
  * the License.
  */
@@ -24,7 +24,7 @@ function updateSnapshotState(oldSnapshotState, newSnapshotState) {
   return merge({}, oldSnapshotState, newSnapshotState);
 }
 
-function toMatchImageSnapshot(received, { customSnapshotIdentifier = '', customDiffConfig = {}, noColors = false, cleanPassingDiffs = false } = {}) {
+function toMatchImageSnapshot(received, { customSnapshotIdentifier = '', customDiffConfig = {}, noColors = false, cleanPassingDiffs = false, comparator = 'blink-diff' } = {}) {
   const { testPath, currentTestName, isNot } = this;
   const chalk = new Chalk({ enabled: !noColors });
 
@@ -34,32 +34,33 @@ function toMatchImageSnapshot(received, { customSnapshotIdentifier = '', customD
   updateSnapshotState(snapshotState, { _counters: snapshotState._counters.set(currentTestName, (snapshotState._counters.get(currentTestName) || 0) + 1) }); // eslint-disable-line max-len
   const snapshotIdentifier = customSnapshotIdentifier || kebabCase(`${path.basename(testPath)}-${currentTestName}-${snapshotState._counters.get(currentTestName)}`);
 
-  const result = diffImageToSnapshot({
+  const comparison = diffImageToSnapshot({
     imageData: received,
     snapshotIdentifier,
     snapshotsDir: path.join(path.dirname(testPath), '__image_snapshots__'),
     updateSnapshot: snapshotState._updateSnapshot === 'all',
     customDiffConfig,
+    comparator
   });
+  
   let pass = true;
-  let message = '';
-  if (result.result === ResultTypes.UPDATE) {
+  let message =  () =>'';
+  if (comparison.result === ResultTypes.UPDATE) {
     // once transition away from jasmine is done this will be a lot more elegant and pure
     // https://github.com/facebook/jest/pull/3668
     snapshotState = updateSnapshotState(snapshotState, { updated: snapshotState.updated += 1 });
-  } else if (result.result === ResultTypes.ADD) {
+  } else if (comparison.result === ResultTypes.ADD) {
     snapshotState = updateSnapshotState(snapshotState, { added: snapshotState.added += 1 });
-    // see https://github.com/yahoo/blink-diff/blob/master/index.js#L251-L285 for result codes
   } else {
-    pass = result.result === ResultTypes.PASS;
+    pass = comparison.result === ResultTypes.PASS;
 
     if (!pass) {
-      const dp = parseInt(result.differencePercentage * 100, 10);
+      const dp = parseInt(comparison.percentDiff * 100, 10);
 
-      message = `Expected image to match or be a close match to snapshot. ${dp}% different.\n`
-        + `${chalk.bold.red('See diff for details:')} ${chalk.red(result.diffOutputPath)}`;
-    } else if (cleanPassingDiffs && result.diffOutputPath && fs.existsSync(result.diffOutputPath)) {
-      fs.unlinkSync(result.diffOutputPath);
+      message = () => `Expected image to match or be a close match to snapshot. There is a ${dp}% difference.\n`
+        + `${chalk.bold.red('See diff for details:')} ${chalk.red(comparison.diffOutputPath)}`;
+    } else if (cleanPassingDiffs && comparison.diffOutputPath && fs.existsSync(comparison.diffOutputPath)) {
+      fs.unlinkSync(comparison.diffOutputPath);
     }
   }
 

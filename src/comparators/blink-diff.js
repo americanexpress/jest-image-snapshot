@@ -58,6 +58,7 @@ function diffImageToSnapshot(options) {
   const resultCode = unformattedDiffResult.code;
   const diffPercentage = unformattedDiffResult.differences / unformattedDiffResult.dimension;
 
+  // see https://github.com/yahoo/blink-diff/blob/master/index.js#L251-L285 for result codes
   return new ComparatorResult(
     resultCode === 0 || resultCode === 1 ? ResultTypes.FAIL : ResultTypes.PASS,
     diffPercentage,

@@ -33,24 +33,19 @@ function diffImageToSnapshot(options) {
   const baselineSnapshotPath = path.join(snapshotsDir, `${snapshotIdentifier}-snap.png`);
 
   if (fs.existsSync(baselineSnapshotPath) && !updateSnapshot) {
-    const comparatorOptions = Object.assign({}, options);
+    const comparatorOptions = Object.assign({
+      baselineSnapshotPath: baselineSnapshotPath,
+      diffOutputPath: path.join(snapshotsDir, '__diff_output__', `${snapshotIdentifier}-diff.png`)
+    }, options);
 
     // Build output paths here in a single place and create necessary directories
-    comparatorOptions.baselineSnapshotPath = baselineSnapshotPath;
-    comparatorOptions.diffOutputPath = path.join(snapshotsDir, '__diff_output__', `${snapshotIdentifier}-diff.png`);
     mkdirp.sync(path.dirname(comparatorOptions.diffOutputPath));
 
-    // Pick a comparator
-    let comparatorModule = null;
-    switch (comparator) {
-      case 'pixelmatch':
-        comparatorModule = pixelmatchComparator;
-        break;
-      case 'blink-diff':
-        comparatorModule = blinkDiffComparator;
-        break;
-      default:
-        throw Error(`Unknown comparator: ${comparator}`);
+    try {
+      // Load the comparator dynamically 
+      let comparatorModule = require(`./comparators/${comparator}`); // eslint-disable-line global-require
+    } catch (ex) {
+      throw Error(`Unknown comparator: ${comparator}. Valid options are blink-diff or pixelmatch`);
     }
 
     // Use it to get a result

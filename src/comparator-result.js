@@ -20,10 +20,10 @@ const ResultTypes = Object.freeze({
 });
 
 class ComparatorResult {
-  constructor(result, differencePercentage = null, differencePixels = null, diffOutputPath = null) {
+  constructor(result, percentDiff = null, pixelCountDiff = null, diffOutputPath = null) {
     this.result = result;
-    this.differencePercentage = differencePercentage;
-    this.differencePixels = differencePixels;
+    this.percentDiff = percentDiff;
+    this.pixelCountDiff = pixelCountDiff;
     this.diffOutputPath = diffOutputPath;
   }
 }
