@@ -12,16 +12,33 @@
  * the License.
  */
 
+const fs = require('fs');
+
 describe('toMatchImageSnapshot', () => {
   function setupMock(diffImageToSnapshotResult) {
     jest.doMock('../../src/diff-snapshot', () => ({
       diffImageToSnapshot: jest.fn(() => diffImageToSnapshotResult),
     }));
+
+    const mockFs = Object.assign({}, fs, {
+      existsSync: jest.fn(),
+      unlink: jest.fn(),
+    });
+    mockFs.existsSync.mockImplementation(path => path === 'test/path');
+    jest.mock('fs', () => mockFs);
+
+    return {
+      mockFs,
+    };
   }
 
   beforeEach(() => {
     jest.resetModules();
     jest.resetAllMocks();
+  });
+
+  afterEach(() => {
+    jest.unmock('fs');
   });
 
   it('should throw an error if used with .not matcher', () => {
@@ -35,25 +52,27 @@ describe('toMatchImageSnapshot', () => {
   });
 
   it('should pass when snapshot is similar enough or same as baseline snapshot', () => {
-    const mockDiffResult = { updated: false, code: 7 };
-    setupMock(mockDiffResult);
+    const mockDiffResult = { updated: false, code: 7, diffOutputPath: 'test/path' };
+    const { mockFs } = setupMock(mockDiffResult);
+
     const { toMatchImageSnapshot } = require('../../src/index');
     expect.extend({ toMatchImageSnapshot });
 
     expect(() => expect('pretendthisisanimagebuffer').toMatchImageSnapshot())
       .not.toThrow();
+    expect(mockFs.unlink).toHaveBeenCalledWith('test/path');
   });
 
   it('should fail when snapshot has a difference beyond allowed threshold', () => {
     // code 1 is result too different: https://github.com/yahoo/blink-diff/blob/master/index.js#L267
     const mockDiffResult = { updated: false, code: 1, diffOutputPath: 'path/to/result.png' };
-    setupMock(mockDiffResult);
+    const { mockFs } = setupMock(mockDiffResult);
     const { toMatchImageSnapshot } = require('../../src/index');
     expect.extend({ toMatchImageSnapshot });
 
-
     expect(() => expect('pretendthisisanimagebuffer').toMatchImageSnapshot())
       .toThrowErrorMatchingSnapshot();
+    expect(mockFs.unlink).not.toHaveBeenCalledWith('test/path');
   });
 
   it('should fail when diff result is unknown', () => {
@@ -125,7 +144,11 @@ describe('toMatchImageSnapshot', () => {
     matcherAtTest('pretendthisisanimagebuffer');
     const { diffImageToSnapshot } = require('../../src/diff-snapshot');
 
-    expect(diffImageToSnapshot.mock.calls[0][0]).toMatchSnapshot();
+    const dataArg = diffImageToSnapshot.mock.calls[0][0];
+    // This is to make the test work on windows
+    dataArg.snapshotsDir = dataArg.snapshotsDir.replace(/\\/g, '/');
+
+    expect(dataArg).toMatchSnapshot();
   });
 
   it('passes uses user passed snapshot name if given', () => {
