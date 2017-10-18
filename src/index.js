@@ -17,12 +17,14 @@ const merge = require('lodash/merge');
 const path = require('path');
 const Chalk = require('chalk').constructor;
 const { diffImageToSnapshot } = require('./diff-snapshot');
+const { ResultTypes } = require('./comparator-result');
+const fs = require('fs');
 
 function updateSnapshotState(oldSnapshotState, newSnapshotState) {
   return merge({}, oldSnapshotState, newSnapshotState);
 }
 
-function toMatchImageSnapshot(received, { customSnapshotIdentifier = '', customDiffConfig = {}, noColors = false } = {}) {
+function toMatchImageSnapshot(received, { customSnapshotIdentifier = '', customDiffConfig = {}, noColors = false, cleanPassingDiffs = false, comparator = 'blink-diff' } = {}) {
   const { testPath, currentTestName, isNot } = this;
   const chalk = new Chalk({ enabled: !noColors });
 
@@ -32,27 +34,35 @@ function toMatchImageSnapshot(received, { customSnapshotIdentifier = '', customD
   updateSnapshotState(snapshotState, { _counters: snapshotState._counters.set(currentTestName, (snapshotState._counters.get(currentTestName) || 0) + 1) }); // eslint-disable-line max-len
   const snapshotIdentifier = customSnapshotIdentifier || kebabCase(`${path.basename(testPath)}-${currentTestName}-${snapshotState._counters.get(currentTestName)}`);
 
-  const result = diffImageToSnapshot({
+  const comparison = diffImageToSnapshot({
     imageData: received,
     snapshotIdentifier,
     snapshotsDir: path.join(path.dirname(testPath), '__image_snapshots__'),
     updateSnapshot: snapshotState._updateSnapshot === 'all',
     customDiffConfig,
+    comparator,
   });
+
   let pass = true;
-  if (result.updated) {
+  let message = () => '';
+  if (comparison.result === ResultTypes.UPDATE) {
     // once transition away from jasmine is done this will be a lot more elegant and pure
     // https://github.com/facebook/jest/pull/3668
     snapshotState = updateSnapshotState(snapshotState, { updated: snapshotState.updated += 1 });
-  } else if (result.added) {
+  } else if (comparison.result === ResultTypes.ADD) {
     snapshotState = updateSnapshotState(snapshotState, { added: snapshotState.added += 1 });
-    // see https://github.com/yahoo/blink-diff/blob/master/index.js#L251-L285 for result codes
-  } else if (result.code === 0 || result.code === 1) {
-    pass = false;
-  }
+  } else {
+    pass = comparison.result === ResultTypes.PASS;
 
-  const message = () => 'Expected image to match or be a close match to snapshot.\n'
-                  + `${chalk.bold.red('See diff for details:')} ${chalk.red(result.diffOutputPath)}`;
+    if (!pass) {
+      const dp = parseInt(comparison.percentDiff * 100, 10);
+
+      message = () => `Expected image to match or be a close match to snapshot. There is a ${dp}% difference.\n`
+        + `${chalk.bold.red('See diff for details:')} ${chalk.red(comparison.diffOutputPath)}`;
+    } else if (cleanPassingDiffs && comparison.diffOutputPath && fs.existsSync(comparison.diffOutputPath)) { // eslint-disable-line max-len
+      fs.unlinkSync(comparison.diffOutputPath);
+    }
+  }
 
   return {
     message,

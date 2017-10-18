@@ -6,7 +6,7 @@
   ![Build Status](https://travis-ci.org/americanexpress/jest-image-snapshot.svg?branch=master)](https://travis-ci.org/americanexpress/jest-image-snapshot
 )
 
-Jest matcher that performs image comparisons using [Blink-diff](https://github.com/yahoo/blink-diff) and behaves just like [Jest snapshots](https://facebook.github.io/jest/docs/snapshot-testing.html) do! Very useful for browser visual comparison testing.
+Jest matcher that performs image comparisons using [Blink-diff](https://github.com/yahoo/blink-diff) or [pixelmatch](https://github.com/mapbox/pixelmatch) and behaves just like [Jest snapshots](https://facebook.github.io/jest/docs/snapshot-testing.html) do! Very useful for browser visual comparison testing.
 
 ## Installation:
   ```bash
@@ -33,7 +33,15 @@ Jest matcher that performs image comparisons using [Blink-diff](https://github.c
 
 ### Optional configuration:
 
-`toMatchImageSnapshot()` takes an optional options object where you can provide your own [blink-diff configuration parameters](http://yahoo.github.io/blink-diff/#object-usage) and/or a custom snapshot identifier string and/or forcing no styled output for possibly storing the results in a file:
+`toMatchImageSnapshot()` takes an optional options object with the following properties:
+
+* `comparator`: (default `blink-diff`) The comparator to use. Valid options are `blink-diff` or `pixelmatch`
+* `customDiffConfig`: Custom config passed to [blink-diff](http://yahoo.github.io/blink-diff/#object-usage) or [pixelmatch](https://github.com/mapbox/pixelmatch#pixelmatchimg1-img2-output-width-height-options) (See options section)
+  * Any blink-diff custom configuration can be provided so long as the values for `imageAPath`, `imageA`, `imageBPath`, `imageB`, or `imageOutputPath` are not changed as these are used internally.
+  * By default both comparators use a 1% difference threshold. 
+* `customSnapshotIdentifier`: A custom name to give this snapshot. If not provided one is computed automatically 
+* `noColors`: (default `false`) Removes colouring from console output, useful if storing the results in a file
+* `cleanPassingDiffs`: (default `false`) By default both comparators output a diff image even if they pass. Setting to true will delete passing diff images
 
 ```javascript
   it('should demonstrate this matcher`s usage with a custom blink-diff config', () => {
@@ -47,9 +55,14 @@ Jest matcher that performs image comparisons using [Blink-diff](https://github.c
   });  
 ```
 
-Any blink-diff custom configuration can be provided so long as the values for `imageAPath`, `imageA`, `imageBPath`, `imageB`, or `imageOutputPath` are not changed as these are used internally.
-
-By default, we have set [these values](https://github.com/americanexpress/jest-image-snapshot/blob/master/src/diff-snapshot.js#L55) for `thresholdType` and `threshold`.
+```javascript
+  it('should use pixelmatch', () => {
+    ...
+    expect(image).toMatchImageSnapshot({ 
+      comparator: 'pixelmatch'
+    });
+  });  
+```
 
 ## How it works
   Given an image (should be either a PNGImage instance or a Buffer instance with PNG data) the `toMatchImageSnapshot()` matcher will create a `__image_snapshots__` directory in the directory the test is in and will store the baseline snapshot image there on the first run.

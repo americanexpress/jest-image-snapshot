@@ -1,10 +1,12 @@
 # node & npm
 node_modules
 *.log
+.jest-cache
 
 # test
 test-results
 __diff_output__
+__tests__/src/__image_snapshots__
 
 # OS
 .DS_Store
