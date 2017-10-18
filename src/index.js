@@ -40,11 +40,11 @@ function toMatchImageSnapshot(received, { customSnapshotIdentifier = '', customD
     snapshotsDir: path.join(path.dirname(testPath), '__image_snapshots__'),
     updateSnapshot: snapshotState._updateSnapshot === 'all',
     customDiffConfig,
-    comparator
+    comparator,
   });
-  
+
   let pass = true;
-  let message =  () =>'';
+  let message = () => '';
   if (comparison.result === ResultTypes.UPDATE) {
     // once transition away from jasmine is done this will be a lot more elegant and pure
     // https://github.com/facebook/jest/pull/3668
@@ -59,7 +59,7 @@ function toMatchImageSnapshot(received, { customSnapshotIdentifier = '', customD
 
       message = () => `Expected image to match or be a close match to snapshot. There is a ${dp}% difference.\n`
         + `${chalk.bold.red('See diff for details:')} ${chalk.red(comparison.diffOutputPath)}`;
-    } else if (cleanPassingDiffs && comparison.diffOutputPath && fs.existsSync(comparison.diffOutputPath)) {
+    } else if (cleanPassingDiffs && comparison.diffOutputPath && fs.existsSync(comparison.diffOutputPath)) { // eslint-disable-line max-len
       fs.unlinkSync(comparison.diffOutputPath);
     }
   }
