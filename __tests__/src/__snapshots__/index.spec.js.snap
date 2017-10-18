@@ -1,13 +1,13 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`toMatchImageSnapshot should fail when snapshot has a difference beyond allowed threshold 2`] = `
-"Expected image to match or be a close match to snapshot. 40% different.
+"Expected image to match or be a close match to snapshot. There is a 40% difference.
 [1m[31mSee diff for details:[39m[22m [31mpath/to/result.png[39m"
 `;
 
 exports[`toMatchImageSnapshot should throw an error if used with .not matcher 1`] = `"Jest: \`.not\` cannot be used with \`.toMatchImageSnapshot()\`."`;
 
 exports[`toMatchImageSnapshot should use noColors options if passed as true and not style error message 2`] = `
-"Expected image to match or be a close match to snapshot. 60% different.
+"Expected image to match or be a close match to snapshot. There is a 60% difference.
 See diff for details: path/to/result.png"
 `;

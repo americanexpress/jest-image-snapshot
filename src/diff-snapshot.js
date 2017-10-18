@@ -44,12 +44,12 @@ function diffImageToSnapshot(options) {
     try {
       // Load the comparator dynamically 
       let comparatorModule = require(`./comparators/${comparator}`); // eslint-disable-line global-require
+
+      // Use it to get a result
+      return comparatorModule.diffImageToSnapshot(comparatorOptions);
     } catch (ex) {
       throw Error(`Unknown comparator: ${comparator}. Valid options are blink-diff or pixelmatch`);
     }
-
-    // Use it to get a result
-    return comparatorModule.diffImageToSnapshot(comparatorOptions);
   }
 
   // If the snapshot doesn't exist or we're supposed to update it just write it straight back
