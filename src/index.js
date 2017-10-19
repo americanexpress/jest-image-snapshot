@@ -17,6 +17,7 @@ const merge = require('lodash/merge');
 const path = require('path');
 const Chalk = require('chalk').constructor;
 const { diffImageToSnapshot } = require('./diff-snapshot');
+const fs = require('fs');
 
 function updateSnapshotState(oldSnapshotState, newSnapshotState) {
   return merge({}, oldSnapshotState, newSnapshotState);
@@ -49,6 +50,11 @@ function toMatchImageSnapshot(received, { customSnapshotIdentifier = '', customD
     // see https://github.com/yahoo/blink-diff/blob/master/index.js#L251-L285 for result codes
   } else if (result.code === 0 || result.code === 1) {
     pass = false;
+  }
+
+  // Clean up passing diff files
+  if (pass && fs.existsSync(result.diffOutputPath)) {
+    fs.unlinkSync(result.diffOutputPath);
   }
 
   const message = () => 'Expected image to match or be a close match to snapshot.\n'
