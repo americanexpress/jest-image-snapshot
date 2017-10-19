@@ -23,7 +23,7 @@ function updateSnapshotState(oldSnapshotState, newSnapshotState) {
   return merge({}, oldSnapshotState, newSnapshotState);
 }
 
-function toMatchImageSnapshot(received, { customSnapshotIdentifier = '', customDiffConfig = {}, noColors = false, cleanPassingDiffs = true } = {}) {
+function toMatchImageSnapshot(received, { customSnapshotIdentifier = '', customDiffConfig = {}, noColors = false } = {}) {
   const { testPath, currentTestName, isNot } = this;
   const chalk = new Chalk({ enabled: !noColors });
 
@@ -53,8 +53,8 @@ function toMatchImageSnapshot(received, { customSnapshotIdentifier = '', customD
   }
 
   // Clean up passing diff files
-  if (pass && cleanPassingDiffs && fs.existsSync(result.diffOutputPath)) {
-    fs.unlink(result.diffOutputPath);
+  if (pass && fs.existsSync(result.diffOutputPath)) {
+    fs.unlinkSync(result.diffOutputPath);
   }
 
   const message = () => 'Expected image to match or be a close match to snapshot.\n'

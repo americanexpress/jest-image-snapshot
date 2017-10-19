@@ -5,6 +5,7 @@ node_modules
 # test
 test-results
 __diff_output__
+.jest-cache
 
 # OS
 .DS_Store

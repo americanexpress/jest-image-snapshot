@@ -22,7 +22,7 @@ describe('toMatchImageSnapshot', () => {
 
     const mockFs = Object.assign({}, fs, {
       existsSync: jest.fn(),
-      unlink: jest.fn(),
+      unlinkSync: jest.fn(),
     });
     mockFs.existsSync.mockImplementation(path => path === 'test/path');
     jest.mock('fs', () => mockFs);
@@ -60,7 +60,7 @@ describe('toMatchImageSnapshot', () => {
 
     expect(() => expect('pretendthisisanimagebuffer').toMatchImageSnapshot())
       .not.toThrow();
-    expect(mockFs.unlink).toHaveBeenCalledWith('test/path');
+    expect(mockFs.unlinkSync).toHaveBeenCalledWith('test/path');
   });
 
   it('should fail when snapshot has a difference beyond allowed threshold', () => {
@@ -72,7 +72,7 @@ describe('toMatchImageSnapshot', () => {
 
     expect(() => expect('pretendthisisanimagebuffer').toMatchImageSnapshot())
       .toThrowErrorMatchingSnapshot();
-    expect(mockFs.unlink).not.toHaveBeenCalledWith('test/path');
+    expect(mockFs.unlinkSync).not.toHaveBeenCalledWith('test/path');
   });
 
   it('should fail when diff result is unknown', () => {
