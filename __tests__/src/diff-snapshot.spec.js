@@ -138,7 +138,6 @@ describe('diff-snapshot', () => {
         imageData: mockImageBuffer,
         snapshotIdentifier: mockSnapshotIdentifier,
         snapshotsDir: mockSnapshotsDir,
-        updateSnapshot: false,
       });
 
       expect(mockMkdirpSync).toHaveBeenCalledWith(path.join(mockSnapshotsDir, '__diff_output__'));

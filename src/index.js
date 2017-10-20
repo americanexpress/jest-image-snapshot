@@ -49,7 +49,6 @@ function toMatchImageSnapshot(received, { customSnapshotIdentifier = '', customD
     snapshotState = updateSnapshotState(snapshotState, { updated: snapshotState.updated += 1 });
   } else if (result.added) {
     snapshotState = updateSnapshotState(snapshotState, { added: snapshotState.added += 1 });
-    // see https://github.com/yahoo/blink-diff/blob/master/index.js#L251-L285 for result codes
   } else {
     pass = result.pass;
 
