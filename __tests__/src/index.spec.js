@@ -42,7 +42,7 @@ describe('toMatchImageSnapshot', () => {
   });
 
   it('should throw an error if used with .not matcher', () => {
-    const mockDiffResult = { updated: false, code: 7 };
+    const mockDiffResult = { updated: false, pass: false };
     setupMock(mockDiffResult);
     const { toMatchImageSnapshot } = require('../../src/index');
     expect.extend({ toMatchImageSnapshot });
@@ -52,7 +52,7 @@ describe('toMatchImageSnapshot', () => {
   });
 
   it('should pass when snapshot is similar enough or same as baseline snapshot', () => {
-    const mockDiffResult = { updated: false, code: 7, diffOutputPath: 'test/path' };
+    const mockDiffResult = { updated: false, pass: false, diffOutputPath: 'test/path' };
     const { mockFs } = setupMock(mockDiffResult);
 
     const { toMatchImageSnapshot } = require('../../src/index');
@@ -65,7 +65,7 @@ describe('toMatchImageSnapshot', () => {
 
   it('should fail when snapshot has a difference beyond allowed threshold', () => {
     // code 1 is result too different: https://github.com/yahoo/blink-diff/blob/master/index.js#L267
-    const mockDiffResult = { updated: false, code: 1, diffOutputPath: 'path/to/result.png' };
+    const mockDiffResult = { updated: false, pass: true, diffOutputPath: 'path/to/result.png' };
     const { mockFs } = setupMock(mockDiffResult);
     const { toMatchImageSnapshot } = require('../../src/index');
     expect.extend({ toMatchImageSnapshot });
@@ -75,21 +75,9 @@ describe('toMatchImageSnapshot', () => {
     expect(mockFs.unlinkSync).not.toHaveBeenCalledWith('test/path');
   });
 
-  it('should fail when diff result is unknown', () => {
-    // code 0 is unknown result: https://github.com/yahoo/blink-diff/blob/master/index.js#L258
-    const mockDiffResult = { updated: false, code: 0, diffOutputPath: 'path/to/result.png' };
-    setupMock(mockDiffResult);
-    const { toMatchImageSnapshot } = require('../../src/index');
-    expect.extend({ toMatchImageSnapshot });
-
-
-    expect(() => expect('pretendthisisanimagebuffer').toMatchImageSnapshot())
-      .toThrowErrorMatchingSnapshot();
-  });
-
   it('should use noColors options if passed as true and not style error message', () => {
     // code 1 is result too different: https://github.com/yahoo/blink-diff/blob/master/index.js#L267
-    const mockDiffResult = { updated: false, code: 1, diffOutputPath: 'path/to/result.png' };
+    const mockDiffResult = { updated: false, pass: false, diffOutputPath: 'path/to/result.png', percentDiff: 0.4 };
     setupMock(mockDiffResult);
     const { toMatchImageSnapshot } = require('../../src/index');
     expect.extend({ toMatchImageSnapshot });

@@ -20,9 +20,16 @@ expect.extend({ toMatchImageSnapshot });
 
 describe('integration tests', () => {
   const imagePath = path.resolve(__dirname, '../stubs', 'TestImage.png');
-  const data = fs.readFileSync(imagePath);
+  const imageData = fs.readFileSync(imagePath);
+  
+  const failImagePath = path.resolve(__dirname, '../stubs', 'TestImageFailure.png');
+  const failImageData = fs.readFileSync(failImagePath);
 
   it('matches an identical snapshot.', () => {
-    expect(data).toMatchImageSnapshot();
+    expect(imageData).toMatchImageSnapshot({customSnapshotIdentifier: 'integration'});
+  });
+
+  it('matches an identical snapshot.', () => {
+    expect(() => expect(failImageData).toMatchImageSnapshot({customSnapshotIdentifier: 'integration'})).toThrowError();
   });
 });
