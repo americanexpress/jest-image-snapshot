@@ -6,6 +6,7 @@ node_modules
 test-results
 __diff_output__
 .jest-cache
+__tests__/src/__image_snapshots__
 
 # OS
 .DS_Store

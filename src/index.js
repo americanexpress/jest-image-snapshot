@@ -17,7 +17,6 @@ const merge = require('lodash/merge');
 const path = require('path');
 const Chalk = require('chalk').constructor;
 const { diffImageToSnapshot } = require('./diff-snapshot');
-const fs = require('fs');
 
 function updateSnapshotState(oldSnapshotState, newSnapshotState) {
   return merge({}, oldSnapshotState, newSnapshotState);
@@ -55,7 +54,7 @@ function toMatchImageSnapshot(received, { customSnapshotIdentifier = '', customD
     pass = result.pass;
 
     if (!pass) {
-      const dp = parseInt(result.percentDiff * 100, 10);      
+      const dp = parseInt(result.percentDiff * 100, 10);
 
       message = () => `Expected image to match or be a close match to snapshot. There is a ${dp}% difference\n`
                 + `${chalk.bold.red('See diff for details:')} ${chalk.red(result.diffOutputPath)}`;

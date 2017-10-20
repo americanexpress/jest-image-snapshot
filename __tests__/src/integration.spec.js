@@ -15,21 +15,26 @@
 const fs = require('fs');
 const path = require('path');
 const toMatchImageSnapshot = require('../../src').toMatchImageSnapshot;
+const rimraf = require('rimraf');
 
 expect.extend({ toMatchImageSnapshot });
 
 describe('integration tests', () => {
   const imagePath = path.resolve(__dirname, '../stubs', 'TestImage.png');
   const imageData = fs.readFileSync(imagePath);
-  
+
   const failImagePath = path.resolve(__dirname, '../stubs', 'TestImageFailure.png');
   const failImageData = fs.readFileSync(failImagePath);
 
-  it('matches an identical snapshot.', () => {
-    expect(imageData).toMatchImageSnapshot({customSnapshotIdentifier: 'integration'});
+  beforeAll(() => {
+    rimraf.sync('./__tests__/src/__image_snapshots__');
   });
 
   it('matches an identical snapshot.', () => {
-    expect(() => expect(failImageData).toMatchImageSnapshot({customSnapshotIdentifier: 'integration'})).toThrowError();
+    expect(() => expect(imageData).toMatchImageSnapshot({ customSnapshotIdentifier: 'integration' })).not.toThrowError();
+  });
+
+  it('fails with a different snapshot.', () => {
+    expect(() => expect(failImageData).toMatchImageSnapshot({ customSnapshotIdentifier: 'integration' })).toThrowError();
   });
 });

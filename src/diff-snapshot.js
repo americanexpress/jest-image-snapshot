@@ -25,7 +25,7 @@ function diffImageToSnapshot(options) {
     snapshotsDir,
     updateSnapshot = false,
     customDiffConfig = {},
-   } = options;
+  } = options;
 
   let result = {};
   const baselineSnapshotPath = path.join(snapshotsDir, `${snapshotIdentifier}-snap.png`);
@@ -54,15 +54,16 @@ function diffImageToSnapshot(options) {
     const diffPercentage = diffPixels / totalPixels;
 
     const pass = diffPixels === 0;
-    if (pass) {
+    if (!pass) {
       const buffer = PNG.sync.write(diffImg);
       fs.writeFileSync(diffOutputPath, buffer);
-    } 
+    }
 
     result = {
       pass,
       diffOutputPath,
-      diffPercentage
+      diffPercentage,
+      diffPixels,
     };
   } else {
     mkdirp.sync(snapshotsDir);
