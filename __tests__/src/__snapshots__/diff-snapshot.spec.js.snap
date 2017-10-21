@@ -2,31 +2,13 @@
 
 exports[`diff-snapshot diffImageToSnapshot should merge custom configuration with default configuration if custom config is passed 1`] = `
 Object {
-  "threshold": 0.01,
-}
-`;
-
-exports[`diff-snapshot diffImageToSnapshot should merge custom configuration with default configuration if custom config is passed 2`] = `
-Object {
   "foo": "bar",
   "threshold": 0.1,
 }
 `;
 
-exports[`diff-snapshot diffImageToSnapshot should run comparison if there is already a snapshot stored and updateSnapshot flag is not set 1`] = `
+exports[`diff-snapshot diffImageToSnapshot should take the default diff config 1`] = `
 Object {
-  "diffOutputPath": "\\\\path\\\\to\\\\snapshots\\\\__diff_output__\\\\id1-diff.png",
-  "diffPercentage": 0,
-  "diffPixels": 0,
-  "pass": true,
-}
-`;
-
-exports[`diff-snapshot diffImageToSnapshot should write a diff image only if the test fails 1`] = `
-Object {
-  "diffOutputPath": "\\\\path\\\\to\\\\snapshots\\\\__diff_output__\\\\id1-diff.png",
-  "diffPercentage": 0.5,
-  "diffPixels": 5000,
-  "pass": false,
+  "threshold": 0.01,
 }
 `;

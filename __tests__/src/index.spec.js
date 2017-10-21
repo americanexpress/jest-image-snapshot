@@ -104,7 +104,6 @@ describe('toMatchImageSnapshot', () => {
     const result = matcherAtTest('pretendthisisanimagebuffer', { customDiffConfig });
     const { diffImageToSnapshot } = require('../../src/diff-snapshot');
     expect(diffImageToSnapshot.mock.calls[0][0].customDiffConfig).toBe(customDiffConfig);
-    expect(result.pass).toEqual(true);
     expect(result.message()).toMatchSnapshot();
   });
 
@@ -134,7 +133,6 @@ describe('toMatchImageSnapshot', () => {
     dataArg.snapshotsDir = dataArg.snapshotsDir.replace(/\\/g, '/');
 
     expect(dataArg).toMatchSnapshot();
-    expect(result.pass).toEqual(true);
     expect(result.message()).toMatchSnapshot();
   });
 

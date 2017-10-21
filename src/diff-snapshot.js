@@ -32,21 +32,23 @@ function diffImageToSnapshot(options) {
   if (fs.existsSync(baselineSnapshotPath) && !updateSnapshot) {
     const outputDir = path.join(snapshotsDir, '__diff_output__');
     const diffOutputPath = path.join(outputDir, `${snapshotIdentifier}-diff.png`);
-    const defaultBlinkDiffConfig = {
+    const defaultDiffConfig = {
       threshold: 0.01,
     };
 
     mkdirp.sync(outputDir);
-    const diffConfig = Object.assign({}, defaultBlinkDiffConfig, customDiffConfig);
+    const diffConfig = Object.assign({}, defaultDiffConfig, customDiffConfig);
 
     const comparisonImg = PNG.sync.read(imageData);
     const baselineImg = PNG.sync.read(fs.readFileSync(baselineSnapshotPath));
 
     const diffImg = new PNG({ width: comparisonImg.width, height: comparisonImg.height });
     const diffPixels = pixelmatch(
-      comparisonImg.data, baselineImg.data,
+      comparisonImg.data,
+      baselineImg.data,
       diffImg.data,
-      comparisonImg.width, comparisonImg.height,
+      comparisonImg.width,
+      comparisonImg.height,
       diffConfig
     );
 

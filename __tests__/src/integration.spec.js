@@ -23,11 +23,12 @@ describe('integration tests', () => {
   const imagePath = path.resolve(__dirname, '../stubs', 'TestImage.png');
   const imageData = fs.readFileSync(imagePath);
 
-  const failImagePath = path.resolve(__dirname, '../stubs', 'TestImageFailure.png');
-  const failImageData = fs.readFileSync(failImagePath);
-
   beforeAll(() => {
     rimraf.sync('./__tests__/src/__image_snapshots__');
+  });
+
+  it('writes a snapshot with no error.', () => {
+    expect(() => expect(imageData).toMatchImageSnapshot({ customSnapshotIdentifier: 'integration' })).not.toThrowError();
   });
 
   it('matches an identical snapshot.', () => {
@@ -35,6 +36,16 @@ describe('integration tests', () => {
   });
 
   it('fails with a different snapshot.', () => {
+    const failImagePath = path.resolve(__dirname, '../stubs', 'TestImageFailure.png');
+    const failImageData = fs.readFileSync(failImagePath);
+
+    expect(() => expect(failImageData).toMatchImageSnapshot({ customSnapshotIdentifier: 'integration' })).toThrowError();
+  });
+
+  it('fails gracefully with a different snapshot.', () => {
+    const failImagePath = path.resolve(__dirname, '../stubs', 'TestImageFailureOversize.png');
+    const failImageData = fs.readFileSync(failImagePath);
+
     expect(() => expect(failImageData).toMatchImageSnapshot({ customSnapshotIdentifier: 'integration' })).toThrowError();
   });
 });

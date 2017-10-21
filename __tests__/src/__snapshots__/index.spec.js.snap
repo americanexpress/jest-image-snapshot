@@ -13,7 +13,7 @@ Object {
 exports[`toMatchImageSnapshot passes diffImageToSnapshot everything it needs to create a snapshot and compare if needed 2`] = `""`;
 
 exports[`toMatchImageSnapshot should fail when snapshot has a difference beyond allowed threshold 2`] = `
-"Expected image to match or be a close match to snapshot. There is a 80% difference
+"Expected image to match or be a close match to snapshot. 80% different
 [1m[31mSee diff for details:[39m[22m [31mpath/to/result.png[39m"
 `;
 
@@ -22,6 +22,6 @@ exports[`toMatchImageSnapshot should throw an error if used with .not matcher 1`
 exports[`toMatchImageSnapshot should use custom pixelmatch configuration if passed in 1`] = `""`;
 
 exports[`toMatchImageSnapshot should use noColors options if passed as true and not style error message 2`] = `
-"Expected image to match or be a close match to snapshot. There is a 40% difference
+"Expected image to match or be a close match to snapshot. 40% different
 See diff for details: path/to/result.png"
 `;

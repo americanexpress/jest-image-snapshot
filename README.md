@@ -39,7 +39,6 @@ Jest matcher that performs image comparisons using [pixelmatch](https://github.c
   * By default we have set the threshold to 0.01, you can increase that value by passing a customDiffConfig as demonstrated below
 * `customSnapshotIdentifier`: A custom name to give this snapshot. If not provided one is computed automatically
 * `noColors`: (default `false`) Removes colouring from console output, useful if storing the results in a file
-* `cleanPassingDiffs`: (default `false`) By default both comparators output a diff image even if they pass. Setting to true will delete passing diff images
 
 ```javascript
   it('should demonstrate this matcher`s usage with a custom pixelmatch config', () => {
