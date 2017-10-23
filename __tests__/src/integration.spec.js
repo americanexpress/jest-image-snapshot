@@ -15,7 +15,6 @@
 const fs = require('fs');
 const path = require('path');
 const toMatchImageSnapshot = require('../../src').toMatchImageSnapshot;
-const rimraf = require('rimraf');
 
 expect.extend({ toMatchImageSnapshot });
 
@@ -23,11 +22,9 @@ describe('integration tests', () => {
   const imagePath = path.resolve(__dirname, '../stubs', 'TestImage.png');
   const imageData = fs.readFileSync(imagePath);
 
-  beforeAll(() => {
-    rimraf.sync('./__tests__/src/__image_snapshots__');
-  });
-
   it('writes a snapshot with no error.', () => {
+    fs.unlink('./__tests__/src/__image_snapshots__/integration-snap.png');
+
     expect(() => expect(imageData).toMatchImageSnapshot({ customSnapshotIdentifier: 'integration' })).not.toThrowError();
   });
 
@@ -42,7 +39,7 @@ describe('integration tests', () => {
     expect(() => expect(failImageData).toMatchImageSnapshot({ customSnapshotIdentifier: 'integration' })).toThrowError();
   });
 
-  it('fails gracefully with a different snapshot.', () => {
+  it('fails gracefully with a differently sized image.', () => {
     const failImagePath = path.resolve(__dirname, '../stubs', 'TestImageFailureOversize.png');
     const failImageData = fs.readFileSync(failImagePath);
 

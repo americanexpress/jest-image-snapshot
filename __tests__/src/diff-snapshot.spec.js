@@ -78,7 +78,7 @@ describe('diff-snapshot', () => {
       return diffImageToSnapshot;
     }
 
-    it('should run comparison if there is already a snapshot stored and updateSnapshot flag is not set, it should not write a diff', () => {
+    it('should run comparison if there is already a snapshot stored and updateSnapshot flag is not set', () => {
       const diffImageToSnapshot = setupTest({ snapshotExists: true });
       const result = diffImageToSnapshot({
         imageData: mockImageBuffer,
@@ -102,6 +102,26 @@ describe('diff-snapshot', () => {
         100,
         { threshold: 0.01 }
       );
+    });
+
+    it('it should not write a diff if a test passes', () => {
+      const diffImageToSnapshot = setupTest({ snapshotExists: true, pixelmatchResult: 0 });
+      const result = diffImageToSnapshot({
+        imageData: mockImageBuffer,
+        snapshotIdentifier: mockSnapshotIdentifier,
+        snapshotsDir: mockSnapshotsDir,
+        updateSnapshot: false,
+      });
+
+      expect(result).toMatchObject({
+        diffOutputPath: path.join(mockSnapshotsDir, '__diff_output__', 'id1-diff.png'),
+        diffPercentage: 0,
+        diffPixels: 0,
+        pass: true,
+      });
+      // Check that pixelmatch was called
+      expect(mockPixelMatch).toHaveBeenCalledTimes(1);
+      // Check that that it did not attempt to write a diff
       expect(mockWriteFileSync).not.toHaveBeenCalled();
     });
 

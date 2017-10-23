@@ -32,8 +32,7 @@
     "amex-jest-preset": "^4.0.2",
     "eslint": "^3.19.0",
     "eslint-config-amex": "^6.0.0",
-    "jest": "^20.0.0",
-    "rimraf": "^2.6.2"
+    "jest": "^20.0.0"
   },
   "dependencies": {
     "chalk": "^1.1.3",
