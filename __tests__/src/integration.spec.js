@@ -21,10 +21,15 @@ expect.extend({ toMatchImageSnapshot });
 describe('integration tests', () => {
   const imagePath = path.resolve(__dirname, '../stubs', 'TestImage.png');
   const imageData = fs.readFileSync(imagePath);
+  const snapPath = './__tests__/src/__image_snapshots__/integration-snap.png';
+
+  beforeAll(() => {
+    if (fs.exists(snapPath)) {
+      fs.unlink(snapPath);
+    }
+  });
 
   it('writes a snapshot with no error.', () => {
-    fs.unlink('./__tests__/src/__image_snapshots__/integration-snap.png');
-
     expect(() => expect(imageData).toMatchImageSnapshot({ customSnapshotIdentifier: 'integration' })).not.toThrowError();
   });
 
