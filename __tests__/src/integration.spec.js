@@ -96,7 +96,7 @@ describe('integration tests', () => {
     const failImageData = fs.readFileSync(failImagePath);
 
     // Test against a different image
-    expect(() => expect(failImageData).toMatchImageSnapshot({ customSnapshotIdentifier })).toThrowErrorMatchingSnapshot(); // eslint-disable-line max-len
+    expect(() => expect(failImageData).toMatchImageSnapshot({ customSnapshotIdentifier })).toThrowError(); // eslint-disable-line max-len
   });
 
   it('fails gracefully with a differently sized image.', () => {
@@ -110,6 +110,6 @@ describe('integration tests', () => {
     const failImageData = fs.readFileSync(failImagePath);
 
     // Test against an image much larger than the snapshot.
-    expect(() => expect(failImageData).toMatchImageSnapshot({ customSnapshotIdentifier })).toThrowErrorMatchingSnapshot(); // eslint-disable-line max-len
+    expect(() => expect(failImageData).toMatchImageSnapshot({ customSnapshotIdentifier })).toThrowError(); // eslint-disable-line max-len
   });
 });
