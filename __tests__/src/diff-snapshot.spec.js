@@ -89,8 +89,8 @@ describe('diff-snapshot', () => {
 
       expect(result).toMatchObject({
         diffOutputPath: path.join(mockSnapshotsDir, '__diff_output__', 'id1-diff.png'),
-        diffPercentage: 0,
-        diffPixels: 0,
+        percentDiff: 0,
+        pixelCountDiff: 0,
         pass: true,
       });
       expect(mockPixelMatch).toHaveBeenCalledTimes(1);
@@ -115,8 +115,8 @@ describe('diff-snapshot', () => {
 
       expect(result).toMatchObject({
         diffOutputPath: path.join(mockSnapshotsDir, '__diff_output__', 'id1-diff.png'),
-        diffPercentage: 0,
-        diffPixels: 0,
+        percentDiff: 0,
+        pixelCountDiff: 0,
         pass: true,
       });
       // Check that pixelmatch was called
@@ -136,8 +136,8 @@ describe('diff-snapshot', () => {
 
       expect(result).toMatchObject({
         diffOutputPath: path.join(mockSnapshotsDir, '__diff_output__', 'id1-diff.png'),
-        diffPercentage: 0.5,
-        diffPixels: 5000,
+        percentDiff: 0.5,
+        pixelCountDiff: 5000,
         pass: false,
       });
       expect(mockPixelMatch).toHaveBeenCalledTimes(1);

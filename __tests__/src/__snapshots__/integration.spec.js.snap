@@ -1,0 +1,11 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`integration tests fails gracefully with a differently sized image. 3`] = `
+"Expected image to match or be a close match to snapshot. 40% different
+[1m[31mSee diff for details:[39m[22m [31mC:\\\\Users\\\\Paul\\\\Documents\\\\GitHub\\\\jest-image-snapshot\\\\__tests__\\\\src\\\\__image_snapshots__\\\\__diff_output__\\\\integration-4-diff.png[39m"
+`;
+
+exports[`integration tests fails with a different snapshot. 3`] = `
+"Expected image to match or be a close match to snapshot. 86% different
+[1m[31mSee diff for details:[39m[22m [31mC:\\\\Users\\\\Paul\\\\Documents\\\\GitHub\\\\jest-image-snapshot\\\\__tests__\\\\src\\\\__image_snapshots__\\\\__diff_output__\\\\integration-3-diff.png[39m"
+`;

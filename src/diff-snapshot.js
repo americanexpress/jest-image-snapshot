@@ -43,7 +43,7 @@ function diffImageToSnapshot(options) {
     const baselineImg = PNG.sync.read(fs.readFileSync(baselineSnapshotPath));
 
     const diffImg = new PNG({ width: comparisonImg.width, height: comparisonImg.height });
-    const diffPixels = pixelmatch(
+    const pixelCountDiff = pixelmatch(
       comparisonImg.data,
       baselineImg.data,
       diffImg.data,
@@ -53,9 +53,9 @@ function diffImageToSnapshot(options) {
     );
 
     const totalPixels = comparisonImg.width * comparisonImg.height;
-    const diffPercentage = diffPixels / totalPixels;
+    const percentDiff = pixelCountDiff / totalPixels;
 
-    const pass = diffPixels === 0;
+    const pass = pixelCountDiff === 0;
     if (!pass) {
       const buffer = PNG.sync.write(diffImg);
       fs.writeFileSync(diffOutputPath, buffer);
@@ -64,8 +64,8 @@ function diffImageToSnapshot(options) {
     result = {
       pass,
       diffOutputPath,
-      diffPercentage,
-      diffPixels,
+      percentDiff,
+      pixelCountDiff,
     };
   } else {
     mkdirp.sync(snapshotsDir);
