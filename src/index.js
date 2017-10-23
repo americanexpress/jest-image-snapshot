@@ -22,51 +22,61 @@ function updateSnapshotState(oldSnapshotState, newSnapshotState) {
   return merge({}, oldSnapshotState, newSnapshotState);
 }
 
-function toMatchImageSnapshot(received, { customSnapshotIdentifier = '', customDiffConfig = {}, noColors = false } = {}) {
-  const { testPath, currentTestName, isNot } = this;
-  const chalk = new Chalk({ enabled: !noColors });
+function configureToMatchImageSnapshot({
+  customDiffConfig: commonCustomDiffConfig = {},
+  noColors: commonNoColors = false,
+} = {}) {
+  return function toMatchImageSnapshot(received, {
+    customSnapshotIdentifier = '',
+    customDiffConfig = {},
+    noColors = commonNoColors,
+  } = {}) {
+    const { testPath, currentTestName, isNot } = this;
+    const chalk = new Chalk({ enabled: !noColors });
 
-  let { snapshotState } = this;
-  if (isNot) { throw new Error('Jest: `.not` cannot be used with `.toMatchImageSnapshot()`.'); }
+    let { snapshotState } = this;
+    if (isNot) { throw new Error('Jest: `.not` cannot be used with `.toMatchImageSnapshot()`.'); }
 
-  updateSnapshotState(snapshotState, { _counters: snapshotState._counters.set(currentTestName, (snapshotState._counters.get(currentTestName) || 0) + 1) }); // eslint-disable-line max-len
-  const snapshotIdentifier = customSnapshotIdentifier || kebabCase(`${path.basename(testPath)}-${currentTestName}-${snapshotState._counters.get(currentTestName)}`);
+    updateSnapshotState(snapshotState, { _counters: snapshotState._counters.set(currentTestName, (snapshotState._counters.get(currentTestName) || 0) + 1) }); // eslint-disable-line max-len
+    const snapshotIdentifier = customSnapshotIdentifier || kebabCase(`${path.basename(testPath)}-${currentTestName}-${snapshotState._counters.get(currentTestName)}`);
 
-  const result = diffImageToSnapshot({
-    imageData: received,
-    snapshotIdentifier,
-    snapshotsDir: path.join(path.dirname(testPath), '__image_snapshots__'),
-    updateSnapshot: snapshotState._updateSnapshot === 'all',
-    customDiffConfig,
-  });
+    const result = diffImageToSnapshot({
+      imageData: received,
+      snapshotIdentifier,
+      snapshotsDir: path.join(path.dirname(testPath), '__image_snapshots__'),
+      updateSnapshot: snapshotState._updateSnapshot === 'all',
+      customDiffConfig: Object.assign({}, commonCustomDiffConfig, customDiffConfig),
+    });
 
-  let pass = true;
-  let message = () => '';
+    let pass = true;
+    let message = () => '';
 
-  if (result.updated) {
-    // once transition away from jasmine is done this will be a lot more elegant and pure
-    // https://github.com/facebook/jest/pull/3668
-    snapshotState = updateSnapshotState(snapshotState, { updated: snapshotState.updated += 1 });
-  } else if (result.added) {
-    snapshotState = updateSnapshotState(snapshotState, { added: snapshotState.added += 1 });
-  } else {
-    pass = result.pass;
+    if (result.updated) {
+      // once transition away from jasmine is done this will be a lot more elegant and pure
+      // https://github.com/facebook/jest/pull/3668
+      snapshotState = updateSnapshotState(snapshotState, { updated: snapshotState.updated += 1 });
+    } else if (result.added) {
+      snapshotState = updateSnapshotState(snapshotState, { added: snapshotState.added += 1 });
+    } else {
+      pass = result.pass;
 
-    if (!pass) {
-      const differencePercentage = parseInt(result.diffRatio * 100, 10);
+      if (!pass) {
+        const differencePercentage = parseInt(result.diffRatio * 100, 10);
 
-      message = () => `Expected image to match or be a close match to snapshot. ${differencePercentage}% different\n`
-                + `${chalk.bold.red('See diff for details:')} ${chalk.red(result.diffOutputPath)}`;
+        message = () => `Expected image to match or be a close match to snapshot. ${differencePercentage}% different\n`
+                  + `${chalk.bold.red('See diff for details:')} ${chalk.red(result.diffOutputPath)}`;
+      }
     }
-  }
 
-  return {
-    message,
-    pass,
+    return {
+      message,
+      pass,
+    };
   };
 }
 
 module.exports = {
-  toMatchImageSnapshot,
+  toMatchImageSnapshot: configureToMatchImageSnapshot(),
+  configureToMatchImageSnapshot,
   updateSnapshotState,
 };

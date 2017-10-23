@@ -52,6 +52,19 @@ Jest matcher that performs image comparisons using [pixelmatch](https://github.c
   });
 ```
 
+Custom defaults can be set with a configurable extension. This will allow for customization of this module's defaults. For example, a 0% default threshold can be shared across all tests with the configuration below.
+
+```javascript
+const { configureToMatchImageSnapshot } = require('jest-image-snapshot');
+
+const customConfig = { threshold: 0 };
+const toMatchImageSnapshot = configureToMatchImageSnapshot({ 
+  customDiffConfig: customConfig, 
+  noColors: true,
+})
+expect.extend({ toMatchImageSnapshot });
+```
+
 ## How it works
   Given an image (should be either a PNGImage instance or a Buffer instance with PNG data) the `toMatchImageSnapshot()` matcher will create a `__image_snapshots__` directory in the directory the test is in and will store the baseline snapshot image there on the first run.
 
