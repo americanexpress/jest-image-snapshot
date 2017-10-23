@@ -89,7 +89,7 @@ describe('diff-snapshot', () => {
 
       expect(result).toMatchObject({
         diffOutputPath: path.join(mockSnapshotsDir, '__diff_output__', 'id1-diff.png'),
-        percentDiff: 0,
+        diffRatio: 0,
         pixelCountDiff: 0,
         pass: true,
       });
@@ -115,7 +115,7 @@ describe('diff-snapshot', () => {
 
       expect(result).toMatchObject({
         diffOutputPath: path.join(mockSnapshotsDir, '__diff_output__', 'id1-diff.png'),
-        percentDiff: 0,
+        diffRatio: 0,
         pixelCountDiff: 0,
         pass: true,
       });
@@ -136,7 +136,7 @@ describe('diff-snapshot', () => {
 
       expect(result).toMatchObject({
         diffOutputPath: path.join(mockSnapshotsDir, '__diff_output__', 'id1-diff.png'),
-        percentDiff: 0.5,
+        diffRatio: 0.5,
         pixelCountDiff: 5000,
         pass: false,
       });

@@ -53,7 +53,7 @@ function diffImageToSnapshot(options) {
     );
 
     const totalPixels = comparisonImg.width * comparisonImg.height;
-    const percentDiff = pixelCountDiff / totalPixels;
+    const diffRatio = pixelCountDiff / totalPixels;
 
     const pass = pixelCountDiff === 0;
     if (!pass) {
@@ -64,7 +64,7 @@ function diffImageToSnapshot(options) {
     result = {
       pass,
       diffOutputPath,
-      percentDiff,
+      diffRatio,
       pixelCountDiff,
     };
   } else {

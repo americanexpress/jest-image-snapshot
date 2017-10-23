@@ -63,7 +63,7 @@ describe('toMatchImageSnapshot', () => {
   });
 
   it('should fail when snapshot has a difference beyond allowed threshold', () => {
-    const mockDiffResult = { updated: false, pass: false, diffOutputPath: 'path/to/result.png', percentDiff: 0.8 };
+    const mockDiffResult = { updated: false, pass: false, diffOutputPath: 'path/to/result.png', diffRatio: 0.8 };
     setupMock(mockDiffResult);
     const { toMatchImageSnapshot } = require('../../src/index');
     expect.extend({ toMatchImageSnapshot });
@@ -73,7 +73,7 @@ describe('toMatchImageSnapshot', () => {
   });
 
   it('should use noColors options if passed as true and not style error message', () => {
-    const mockDiffResult = { updated: false, pass: false, diffOutputPath: 'path/to/result.png', percentDiff: 0.4 };
+    const mockDiffResult = { updated: false, pass: false, diffOutputPath: 'path/to/result.png', diffRatio: 0.4 };
     setupMock(mockDiffResult);
     const { toMatchImageSnapshot } = require('../../src/index');
     expect.extend({ toMatchImageSnapshot });
