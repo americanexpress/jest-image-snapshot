@@ -17,7 +17,6 @@ const merge = require('lodash/merge');
 const path = require('path');
 const Chalk = require('chalk').constructor;
 const { diffImageToSnapshot } = require('./diff-snapshot');
-const fs = require('fs');
 
 function updateSnapshotState(oldSnapshotState, newSnapshotState) {
   return merge({}, oldSnapshotState, newSnapshotState);
@@ -40,25 +39,26 @@ function toMatchImageSnapshot(received, { customSnapshotIdentifier = '', customD
     updateSnapshot: snapshotState._updateSnapshot === 'all',
     customDiffConfig,
   });
+
   let pass = true;
+  let message = () => '';
+
   if (result.updated) {
     // once transition away from jasmine is done this will be a lot more elegant and pure
     // https://github.com/facebook/jest/pull/3668
     snapshotState = updateSnapshotState(snapshotState, { updated: snapshotState.updated += 1 });
   } else if (result.added) {
     snapshotState = updateSnapshotState(snapshotState, { added: snapshotState.added += 1 });
-    // see https://github.com/yahoo/blink-diff/blob/master/index.js#L251-L285 for result codes
-  } else if (result.code === 0 || result.code === 1) {
-    pass = false;
-  }
+  } else {
+    pass = result.pass;
 
-  // Clean up passing diff files
-  if (pass && fs.existsSync(result.diffOutputPath)) {
-    fs.unlinkSync(result.diffOutputPath);
-  }
+    if (!pass) {
+      const differencePercentage = parseInt(result.diffRatio * 100, 10);
 
-  const message = () => 'Expected image to match or be a close match to snapshot.\n'
-                  + `${chalk.bold.red('See diff for details:')} ${chalk.red(result.diffOutputPath)}`;
+      message = () => `Expected image to match or be a close match to snapshot. ${differencePercentage}% different\n`
+                + `${chalk.bold.red('See diff for details:')} ${chalk.red(result.diffOutputPath)}`;
+    }
+  }
 
   return {
     message,

@@ -13,22 +13,10 @@
  */
 
 const fs = require('fs');
-const BlinkDiff = require('blink-diff');
-const intersection = require('lodash/intersection');
+const PNG = require('pngjs').PNG;
+const pixelmatch = require('pixelmatch');
 const mkdirp = require('mkdirp');
 const path = require('path');
-
-const unsupportedDiffConfigKeys = [
-  'imageAPath',
-  'imageA',
-  'imageBPath',
-  'imageB',
-  'imageOutputPath',
-];
-
-function isDiffConfigValid(customDiffConfig) {
-  return intersection(unsupportedDiffConfigKeys, Object.keys(customDiffConfig)).length === 0;
-}
 
 function diffImageToSnapshot(options) {
   const {
@@ -37,39 +25,48 @@ function diffImageToSnapshot(options) {
     snapshotsDir,
     updateSnapshot = false,
     customDiffConfig = {},
-   } = options;
-
-  if (!isDiffConfigValid(customDiffConfig)) {
-    throw new Error(
-      `Passing in options: ${unsupportedDiffConfigKeys} via Blink-Diff configuration `
-      + 'is not supported as those option are internally used. '
-      + 'Instead pass your image data as first argument to this function!'
-    );
-  }
+  } = options;
 
   let result = {};
   const baselineSnapshotPath = path.join(snapshotsDir, `${snapshotIdentifier}-snap.png`);
   if (fs.existsSync(baselineSnapshotPath) && !updateSnapshot) {
     const outputDir = path.join(snapshotsDir, '__diff_output__');
     const diffOutputPath = path.join(outputDir, `${snapshotIdentifier}-diff.png`);
-    const defaultBlinkDiffConfig = {
-      imageA: imageData,
-      imageBPath: baselineSnapshotPath,
-      thresholdType: 'percent',
+    const defaultDiffConfig = {
       threshold: 0.01,
-      imageOutputPath: diffOutputPath,
     };
 
     mkdirp.sync(outputDir);
-    const diffConfig = Object.assign({}, defaultBlinkDiffConfig, customDiffConfig);
-    const diff = new BlinkDiff(diffConfig);
-    const unformattedDiffResult = diff.runSync();
+    const diffConfig = Object.assign({}, defaultDiffConfig, customDiffConfig);
 
-    result = Object.assign(
-      {},
-      unformattedDiffResult,
-      { diffOutputPath }
+    const comparisonImg = PNG.sync.read(imageData);
+    const baselineImg = PNG.sync.read(fs.readFileSync(baselineSnapshotPath));
+
+    const diffImg = new PNG({ width: comparisonImg.width, height: comparisonImg.height });
+    const pixelCountDiff = pixelmatch(
+      comparisonImg.data,
+      baselineImg.data,
+      diffImg.data,
+      comparisonImg.width,
+      comparisonImg.height,
+      diffConfig
     );
+
+    const totalPixels = comparisonImg.width * comparisonImg.height;
+    const diffRatio = pixelCountDiff / totalPixels;
+
+    const pass = pixelCountDiff === 0;
+    if (!pass) {
+      const buffer = PNG.sync.write(diffImg);
+      fs.writeFileSync(diffOutputPath, buffer);
+    }
+
+    result = {
+      pass,
+      diffOutputPath,
+      diffRatio,
+      pixelCountDiff,
+    };
   } else {
     mkdirp.sync(snapshotsDir);
     fs.writeFileSync(baselineSnapshotPath, imageData);
@@ -80,7 +77,5 @@ function diffImageToSnapshot(options) {
 }
 
 module.exports = {
-  unsupportedDiffConfigKeys,
   diffImageToSnapshot,
-  isDiffConfigValid,
 };

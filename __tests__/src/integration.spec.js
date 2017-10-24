@@ -14,15 +14,102 @@
 
 const fs = require('fs');
 const path = require('path');
-const toMatchImageSnapshot = require('../../src').toMatchImageSnapshot;
-
-expect.extend({ toMatchImageSnapshot });
 
 describe('integration tests', () => {
   const imagePath = path.resolve(__dirname, '../stubs', 'TestImage.png');
-  const data = fs.readFileSync(imagePath);
+  const imageData = fs.readFileSync(imagePath);
+  const snapDir = './__tests__/src/__image_snapshots__/';
+
+  const setupInterception = () => {
+    // When running the tests with -u we don't actually want to update the
+    // our integration snaps or everything goes weird. The integration tests
+    // stop failing because all out snapshots update mid-test
+    // To prevent this I'm intercepting toMatchImageSnapshot and forcing _updateSnapshot
+    // to always be false in the integration tests. This is intentional!
+    const intercept = require.requireActual('../../src');
+    const originalToMatchImageSnapshot = intercept.toMatchImageSnapshot;
+
+    intercept.toMatchImageSnapshot = function (...args) {
+      const ctx = this;
+      let originalUpdateSnapshot = null;
+
+      // First check if _updateSnapshot is set just in case
+      if (ctx && ctx.snapshotState && ctx.snapshotState._updateSnapshot) { // eslint-disable-line no-underscore-dangle,max-len
+        originalUpdateSnapshot = ctx.snapshotState._updateSnapshot; // eslint-disable-line no-underscore-dangle,max-len
+        // Disable it
+        ctx.snapshotState._updateSnapshot = 'none'; // eslint-disable-line no-underscore-dangle
+      }
+
+      // Run the comparison
+      const result = originalToMatchImageSnapshot.apply(ctx, args);
+
+      // Enable again so that the rest of Jest performs normally
+      if (originalUpdateSnapshot) {
+        ctx.snapshotState._updateSnapshot = originalUpdateSnapshot; // eslint-disable-line no-underscore-dangle,max-len
+      }
+
+      return result;
+    };
+
+    return intercept;
+  };
+
+  const cleanSnapshot = function (customSnapshotIdentifier) {
+    const snapPath = path.join(snapDir, `${customSnapshotIdentifier}-snap.png`);
+
+    if (fs.exists(snapPath)) {
+      fs.unlink(snapPath);
+    }
+  };
+
+  beforeAll(() => {
+    const toMatchImageSnapshot = setupInterception().toMatchImageSnapshot;
+    expect.extend({ toMatchImageSnapshot });
+  });
+
+  it('writes a snapshot with no error.', () => {
+    const customSnapshotIdentifier = 'integration-1';
+    cleanSnapshot(customSnapshotIdentifier);
+
+    expect(() => expect(imageData).toMatchImageSnapshot({ customSnapshotIdentifier })).not.toThrowError(); // eslint-disable-line max-len
+  });
 
   it('matches an identical snapshot.', () => {
-    expect(data).toMatchImageSnapshot();
+    const customSnapshotIdentifier = 'integration-2';
+    cleanSnapshot(customSnapshotIdentifier);
+
+    // Write a new snapshot image
+    expect(() => expect(imageData).toMatchImageSnapshot({ customSnapshotIdentifier })).not.toThrowError(); // eslint-disable-line max-len
+
+    // Then we test and expect it to pass
+    expect(() => expect(imageData).toMatchImageSnapshot({ customSnapshotIdentifier })).not.toThrowError(); // eslint-disable-line max-len
+  });
+
+  it('fails with a different snapshot.', () => {
+    const customSnapshotIdentifier = 'integration-3';
+    cleanSnapshot(customSnapshotIdentifier);
+
+    // Write a new snapshot image
+    expect(() => expect(imageData).toMatchImageSnapshot({ customSnapshotIdentifier })).not.toThrowError(); // eslint-disable-line max-len
+
+    const failImagePath = path.resolve(__dirname, '../stubs', 'TestImageFailure.png');
+    const failImageData = fs.readFileSync(failImagePath);
+
+    // Test against a different image
+    expect(() => expect(failImageData).toMatchImageSnapshot({ customSnapshotIdentifier })).toThrowError(); // eslint-disable-line max-len
+  });
+
+  it('fails gracefully with a differently sized image.', () => {
+    const customSnapshotIdentifier = 'integration-4';
+    cleanSnapshot(customSnapshotIdentifier);
+
+    // First we need to write a new snapshot image
+    expect(() => expect(imageData).toMatchImageSnapshot({ customSnapshotIdentifier })).not.toThrowError(); // eslint-disable-line max-len
+
+    const failImagePath = path.resolve(__dirname, '../stubs', 'TestImageFailureOversize.png');
+    const failImageData = fs.readFileSync(failImagePath);
+
+    // Test against an image much larger than the snapshot.
+    expect(() => expect(failImageData).toMatchImageSnapshot({ customSnapshotIdentifier })).toThrowError(); // eslint-disable-line max-len
   });
 });

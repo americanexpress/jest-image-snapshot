@@ -10,19 +10,14 @@ Object {
 }
 `;
 
-exports[`toMatchImageSnapshot should fail when diff result is unknown 2`] = `
-"Expected image to match or be a close match to snapshot.
-[1m[31mSee diff for details:[39m[22m [31mpath/to/result.png[39m"
-`;
-
 exports[`toMatchImageSnapshot should fail when snapshot has a difference beyond allowed threshold 2`] = `
-"Expected image to match or be a close match to snapshot.
+"Expected image to match or be a close match to snapshot. 80% different
 [1m[31mSee diff for details:[39m[22m [31mpath/to/result.png[39m"
 `;
 
 exports[`toMatchImageSnapshot should throw an error if used with .not matcher 1`] = `"Jest: \`.not\` cannot be used with \`.toMatchImageSnapshot()\`."`;
 
 exports[`toMatchImageSnapshot should use noColors options if passed as true and not style error message 2`] = `
-"Expected image to match or be a close match to snapshot.
+"Expected image to match or be a close match to snapshot. 40% different
 See diff for details: path/to/result.png"
 `;
