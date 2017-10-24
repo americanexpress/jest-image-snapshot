@@ -103,7 +103,7 @@ describe('toMatchImageSnapshot', () => {
     const customDiffConfig = { threshold: 0.3 };
     const result = matcherAtTest('pretendthisisanimagebuffer', { customDiffConfig });
     const { diffImageToSnapshot } = require('../../src/diff-snapshot');
-    expect(diffImageToSnapshot.mock.calls[0][0].customDiffConfig).toBe(customDiffConfig);
+    expect(diffImageToSnapshot.mock.calls[0][0].customDiffConfig).toEqual(customDiffConfig);
     expect(result.message()).toEqual('');
   });
 
@@ -222,5 +222,52 @@ describe('toMatchImageSnapshot', () => {
     const { toMatchImageSnapshot } = require('../../src/index');
     const matcherAtTest = toMatchImageSnapshot.bind(mockTestContext);
     expect(() => matcherAtTest('pretendthisisanimagebuffer')).not.toThrow();
+  });
+
+  it('can provide custom defaults', () => {
+    const mockTestContext = {
+      testPath: 'path/to/test.spec.js',
+      currentTestName: 'test1',
+      isNot: false,
+      snapshotState: {
+        _counters: new Map(),
+        update: true,
+        updated: undefined,
+        added: undefined,
+      },
+    };
+    setupMock({ updated: true, code: 0 });
+
+    const diffImageToSnapshot = jest.fn(() => ({}));
+    jest.doMock('../../src/diff-snapshot', () => ({
+      diffImageToSnapshot,
+    }));
+
+    const Chalk = jest.fn();
+    jest.doMock('chalk', () => ({
+      constructor: Chalk,
+    }));
+    const { configureToMatchImageSnapshot } = require('../../src/index');
+    const customConfig = { perceptual: true };
+    const toMatchImageSnapshot = configureToMatchImageSnapshot({
+      customDiffConfig: customConfig,
+      noColors: true,
+    });
+    expect.extend({ toMatchImageSnapshot });
+    const matcherAtTest = toMatchImageSnapshot.bind(mockTestContext);
+
+    matcherAtTest();
+
+    expect(diffImageToSnapshot).toHaveBeenCalledWith({
+      customDiffConfig: {
+        perceptual: true,
+      },
+      snapshotIdentifier: 'test-spec-js-test-1-1',
+      snapshotsDir: 'path/to/__image_snapshots__',
+      updateSnapshot: false,
+    });
+    expect(Chalk).toHaveBeenCalledWith({
+      enabled: false,
+    });
   });
 });
