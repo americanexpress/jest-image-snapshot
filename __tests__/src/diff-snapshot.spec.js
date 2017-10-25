@@ -85,6 +85,8 @@ describe('diff-snapshot', () => {
         snapshotIdentifier: mockSnapshotIdentifier,
         snapshotsDir: mockSnapshotsDir,
         updateSnapshot: false,
+        failureThreshold: 0,
+        failureThresholdType: 'pixel',
       });
 
       expect(result).toMatchObject({
@@ -111,6 +113,8 @@ describe('diff-snapshot', () => {
         snapshotIdentifier: mockSnapshotIdentifier,
         snapshotsDir: mockSnapshotsDir,
         updateSnapshot: false,
+        failureThreshold: 0,
+        failureThresholdType: 'pixel',
       });
 
       expect(result).toMatchObject({
@@ -132,6 +136,8 @@ describe('diff-snapshot', () => {
         snapshotIdentifier: mockSnapshotIdentifier,
         snapshotsDir: mockSnapshotsDir,
         updateSnapshot: false,
+        failureThreshold: 0,
+        failureThresholdType: 'pixel',
       });
 
       expect(result).toMatchObject({
@@ -156,6 +162,70 @@ describe('diff-snapshot', () => {
       );
     });
 
+    it('should pass <= failureThreshold pixel', () => {
+      const diffImageToSnapshot = setupTest({ snapshotExists: true, pixelmatchResult: 250 });
+      const result = diffImageToSnapshot({
+        imageData: mockFailImageBuffer,
+        snapshotIdentifier: mockSnapshotIdentifier,
+        snapshotsDir: mockSnapshotsDir,
+        updateSnapshot: false,
+        failureThreshold: 250,
+        failureThresholdType: 'pixel',
+      });
+
+      expect(result.pass).toBe(true);
+      expect(result.pixelCountDiff).toBe(250);
+      expect(result.diffRatio).toBe(0.025);
+    });
+
+    it('should fail > failureThreshold pixel', () => {
+      const diffImageToSnapshot = setupTest({ snapshotExists: true, pixelmatchResult: 251 });
+      const result = diffImageToSnapshot({
+        imageData: mockFailImageBuffer,
+        snapshotIdentifier: mockSnapshotIdentifier,
+        snapshotsDir: mockSnapshotsDir,
+        updateSnapshot: false,
+        failureThreshold: 250,
+        failureThresholdType: 'pixel',
+      });
+
+      expect(result.pass).toBe(false);
+      expect(result.pixelCountDiff).toBe(251);
+      expect(result.diffRatio).toBe(0.0251);
+    });
+
+    it('should pass <= failureThreshold percent', () => {
+      const diffImageToSnapshot = setupTest({ snapshotExists: true, pixelmatchResult: 250 });
+      const result = diffImageToSnapshot({
+        imageData: mockFailImageBuffer,
+        snapshotIdentifier: mockSnapshotIdentifier,
+        snapshotsDir: mockSnapshotsDir,
+        updateSnapshot: false,
+        failureThreshold: 0.025,
+        failureThresholdType: 'percent',
+      });
+
+      expect(result.pass).toBe(true);
+      expect(result.pixelCountDiff).toBe(250);
+      expect(result.diffRatio).toBe(0.025);
+    });
+
+    it('should fail > failureThreshold percent', () => {
+      const diffImageToSnapshot = setupTest({ snapshotExists: true, pixelmatchResult: 251 });
+      const result = diffImageToSnapshot({
+        imageData: mockFailImageBuffer,
+        snapshotIdentifier: mockSnapshotIdentifier,
+        snapshotsDir: mockSnapshotsDir,
+        updateSnapshot: false,
+        failureThreshold: 0.025,
+        failureThresholdType: 'percent',
+      });
+
+      expect(result.pass).toBe(false);
+      expect(result.pixelCountDiff).toBe(251);
+      expect(result.diffRatio).toBe(0.0251);
+    });
+
     it('should take the default diff config', () => {
       const diffImageToSnapshot = setupTest({ snapshotExists: true });
 
@@ -164,6 +234,8 @@ describe('diff-snapshot', () => {
         snapshotIdentifier: mockSnapshotIdentifier,
         snapshotsDir: mockSnapshotsDir,
         updateSnapshot: false,
+        failureThreshold: 0,
+        failureThresholdType: 'pixel',
       });
       expect(mockPixelMatch).toHaveBeenCalledTimes(1);
       expect(mockPixelMatch.mock.calls[0][5]).toMatchSnapshot();
@@ -181,6 +253,8 @@ describe('diff-snapshot', () => {
           threshold: 0.1,
           foo: 'bar',
         },
+        failureThreshold: 0,
+        failureThresholdType: 'pixel',
       });
       expect(mockPixelMatch).toHaveBeenCalledTimes(1);
       expect(mockPixelMatch.mock.calls[0][5]).toMatchSnapshot();
@@ -192,6 +266,8 @@ describe('diff-snapshot', () => {
         imageData: mockImageBuffer,
         snapshotIdentifier: mockSnapshotIdentifier,
         snapshotsDir: mockSnapshotsDir,
+        failureThreshold: 0,
+        failureThresholdType: 'pixel',
       });
 
       expect(mockMkdirpSync).toHaveBeenCalledWith(path.join(mockSnapshotsDir, '__diff_output__'));
@@ -204,6 +280,8 @@ describe('diff-snapshot', () => {
         snapshotIdentifier: mockSnapshotIdentifier,
         snapshotsDir: mockSnapshotsDir,
         updateSnapshot: false,
+        failureThreshold: 0,
+        failureThresholdType: 'pixel',
       });
 
       expect(mockMkdirSync).not.toHaveBeenCalledWith(path.join(mockSnapshotsDir, '__diff_output__'));
@@ -216,6 +294,8 @@ describe('diff-snapshot', () => {
         snapshotIdentifier: mockSnapshotIdentifier,
         snapshotsDir: mockSnapshotsDir,
         updateSnapshot: true,
+        failureThreshold: 0,
+        failureThresholdType: 'pixel',
       });
 
       expect(mockMkdirpSync).toHaveBeenCalledWith(mockSnapshotsDir);
@@ -228,6 +308,8 @@ describe('diff-snapshot', () => {
         snapshotIdentifier: mockSnapshotIdentifier,
         snapshotsDir: mockSnapshotsDir,
         updateSnapshot: true,
+        failureThreshold: 0,
+        failureThresholdType: 'pixel',
       });
 
       expect(mockMkdirSync).not.toHaveBeenCalledWith(mockSnapshotsDir);
@@ -240,6 +322,8 @@ describe('diff-snapshot', () => {
         snapshotIdentifier: mockSnapshotIdentifier,
         snapshotsDir: mockSnapshotsDir,
         updateSnapshot: false,
+        failureThreshold: 0,
+        failureThresholdType: 'pixel',
       });
 
       expect(mockWriteFileSync).toHaveBeenCalledTimes(1);
@@ -253,6 +337,8 @@ describe('diff-snapshot', () => {
         snapshotIdentifier: mockSnapshotIdentifier,
         snapshotsDir: mockSnapshotsDir,
         updateSnapshot: true,
+        failureThreshold: 0,
+        failureThresholdType: 'pixel',
       });
 
       expect(diffResult).toHaveProperty('updated', true);
@@ -265,6 +351,8 @@ describe('diff-snapshot', () => {
         snapshotIdentifier: mockSnapshotIdentifier,
         snapshotsDir: mockSnapshotsDir,
         updateSnapshot: false,
+        failureThreshold: 0,
+        failureThresholdType: 'pixel',
       });
 
       expect(diffResult).toHaveProperty('added', true);
@@ -281,9 +369,26 @@ describe('diff-snapshot', () => {
         snapshotIdentifier: mockSnapshotIdentifier,
         snapshotsDir: mockSnapshotsDir,
         updateSnapshot: false,
+        failureThreshold: 0,
+        failureThresholdType: 'pixel',
       });
 
       expect(diffResult).toHaveProperty('diffOutputPath', path.join(mockSnapshotsDir, '__diff_output__', `${mockSnapshotIdentifier}-diff.png`));
+    });
+
+    it('should throw an error if an unknown threshold type is supplied', () => {
+      const diffImageToSnapshot = setupTest({ snapshotExists: true });
+
+      expect(() => {
+        diffImageToSnapshot({
+          imageData: mockImageBuffer,
+          snapshotIdentifier: mockSnapshotIdentifier,
+          snapshotsDir: mockSnapshotsDir,
+          updateSnapshot: false,
+          failureThreshold: 0,
+          failureThresholdType: 'banana',
+        });
+      }).toThrowErrorMatchingSnapshot();
     });
   });
 });

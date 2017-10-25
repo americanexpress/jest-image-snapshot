@@ -25,6 +25,8 @@ function diffImageToSnapshot(options) {
     snapshotsDir,
     updateSnapshot = false,
     customDiffConfig = {},
+    failureThreshold,
+    failureThresholdType,
   } = options;
 
   let result = {};
@@ -55,7 +57,15 @@ function diffImageToSnapshot(options) {
     const totalPixels = comparisonImg.width * comparisonImg.height;
     const diffRatio = pixelCountDiff / totalPixels;
 
-    const pass = pixelCountDiff === 0;
+    let pass = false;
+    if (failureThresholdType === 'pixel') {
+      pass = pixelCountDiff <= failureThreshold;
+    } else if (failureThresholdType === 'percent') {
+      pass = diffRatio <= failureThreshold;
+    } else {
+      throw new Error(`Unknown failureThresholdType: ${failureThresholdType}. The options are pixel/percent`);
+    }
+
     if (!pass) {
       const buffer = PNG.sync.write(diffImg);
       fs.writeFileSync(diffOutputPath, buffer);

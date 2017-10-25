@@ -36,9 +36,11 @@ Jest matcher that performs image comparisons using [pixelmatch](https://github.c
 `toMatchImageSnapshot()` takes an optional options object with the following properties:
 
 * `customDiffConfig`: Custom config passed [pixelmatch](https://github.com/mapbox/pixelmatch#pixelmatchimg1-img2-output-width-height-options) (See options section)
-  * By default we have set the threshold to 0.01, you can increase that value by passing a customDiffConfig as demonstrated below
+  * By default we have set the threshold to 0.01, you can increase that value by passing a customDiffConfig as demonstrated below. Please note the threshold set in the customDiffConfig is the per pixel sensitivity threshold.
 * `customSnapshotIdentifier`: A custom name to give this snapshot. If not provided one is computed automatically
 * `noColors`: (default `false`) Removes colouring from console output, useful if storing the results in a file
+* `failureThreshold`: (default `0.01` 1% difference) Sets the threshold that would trigger a failure based on the type selected
+* `failureThresholdType`: (default `percent`) (options `percent`/`pixel`) Sets the type of threshold that would trigger a failure. For example, 1% difference or > 500 pixels
 
 ```javascript
   it('should demonstrate this matcher`s usage with a custom pixelmatch config', () => {
@@ -58,8 +60,8 @@ Custom defaults can be set with a configurable extension. This will allow for cu
 const { configureToMatchImageSnapshot } = require('jest-image-snapshot');
 
 const customConfig = { threshold: 0 };
-const toMatchImageSnapshot = configureToMatchImageSnapshot({ 
-  customDiffConfig: customConfig, 
+const toMatchImageSnapshot = configureToMatchImageSnapshot({
+  customDiffConfig: customConfig,
   noColors: true,
 })
 expect.extend({ toMatchImageSnapshot });
