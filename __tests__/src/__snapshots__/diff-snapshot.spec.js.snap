@@ -13,4 +13,4 @@ Object {
 }
 `;
 
-exports[`diff-snapshot diffImageToSnapshot should throw an error if an unknown threshold type is supplied 1`] = `"Unknown failureThresholdType: banana. The options are pixel/percent"`;
+exports[`diff-snapshot diffImageToSnapshot should throw an error if an unknown threshold type is supplied 1`] = `"Unknown failureThresholdType: banana. Valid options are \\"pixel\\" or \\"percent\\"."`;

@@ -63,7 +63,7 @@ function diffImageToSnapshot(options) {
     } else if (failureThresholdType === 'percent') {
       pass = diffRatio <= failureThreshold;
     } else {
-      throw new Error(`Unknown failureThresholdType: ${failureThresholdType}. The options are pixel/percent`);
+      throw new Error(`Unknown failureThresholdType: ${failureThresholdType}. Valid options are "pixel" or "percent".`);
     }
 
     if (!pass) {

@@ -39,8 +39,8 @@ Jest matcher that performs image comparisons using [pixelmatch](https://github.c
   * By default we have set the threshold to 0.01, you can increase that value by passing a customDiffConfig as demonstrated below. Please note the threshold set in the customDiffConfig is the per pixel sensitivity threshold.
 * `customSnapshotIdentifier`: A custom name to give this snapshot. If not provided one is computed automatically
 * `noColors`: (default `false`) Removes colouring from console output, useful if storing the results in a file
-* `failureThreshold`: (default `0.01` 1% difference) Sets the threshold that would trigger a failure based on the type selected
-* `failureThresholdType`: (default `percent`) (options `percent`/`pixel`) Sets the type of threshold that would trigger a failure. For example, 1% difference or > 500 pixels
+* `failureThreshold`: (default `0`) Sets the threshold that would trigger a failure based on the type selected
+* `failureThresholdType`: (default `pixel`) (options `percent` or `pixel`) Sets the type of threshold that would trigger a failure. 
 
 ```javascript
   it('should demonstrate this matcher`s usage with a custom pixelmatch config', () => {
@@ -50,6 +50,18 @@ Jest matcher that performs image comparisons using [pixelmatch](https://github.c
       customDiffConfig: customConfig,
       customSnapshotIdentifier: 'customSnapshotName',
       noColors: true // the default is false
+    });
+  });
+```
+
+The failure threshold can be set in percent, in this case if the difference is over 1%.
+
+```javascript
+  it('should fail if there is more than a 1% difference', () => {
+    ...
+    expect(image).toMatchImageSnapshot({
+      failureThreshold: '0.01',
+      failureThresholdType: 'percent'
     });
   });
 ```

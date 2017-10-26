@@ -25,8 +25,8 @@ function updateSnapshotState(oldSnapshotState, newSnapshotState) {
 function configureToMatchImageSnapshot({
   customDiffConfig: commonCustomDiffConfig = {},
   noColors: commonNoColors = false,
-  failureThreshold: commonFailureThreshold = 0.01,
-  failureThresholdType: commonFailureThresholdType = 'percent',
+  failureThreshold: commonFailureThreshold = 0,
+  failureThresholdType: commonFailureThresholdType = 'pixel',
 } = {}) {
   return function toMatchImageSnapshot(received, {
     customSnapshotIdentifier = '',

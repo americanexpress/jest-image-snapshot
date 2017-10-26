@@ -266,8 +266,8 @@ describe('toMatchImageSnapshot', () => {
       snapshotIdentifier: 'test-spec-js-test-1-1',
       snapshotsDir: path.join('path', 'to', '__image_snapshots__'),
       updateSnapshot: false,
-      failureThreshold: 0.01,
-      failureThresholdType: 'percent',
+      failureThreshold: 0,
+      failureThresholdType: 'pixel',
     });
     expect(Chalk).toHaveBeenCalledWith({
       enabled: false,
