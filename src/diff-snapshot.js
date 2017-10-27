@@ -38,7 +38,6 @@ function diffImageToSnapshot(options) {
       threshold: 0.01,
     };
 
-    mkdirp.sync(outputDir);
     const diffConfig = Object.assign({}, defaultDiffConfig, customDiffConfig);
 
     const comparisonImg = PNG.sync.read(imageData);
@@ -67,6 +66,7 @@ function diffImageToSnapshot(options) {
     }
 
     if (!pass) {
+      mkdirp.sync(outputDir);
       const buffer = PNG.sync.write(diffImg);
       fs.writeFileSync(diffOutputPath, buffer);
     }
