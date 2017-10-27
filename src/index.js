@@ -25,11 +25,15 @@ function updateSnapshotState(oldSnapshotState, newSnapshotState) {
 function configureToMatchImageSnapshot({
   customDiffConfig: commonCustomDiffConfig = {},
   noColors: commonNoColors = false,
+  failureThreshold: commonFailureThreshold = 0,
+  failureThresholdType: commonFailureThresholdType = 'pixel',
 } = {}) {
   return function toMatchImageSnapshot(received, {
     customSnapshotIdentifier = '',
     customDiffConfig = {},
     noColors = commonNoColors,
+    failureThreshold = commonFailureThreshold,
+    failureThresholdType = commonFailureThresholdType,
   } = {}) {
     const { testPath, currentTestName, isNot } = this;
     const chalk = new Chalk({ enabled: !noColors });
@@ -46,6 +50,8 @@ function configureToMatchImageSnapshot({
       snapshotsDir: path.join(path.dirname(testPath), '__image_snapshots__'),
       updateSnapshot: snapshotState._updateSnapshot === 'all',
       customDiffConfig: Object.assign({}, commonCustomDiffConfig, customDiffConfig),
+      failureThreshold,
+      failureThresholdType,
     });
 
     let pass = true;
