@@ -284,6 +284,8 @@ describe('diff-snapshot', () => {
         snapshotIdentifier: mockSnapshotIdentifier,
         snapshotsDir: mockSnapshotsDir,
         updateSnapshot: false,
+        failureThreshold: 0,
+        failureThresholdType: 'pixel',
       });
 
       expect(mockMkdirSync).not.toHaveBeenCalled();
