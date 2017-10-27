@@ -13,6 +13,7 @@
  */
 
 const fs = require('fs');
+const path = require('path');
 
 describe('toMatchImageSnapshot', () => {
   function setupMock(diffImageToSnapshotResult) {
@@ -24,7 +25,7 @@ describe('toMatchImageSnapshot', () => {
       existsSync: jest.fn(),
       unlinkSync: jest.fn(),
     });
-    mockFs.existsSync.mockImplementation(path => path === 'test/path');
+    mockFs.existsSync.mockImplementation(p => p === 'test/path');
     jest.mock('fs', () => mockFs);
 
     return {
@@ -226,7 +227,7 @@ describe('toMatchImageSnapshot', () => {
 
   it('can provide custom defaults', () => {
     const mockTestContext = {
-      testPath: 'path/to/test.spec.js',
+      testPath: path.join('path', 'to', 'test.spec.js'),
       currentTestName: 'test1',
       isNot: false,
       snapshotState: {
@@ -263,8 +264,10 @@ describe('toMatchImageSnapshot', () => {
         perceptual: true,
       },
       snapshotIdentifier: 'test-spec-js-test-1-1',
-      snapshotsDir: 'path/to/__image_snapshots__',
+      snapshotsDir: path.join('path', 'to', '__image_snapshots__'),
       updateSnapshot: false,
+      failureThreshold: 0,
+      failureThresholdType: 'pixel',
     });
     expect(Chalk).toHaveBeenCalledWith({
       enabled: false,

@@ -36,9 +36,12 @@ Jest matcher that performs image comparisons using [pixelmatch](https://github.c
 `toMatchImageSnapshot()` takes an optional options object with the following properties:
 
 * `customDiffConfig`: Custom config passed [pixelmatch](https://github.com/mapbox/pixelmatch#pixelmatchimg1-img2-output-width-height-options) (See options section)
-  * By default we have set the threshold to 0.01, you can increase that value by passing a customDiffConfig as demonstrated below
+  * By default we have set the `threshold` to 0.01, you can increase that value by passing a customDiffConfig as demonstrated below. 
+  * Please note the `threshold` set in the `customDiffConfig` is the per pixel sensitivity threshold. For example with a source pixel colour of `#ffffff` (white) and a comparison pixel colour of `#fcfcfc` (really light grey) if you set the threshold to 0 then it would trigger a failure *on that pixel*. However if you were to use say 0.5 then it wouldn't, the colour difference would need to be much more extreme to trigger a failure on that pixel, say `#000000` (black)
 * `customSnapshotIdentifier`: A custom name to give this snapshot. If not provided one is computed automatically
 * `noColors`: (default `false`) Removes colouring from console output, useful if storing the results in a file
+* `failureThreshold`: (default `0`) Sets the threshold that would trigger a test failure based on the `failureThresholdType` selected. This is different to the `customDiffConfig.threshold` above, that is the per pixel failure threshold, this is the failure threshold for the entire comparison.
+* `failureThresholdType`: (default `pixel`) (options `percent` or `pixel`) Sets the type of threshold that would trigger a failure.
 
 ```javascript
   it('should demonstrate this matcher`s usage with a custom pixelmatch config', () => {
@@ -52,14 +55,26 @@ Jest matcher that performs image comparisons using [pixelmatch](https://github.c
   });
 ```
 
+The failure threshold can be set in percent, in this case if the difference is over 1%.
+
+```javascript
+  it('should fail if there is more than a 1% difference', () => {
+    ...
+    expect(image).toMatchImageSnapshot({
+      failureThreshold: '0.01',
+      failureThresholdType: 'percent'
+    });
+  });
+```
+
 Custom defaults can be set with a configurable extension. This will allow for customization of this module's defaults. For example, a 0% default threshold can be shared across all tests with the configuration below.
 
 ```javascript
 const { configureToMatchImageSnapshot } = require('jest-image-snapshot');
 
 const customConfig = { threshold: 0 };
-const toMatchImageSnapshot = configureToMatchImageSnapshot({ 
-  customDiffConfig: customConfig, 
+const toMatchImageSnapshot = configureToMatchImageSnapshot({
+  customDiffConfig: customConfig,
   noColors: true,
 })
 expect.extend({ toMatchImageSnapshot });
