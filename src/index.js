@@ -18,6 +18,8 @@ const path = require('path');
 const Chalk = require('chalk').constructor;
 const { diffImageToSnapshot } = require('./diff-snapshot');
 
+const SNAPSHOTS_DIR = '__image_snapshots__';
+
 function updateSnapshotState(oldSnapshotState, newSnapshotState) {
   return merge({}, oldSnapshotState, newSnapshotState);
 }
@@ -30,6 +32,7 @@ function configureToMatchImageSnapshot({
 } = {}) {
   return function toMatchImageSnapshot(received, {
     customSnapshotIdentifier = '',
+    customSnapshotsDir,
     customDiffConfig = {},
     noColors = commonNoColors,
     failureThreshold = commonFailureThreshold,
@@ -47,7 +50,7 @@ function configureToMatchImageSnapshot({
     const result = diffImageToSnapshot({
       imageData: received,
       snapshotIdentifier,
-      snapshotsDir: path.join(path.dirname(testPath), '__image_snapshots__'),
+      snapshotsDir: customSnapshotsDir || path.join(path.dirname(testPath), SNAPSHOTS_DIR),
       updateSnapshot: snapshotState._updateSnapshot === 'all',
       customDiffConfig: Object.assign({}, commonCustomDiffConfig, customDiffConfig),
       failureThreshold,
@@ -85,4 +88,5 @@ module.exports = {
   toMatchImageSnapshot: configureToMatchImageSnapshot(),
   configureToMatchImageSnapshot,
   updateSnapshotState,
+  SNAPSHOTS_DIR,
 };
