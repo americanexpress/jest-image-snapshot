@@ -29,7 +29,7 @@ describe('integration tests', () => {
     const intercept = require.requireActual('../../src');
     const originalToMatchImageSnapshot = intercept.toMatchImageSnapshot;
 
-    intercept.toMatchImageSnapshot = function (...args) {
+    intercept.toMatchImageSnapshot = function toMatchImageSnapshot(...args) {
       const ctx = this;
       let originalUpdateSnapshot = null;
 
@@ -54,8 +54,10 @@ describe('integration tests', () => {
     return intercept;
   };
 
-  const cleanSnapshot = function (customSnapshotIdentifier) {
-    const snapPath = path.join(snapDir, `${customSnapshotIdentifier}-snap.png`);
+  const getSnapshotBasename = identifier => `${identifier}-snap.png`;
+
+  const cleanSnapshot = (customSnapshotIdentifier, snapshotsDir = snapDir) => {
+    const snapPath = path.join(snapshotsDir, getSnapshotBasename(customSnapshotIdentifier));
 
     if (fs.exists(snapPath)) {
       fs.unlink(snapPath);
@@ -111,5 +113,18 @@ describe('integration tests', () => {
 
     // Test against an image much larger than the snapshot.
     expect(() => expect(failImageData).toMatchImageSnapshot({ customSnapshotIdentifier })).toThrowError(); // eslint-disable-line max-len
+  });
+
+  it('creates snapshot in custom directory if such is specified.', () => {
+    const customSnapshotsDir = path.resolve(__dirname, '__custom_snapshots_dir__');
+    const customSnapshotIdentifier = 'integration-5';
+
+    cleanSnapshot(customSnapshotIdentifier, customSnapshotsDir);
+
+    // First we need to write a new snapshot image
+    expect(() => expect(imageData).toMatchImageSnapshot({ customSnapshotsDir, customSnapshotIdentifier })).not.toThrowError(); // eslint-disable-line max-len
+
+    // Then we check if the file was created in custom directory
+    expect(() => fs.readFileSync(path.resolve(customSnapshotsDir, getSnapshotBasename(customSnapshotIdentifier)))).not.toThrowError(); // eslint-disable-line max-len
   });
 });
