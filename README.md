@@ -121,7 +121,7 @@ expect.extend({ toMatchImageSnapshot });
   terms below. Except for the rights granted in this Agreement to American Express
   and to recipients of software distributed by American Express, You reserve all
   right, title, and interest, if any, in and to Your Contributions. Please [fill
-  out the Agreement](https://cla-assistant.io/americanexpress/).
+  out the Agreement](https://cla-assistant.io/americanexpress/jest-image-snapshot).
 
   Please feel free to open pull requests and see `CONTRIBUTING.md` for commit formatting details.
 
