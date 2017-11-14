@@ -100,11 +100,11 @@ expect.extend({ toMatchImageSnapshot });
     });
   ```
 
-  <img title="Adding an image snapshot" src="./images/adding-snapshot.gif" width="50%">
+  <img title="Adding an image snapshot" src="./images/create-snapshot.gif" width="50%">
 
   Then after a few days as I finish adding another feature to my component I notice one of my tests failing!
 
-  <img title="A failing image snapshot test" src="./images/failing-snapshot.gif" width="50%">
+  <img title="A failing image snapshot test" src="./images/fail-snapshot.gif" width="50%">
 
   Oh no! I must have introduced a regression! Let's see what the diff looks like to identify what I need to fix:
 
