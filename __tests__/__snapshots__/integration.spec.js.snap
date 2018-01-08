@@ -1,0 +1,3 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`toMatchImageSnapshot failures fails gracefully with a differently sized image 3`] = `"toMatchImageSnapshot(): Received image size must match baseline snapshot size in order to make comparison."`;

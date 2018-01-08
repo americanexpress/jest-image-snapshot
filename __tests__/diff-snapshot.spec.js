@@ -49,7 +49,7 @@ describe('diff-snapshot', () => {
       });
       jest.mock('fs', () => mockFs);
       jest.mock('mkdirp', () => ({ sync: mockMkdirpSync }));
-      const { diffImageToSnapshot } = require('../../src/diff-snapshot');
+      const { diffImageToSnapshot } = require('../src/diff-snapshot');
 
       mockFs.existsSync.mockImplementation((p) => {
         switch (p) {
@@ -82,7 +82,7 @@ describe('diff-snapshot', () => {
     it('should run comparison if there is already a snapshot stored and updateSnapshot flag is not set', () => {
       const diffImageToSnapshot = setupTest({ snapshotExists: true });
       const result = diffImageToSnapshot({
-        imageData: mockImageBuffer,
+        receivedImageBuffer: mockImageBuffer,
         snapshotIdentifier: mockSnapshotIdentifier,
         snapshotsDir: mockSnapshotsDir,
         updateSnapshot: false,
@@ -93,7 +93,7 @@ describe('diff-snapshot', () => {
       expect(result).toMatchObject({
         diffOutputPath: path.join(mockSnapshotsDir, '__diff_output__', 'id1-diff.png'),
         diffRatio: 0,
-        pixelCountDiff: 0,
+        diffPixelCount: 0,
         pass: true,
       });
       expect(mockPixelMatch).toHaveBeenCalledTimes(1);
@@ -110,7 +110,7 @@ describe('diff-snapshot', () => {
     it('it should not write a diff if a test passes', () => {
       const diffImageToSnapshot = setupTest({ snapshotExists: true, pixelmatchResult: 0 });
       const result = diffImageToSnapshot({
-        imageData: mockImageBuffer,
+        receivedImageBuffer: mockImageBuffer,
         snapshotIdentifier: mockSnapshotIdentifier,
         snapshotsDir: mockSnapshotsDir,
         updateSnapshot: false,
@@ -121,7 +121,7 @@ describe('diff-snapshot', () => {
       expect(result).toMatchObject({
         diffOutputPath: path.join(mockSnapshotsDir, '__diff_output__', 'id1-diff.png'),
         diffRatio: 0,
-        pixelCountDiff: 0,
+        diffPixelCount: 0,
         pass: true,
       });
       // Check that pixelmatch was called
@@ -133,7 +133,7 @@ describe('diff-snapshot', () => {
     it('should write a diff image if the test fails', () => {
       const diffImageToSnapshot = setupTest({ snapshotExists: true, pixelmatchResult: 5000 });
       const result = diffImageToSnapshot({
-        imageData: mockFailImageBuffer,
+        receivedImageBuffer: mockFailImageBuffer,
         snapshotIdentifier: mockSnapshotIdentifier,
         snapshotsDir: mockSnapshotsDir,
         updateSnapshot: false,
@@ -144,7 +144,7 @@ describe('diff-snapshot', () => {
       expect(result).toMatchObject({
         diffOutputPath: path.join(mockSnapshotsDir, '__diff_output__', 'id1-diff.png'),
         diffRatio: 0.5,
-        pixelCountDiff: 5000,
+        diffPixelCount: 5000,
         pass: false,
       });
       expect(mockPixelMatch).toHaveBeenCalledTimes(1);
@@ -166,7 +166,7 @@ describe('diff-snapshot', () => {
     it('should pass <= failureThreshold pixel', () => {
       const diffImageToSnapshot = setupTest({ snapshotExists: true, pixelmatchResult: 250 });
       const result = diffImageToSnapshot({
-        imageData: mockFailImageBuffer,
+        receivedImageBuffer: mockFailImageBuffer,
         snapshotIdentifier: mockSnapshotIdentifier,
         snapshotsDir: mockSnapshotsDir,
         updateSnapshot: false,
@@ -175,14 +175,14 @@ describe('diff-snapshot', () => {
       });
 
       expect(result.pass).toBe(true);
-      expect(result.pixelCountDiff).toBe(250);
+      expect(result.diffPixelCount).toBe(250);
       expect(result.diffRatio).toBe(0.025);
     });
 
     it('should fail > failureThreshold pixel', () => {
       const diffImageToSnapshot = setupTest({ snapshotExists: true, pixelmatchResult: 251 });
       const result = diffImageToSnapshot({
-        imageData: mockFailImageBuffer,
+        receivedImageBuffer: mockFailImageBuffer,
         snapshotIdentifier: mockSnapshotIdentifier,
         snapshotsDir: mockSnapshotsDir,
         updateSnapshot: false,
@@ -191,14 +191,14 @@ describe('diff-snapshot', () => {
       });
 
       expect(result.pass).toBe(false);
-      expect(result.pixelCountDiff).toBe(251);
+      expect(result.diffPixelCount).toBe(251);
       expect(result.diffRatio).toBe(0.0251);
     });
 
     it('should pass <= failureThreshold percent', () => {
       const diffImageToSnapshot = setupTest({ snapshotExists: true, pixelmatchResult: 250 });
       const result = diffImageToSnapshot({
-        imageData: mockFailImageBuffer,
+        receivedImageBuffer: mockFailImageBuffer,
         snapshotIdentifier: mockSnapshotIdentifier,
         snapshotsDir: mockSnapshotsDir,
         updateSnapshot: false,
@@ -207,14 +207,14 @@ describe('diff-snapshot', () => {
       });
 
       expect(result.pass).toBe(true);
-      expect(result.pixelCountDiff).toBe(250);
+      expect(result.diffPixelCount).toBe(250);
       expect(result.diffRatio).toBe(0.025);
     });
 
     it('should fail > failureThreshold percent', () => {
       const diffImageToSnapshot = setupTest({ snapshotExists: true, pixelmatchResult: 251 });
       const result = diffImageToSnapshot({
-        imageData: mockFailImageBuffer,
+        receivedImageBuffer: mockFailImageBuffer,
         snapshotIdentifier: mockSnapshotIdentifier,
         snapshotsDir: mockSnapshotsDir,
         updateSnapshot: false,
@@ -223,7 +223,7 @@ describe('diff-snapshot', () => {
       });
 
       expect(result.pass).toBe(false);
-      expect(result.pixelCountDiff).toBe(251);
+      expect(result.diffPixelCount).toBe(251);
       expect(result.diffRatio).toBe(0.0251);
     });
 
@@ -231,7 +231,7 @@ describe('diff-snapshot', () => {
       const diffImageToSnapshot = setupTest({ snapshotExists: true });
 
       diffImageToSnapshot({
-        imageData: mockImageBuffer,
+        receivedImageBuffer: mockImageBuffer,
         snapshotIdentifier: mockSnapshotIdentifier,
         snapshotsDir: mockSnapshotsDir,
         updateSnapshot: false,
@@ -246,7 +246,7 @@ describe('diff-snapshot', () => {
       const diffImageToSnapshot = setupTest({ snapshotExists: true });
 
       diffImageToSnapshot({
-        imageData: mockImageBuffer,
+        receivedImageBuffer: mockImageBuffer,
         snapshotIdentifier: mockSnapshotIdentifier,
         snapshotsDir: mockSnapshotsDir,
         updateSnapshot: false,
@@ -268,7 +268,7 @@ describe('diff-snapshot', () => {
         pixelmatchResult: 100,
       });
       diffImageToSnapshot({
-        imageData: mockImageBuffer,
+        receivedImageBuffer: mockImageBuffer,
         snapshotIdentifier: mockSnapshotIdentifier,
         snapshotsDir: mockSnapshotsDir,
         failureThreshold: 0,
@@ -281,7 +281,7 @@ describe('diff-snapshot', () => {
     it('should not create diff output directory if test passed', () => {
       const diffImageToSnapshot = setupTest({ snapshotExists: true, outputDirExists: false });
       diffImageToSnapshot({
-        imageData: mockImageBuffer,
+        receivedImageBuffer: mockImageBuffer,
         snapshotIdentifier: mockSnapshotIdentifier,
         snapshotsDir: mockSnapshotsDir,
         updateSnapshot: false,
@@ -295,7 +295,7 @@ describe('diff-snapshot', () => {
     it('should not create diff output directory if there is one there already', () => {
       const diffImageToSnapshot = setupTest({ snapshotExists: true, outputDirExists: true });
       diffImageToSnapshot({
-        imageData: mockImageBuffer,
+        receivedImageBuffer: mockImageBuffer,
         snapshotIdentifier: mockSnapshotIdentifier,
         snapshotsDir: mockSnapshotsDir,
         updateSnapshot: false,
@@ -309,7 +309,7 @@ describe('diff-snapshot', () => {
     it('should create snapshots directory is there is not one already', () => {
       const diffImageToSnapshot = setupTest({ snapshotExists: true, snapshotDirExists: false });
       diffImageToSnapshot({
-        imageData: mockImageBuffer,
+        receivedImageBuffer: mockImageBuffer,
         snapshotIdentifier: mockSnapshotIdentifier,
         snapshotsDir: mockSnapshotsDir,
         updateSnapshot: true,
@@ -323,7 +323,7 @@ describe('diff-snapshot', () => {
     it('should not create snapshots directory if there already is one', () => {
       const diffImageToSnapshot = setupTest({ snapshotExists: true, snapshotDirExists: true });
       diffImageToSnapshot({
-        imageData: mockImageBuffer,
+        receivedImageBuffer: mockImageBuffer,
         snapshotIdentifier: mockSnapshotIdentifier,
         snapshotsDir: mockSnapshotsDir,
         updateSnapshot: true,
@@ -337,7 +337,7 @@ describe('diff-snapshot', () => {
     it('should create snapshot in __image_snapshots__ directory if there is not a snapshot created yet', () => {
       const diffImageToSnapshot = setupTest({ snapshotExists: false, snapshotDirExists: false });
       diffImageToSnapshot({
-        imageData: mockImageBuffer,
+        receivedImageBuffer: mockImageBuffer,
         snapshotIdentifier: mockSnapshotIdentifier,
         snapshotsDir: mockSnapshotsDir,
         updateSnapshot: false,
@@ -352,7 +352,7 @@ describe('diff-snapshot', () => {
     it('should return updated flag is snapshot was updated', () => {
       const diffImageToSnapshot = setupTest({ snapshotExists: true });
       const diffResult = diffImageToSnapshot({
-        imageData: mockImageBuffer,
+        receivedImageBuffer: mockImageBuffer,
         snapshotIdentifier: mockSnapshotIdentifier,
         snapshotsDir: mockSnapshotsDir,
         updateSnapshot: true,
@@ -366,7 +366,7 @@ describe('diff-snapshot', () => {
     it('should return added flag is snapshot was added', () => {
       const diffImageToSnapshot = setupTest({ snapshotExists: false });
       const diffResult = diffImageToSnapshot({
-        imageData: mockImageBuffer,
+        receivedImageBuffer: mockImageBuffer,
         snapshotIdentifier: mockSnapshotIdentifier,
         snapshotsDir: mockSnapshotsDir,
         updateSnapshot: false,
@@ -384,7 +384,7 @@ describe('diff-snapshot', () => {
     it('should return path to comparison output image if a comparison was performed', () => {
       const diffImageToSnapshot = setupTest({ snapshotExists: true });
       const diffResult = diffImageToSnapshot({
-        imageData: mockImageBuffer,
+        receivedImageBuffer: mockImageBuffer,
         snapshotIdentifier: mockSnapshotIdentifier,
         snapshotsDir: mockSnapshotsDir,
         updateSnapshot: false,
@@ -400,7 +400,7 @@ describe('diff-snapshot', () => {
 
       expect(() => {
         diffImageToSnapshot({
-          imageData: mockImageBuffer,
+          receivedImageBuffer: mockImageBuffer,
           snapshotIdentifier: mockSnapshotIdentifier,
           snapshotsDir: mockSnapshotsDir,
           updateSnapshot: false,

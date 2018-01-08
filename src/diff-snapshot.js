@@ -13,14 +13,14 @@
  */
 
 const fs = require('fs');
-const PNG = require('pngjs').PNG;
+const path = require('path');
 const pixelmatch = require('pixelmatch');
 const mkdirp = require('mkdirp');
-const path = require('path');
+const { PNG } = require('pngjs');
 
 function diffImageToSnapshot(options) {
   const {
-    imageData,
+    receivedImageBuffer,
     snapshotIdentifier,
     snapshotsDir,
     updateSnapshot = false,
@@ -40,25 +40,33 @@ function diffImageToSnapshot(options) {
 
     const diffConfig = Object.assign({}, defaultDiffConfig, customDiffConfig);
 
-    const comparisonImg = PNG.sync.read(imageData);
-    const baselineImg = PNG.sync.read(fs.readFileSync(baselineSnapshotPath));
+    const receivedImage = PNG.sync.read(receivedImageBuffer);
+    const baselineImage = PNG.sync.read(fs.readFileSync(baselineSnapshotPath));
 
-    const diffImg = new PNG({ width: comparisonImg.width, height: comparisonImg.height });
-    const pixelCountDiff = pixelmatch(
-      comparisonImg.data,
-      baselineImg.data,
-      diffImg.data,
-      comparisonImg.width,
-      comparisonImg.height,
+    if (
+      receivedImage.height !== baselineImage.height || receivedImage.width !== baselineImage.width
+    ) {
+      throw new Error('toMatchImageSnapshot(): Received image size must match baseline snapshot size in order to make comparison.');
+    }
+    const imageWidth = receivedImage.width;
+    const imageHeight = receivedImage.height;
+    const diffImage = new PNG({ width: imageWidth, height: imageHeight });
+
+    const diffPixelCount = pixelmatch(
+      receivedImage.data,
+      baselineImage.data,
+      diffImage.data,
+      imageWidth,
+      imageHeight,
       diffConfig
     );
 
-    const totalPixels = comparisonImg.width * comparisonImg.height;
-    const diffRatio = pixelCountDiff / totalPixels;
+    const totalPixels = imageWidth * imageHeight;
+    const diffRatio = diffPixelCount / totalPixels;
 
     let pass = false;
     if (failureThresholdType === 'pixel') {
-      pass = pixelCountDiff <= failureThreshold;
+      pass = diffPixelCount <= failureThreshold;
     } else if (failureThresholdType === 'percent') {
       pass = diffRatio <= failureThreshold;
     } else {
@@ -67,7 +75,7 @@ function diffImageToSnapshot(options) {
 
     if (!pass) {
       mkdirp.sync(outputDir);
-      const buffer = PNG.sync.write(diffImg);
+      const buffer = PNG.sync.write(diffImage);
       fs.writeFileSync(diffOutputPath, buffer);
     }
 
@@ -75,11 +83,11 @@ function diffImageToSnapshot(options) {
       pass,
       diffOutputPath,
       diffRatio,
-      pixelCountDiff,
+      diffPixelCount,
     };
   } else {
     mkdirp.sync(snapshotsDir);
-    fs.writeFileSync(baselineSnapshotPath, imageData);
+    fs.writeFileSync(baselineSnapshotPath, receivedImageBuffer);
 
     result = updateSnapshot ? { updated: true } : { added: true };
   }

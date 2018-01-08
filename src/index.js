@@ -48,7 +48,7 @@ function configureToMatchImageSnapshot({
     const snapshotIdentifier = customSnapshotIdentifier || kebabCase(`${path.basename(testPath)}-${currentTestName}-${snapshotState._counters.get(currentTestName)}`);
 
     const result = diffImageToSnapshot({
-      imageData: received,
+      receivedImageBuffer: received,
       snapshotIdentifier,
       snapshotsDir: customSnapshotsDir || path.join(path.dirname(testPath), SNAPSHOTS_DIR),
       updateSnapshot: snapshotState._updateSnapshot === 'all',
@@ -58,6 +58,10 @@ function configureToMatchImageSnapshot({
     });
 
     let pass = true;
+    /*
+      istanbul ignore next
+      `message` is implementation detail. Actual behavior is tested in integration.spec.js
+    */
     let message = () => '';
 
     if (result.updated) {
@@ -67,12 +71,12 @@ function configureToMatchImageSnapshot({
     } else if (result.added) {
       snapshotState = updateSnapshotState(snapshotState, { added: snapshotState.added += 1 });
     } else {
-      pass = result.pass;
+      ({ pass } = result);
 
       if (!pass) {
-        const differencePercentage = parseInt(result.diffRatio * 100, 10);
+        const differencePercentage = result.diffRatio * 100;
 
-        message = () => `Expected image to match or be a close match to snapshot. ${differencePercentage}% different\n`
+        message = () => `Expected image to match or be a close match to snapshot but was ${differencePercentage}% different from snapshot (${result.diffPixelCount} differing pixels).\n`
                   + `${chalk.bold.red('See diff for details:')} ${chalk.red(result.diffOutputPath)}`;
       }
     }
@@ -87,6 +91,4 @@ function configureToMatchImageSnapshot({
 module.exports = {
   toMatchImageSnapshot: configureToMatchImageSnapshot(),
   configureToMatchImageSnapshot,
-  updateSnapshotState,
-  SNAPSHOTS_DIR,
 };

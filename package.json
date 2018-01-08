@@ -30,9 +30,11 @@
   "license": "Apache-2.0",
   "devDependencies": {
     "amex-jest-preset": "^4.0.2",
-    "eslint": "^3.19.0",
-    "eslint-config-amex": "^6.0.0",
-    "jest": "^22.0.0"
+    "eslint": "^4.15.0",
+    "eslint-config-amex": "^7.0.0",
+    "jest": "^22.0.0",
+    "lodash": "^4.17.4",
+    "rimraf": "^2.6.2"
   },
   "dependencies": {
     "chalk": "^1.1.3",
