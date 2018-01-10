@@ -14,6 +14,7 @@
 
 const fs = require('fs');
 const path = require('path');
+const childProcess = require('child_process');
 const pixelmatch = require('pixelmatch');
 const mkdirp = require('mkdirp');
 const { PNG } = require('pngjs');
@@ -75,8 +76,27 @@ function diffImageToSnapshot(options) {
 
     if (!pass) {
       mkdirp.sync(outputDir);
-      const buffer = PNG.sync.write(diffImage);
-      fs.writeFileSync(diffOutputPath, buffer);
+      const compositeResultImage = new PNG({
+        width: imageWidth * 3,
+        height: imageHeight,
+      });
+      // copy baseline, diff, and received images into composite result image
+      PNG.bitblt(
+        baselineImage, compositeResultImage, 0, 0, imageWidth, imageHeight, 0, 0
+      );
+      PNG.bitblt(
+        diffImage, compositeResultImage, 0, 0, imageWidth, imageHeight, imageWidth, 0
+      );
+      PNG.bitblt(
+        receivedImage, compositeResultImage, 0, 0, imageWidth, imageHeight, imageWidth * 2, 0
+      );
+
+      const input = { imagePath: diffOutputPath, image: compositeResultImage };
+
+      // writing diff in separate process to avoid perf issues associated with Math in Jest VM (https://github.com/facebook/jest/issues/5163)
+      const writeDiffProcess = childProcess.spawnSync('node', [`${__dirname}/write-result-diff-image.js`], { input: Buffer.from(JSON.stringify(input)) });
+      // in case of error print to console
+      if (writeDiffProcess.stderr.toString()) { console.log(writeDiffProcess.stderr.toString()); } // eslint-disable-line no-console, max-len
     }
 
     result = {
