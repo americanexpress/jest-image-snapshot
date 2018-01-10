@@ -18,7 +18,7 @@ const path = require('path');
 
 describe('toMatchImageSnapshot', () => {
   function setupMock(diffImageToSnapshotResult) {
-    jest.doMock('../../src/diff-snapshot', () => ({
+    jest.doMock('../src/diff-snapshot', () => ({
       diffImageToSnapshot: jest.fn(() => diffImageToSnapshotResult),
     }));
 
@@ -44,9 +44,15 @@ describe('toMatchImageSnapshot', () => {
   });
 
   it('should throw an error if used with .not matcher', () => {
-    const mockDiffResult = { updated: false, pass: false };
+    const mockDiffResult = {
+      pass: true,
+      diffOutputPath: 'path/to/result.png',
+      diffRatio: 0,
+      diffPixelCount: 0,
+    };
+
     setupMock(mockDiffResult);
-    const { toMatchImageSnapshot } = require('../../src/index');
+    const { toMatchImageSnapshot } = require('../src/index');
     expect.extend({ toMatchImageSnapshot });
 
     expect(() => expect('pretendthisisanimagebuffer').not.toMatchImageSnapshot())
@@ -54,10 +60,15 @@ describe('toMatchImageSnapshot', () => {
   });
 
   it('should pass when snapshot is similar enough or same as baseline snapshot', () => {
-    const mockDiffResult = { updated: false, pass: true, diffOutputPath: 'test/path' };
+    const mockDiffResult = {
+      pass: true,
+      diffOutputPath: 'path/to/result.png',
+      diffRatio: 0,
+      diffPixelCount: 0,
+    };
     setupMock(mockDiffResult);
 
-    const { toMatchImageSnapshot } = require('../../src/index');
+    const { toMatchImageSnapshot } = require('../src/index');
     expect.extend({ toMatchImageSnapshot });
 
     expect(() => expect('pretendthisisanimagebuffer').toMatchImageSnapshot())
@@ -65,9 +76,15 @@ describe('toMatchImageSnapshot', () => {
   });
 
   it('should fail when snapshot has a difference beyond allowed threshold', () => {
-    const mockDiffResult = { updated: false, pass: false, diffOutputPath: 'path/to/result.png', diffRatio: 0.8 };
+    const mockDiffResult = {
+      pass: false,
+      diffOutputPath: 'path/to/result.png',
+      diffRatio: 0.8,
+      diffPixelCount: 600,
+    };
+
     setupMock(mockDiffResult);
-    const { toMatchImageSnapshot } = require('../../src/index');
+    const { toMatchImageSnapshot } = require('../src/index');
     expect.extend({ toMatchImageSnapshot });
 
     expect(() => expect('pretendthisisanimagebuffer').toMatchImageSnapshot())
@@ -75,9 +92,15 @@ describe('toMatchImageSnapshot', () => {
   });
 
   it('should use noColors options if passed as true and not style error message', () => {
-    const mockDiffResult = { updated: false, pass: false, diffOutputPath: 'path/to/result.png', diffRatio: 0.4 };
+    const mockDiffResult = {
+      pass: false,
+      diffOutputPath: 'path/to/result.png',
+      diffRatio: 0.4,
+      diffPixelCount: 600,
+    };
+
     setupMock(mockDiffResult);
-    const { toMatchImageSnapshot } = require('../../src/index');
+    const { toMatchImageSnapshot } = require('../src/index');
     expect.extend({ toMatchImageSnapshot });
 
     expect(() => expect('pretendthisisanimagebuffer').toMatchImageSnapshot({ noColors: true }))
@@ -96,17 +119,22 @@ describe('toMatchImageSnapshot', () => {
         added: true,
       },
     };
-    const mockDiffResult = { updated: true, pass: true };
+
+    const mockDiffResult = {
+      pass: false,
+      diffOutputPath: 'path/to/result.png',
+      diffRatio: 0.8,
+      diffPixelCount: 600,
+    };
 
     setupMock(mockDiffResult);
-    const { toMatchImageSnapshot } = require('../../src/index');
+    const { toMatchImageSnapshot } = require('../src/index');
     const matcherAtTest = toMatchImageSnapshot.bind(mockTestContext);
 
     const customDiffConfig = { threshold: 0.3 };
-    const result = matcherAtTest('pretendthisisanimagebuffer', { customDiffConfig });
-    const { diffImageToSnapshot } = require('../../src/diff-snapshot');
+    matcherAtTest('pretendthisisanimagebuffer', { customDiffConfig });
+    const { diffImageToSnapshot } = require('../src/diff-snapshot');
     expect(diffImageToSnapshot.mock.calls[0][0].customDiffConfig).toEqual(customDiffConfig);
-    expect(result.message()).toEqual('');
   });
 
   it('passes diffImageToSnapshot everything it needs to create a snapshot and compare if needed', () => {
@@ -121,21 +149,26 @@ describe('toMatchImageSnapshot', () => {
         added: true,
       },
     };
-    const mockDiffResult = { updated: false, pass: true };
+
+    const mockDiffResult = {
+      pass: false,
+      diffOutputPath: 'path/to/result.png',
+      diffRatio: 0.8,
+      diffPixelCount: 600,
+    };
 
     setupMock(mockDiffResult);
-    const { toMatchImageSnapshot } = require('../../src/index');
+    const { toMatchImageSnapshot } = require('../src/index');
     const matcherAtTest = toMatchImageSnapshot.bind(mockTestContext);
 
-    const result = matcherAtTest('pretendthisisanimagebuffer');
-    const { diffImageToSnapshot } = require('../../src/diff-snapshot');
+    matcherAtTest('pretendthisisanimagebuffer');
+    const { diffImageToSnapshot } = require('../src/diff-snapshot');
 
     const dataArg = diffImageToSnapshot.mock.calls[0][0];
     // This is to make the test work on windows
     dataArg.snapshotsDir = dataArg.snapshotsDir.replace(/\\/g, '/');
 
     expect(dataArg).toMatchSnapshot();
-    expect(result.message()).toEqual('');
   });
 
   it('passes uses user passed snapshot name if given', () => {
@@ -150,14 +183,20 @@ describe('toMatchImageSnapshot', () => {
         added: true,
       },
     };
-    const mockDiffResult = { updated: true, pass: false };
+
+    const mockDiffResult = {
+      pass: false,
+      diffOutputPath: 'path/to/result.png',
+      diffRatio: 0.8,
+      diffPixelCount: 600,
+    };
 
     setupMock(mockDiffResult);
-    const { toMatchImageSnapshot } = require('../../src/index');
+    const { toMatchImageSnapshot } = require('../src/index');
     const matcherAtTest = toMatchImageSnapshot.bind(mockTestContext);
 
     matcherAtTest('pretendthisisanimagebuffer', { customSnapshotIdentifier: 'custom-name' });
-    const { diffImageToSnapshot } = require('../../src/diff-snapshot');
+    const { diffImageToSnapshot } = require('../src/diff-snapshot');
 
     expect(diffImageToSnapshot.mock.calls[0][0].snapshotIdentifier).toBe('custom-name');
   });
@@ -174,14 +213,14 @@ describe('toMatchImageSnapshot', () => {
         added: true,
       },
     };
-    const mockDiffResult = { updated: true, pass: false };
+    const mockDiffResult = { updated: true };
 
     setupMock(mockDiffResult);
-    const { toMatchImageSnapshot } = require('../../src/index');
+    const { toMatchImageSnapshot } = require('../src/index');
     const matcherAtTest = toMatchImageSnapshot.bind(mockTestContext);
 
     matcherAtTest('pretendthisisanimagebuffer');
-    const { diffImageToSnapshot } = require('../../src/diff-snapshot');
+    const { diffImageToSnapshot } = require('../src/diff-snapshot');
 
     expect(diffImageToSnapshot.mock.calls[0][0].updateSnapshot).toBe(true);
   });
@@ -198,10 +237,10 @@ describe('toMatchImageSnapshot', () => {
         added: true,
       },
     };
-    const mockDiffResult = { added: true, pass: false };
+    const mockDiffResult = { added: true };
 
     setupMock(mockDiffResult);
-    const { toMatchImageSnapshot } = require('../../src/index');
+    const { toMatchImageSnapshot } = require('../src/index');
     const matcherAtTest = toMatchImageSnapshot.bind(mockTestContext);
     expect(() => matcherAtTest('pretendthisisanimagebuffer')).not.toThrow();
   });
@@ -218,10 +257,10 @@ describe('toMatchImageSnapshot', () => {
         added: undefined,
       },
     };
-    const mockDiffResult = { updated: true, pass: false };
+    const mockDiffResult = { updated: true };
 
     setupMock(mockDiffResult);
-    const { toMatchImageSnapshot } = require('../../src/index');
+    const { toMatchImageSnapshot } = require('../src/index');
     const matcherAtTest = toMatchImageSnapshot.bind(mockTestContext);
     expect(() => matcherAtTest('pretendthisisanimagebuffer')).not.toThrow();
   });
@@ -238,10 +277,10 @@ describe('toMatchImageSnapshot', () => {
         added: undefined,
       },
     };
-    setupMock({ updated: true, code: 0 });
+    setupMock({ updated: true });
 
     const diffImageToSnapshot = jest.fn(() => ({}));
-    jest.doMock('../../src/diff-snapshot', () => ({
+    jest.doMock('../src/diff-snapshot', () => ({
       diffImageToSnapshot,
     }));
 
@@ -249,7 +288,7 @@ describe('toMatchImageSnapshot', () => {
     jest.doMock('chalk', () => ({
       constructor: Chalk,
     }));
-    const { configureToMatchImageSnapshot } = require('../../src/index');
+    const { configureToMatchImageSnapshot } = require('../src/index');
     const customConfig = { perceptual: true };
     const toMatchImageSnapshot = configureToMatchImageSnapshot({
       customDiffConfig: customConfig,
