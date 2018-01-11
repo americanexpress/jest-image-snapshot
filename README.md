@@ -13,7 +13,7 @@ Jest matcher that performs image comparisons using [pixelmatch](https://github.c
   npm i --save-dev jest-image-snapshot
   ```
 
-  Please note that `Jest` 20.x.x is a peerDependency. `jest-image-snapshot` will **not** work with anything below jest 20.x.x
+  Please note that `Jest` `>=20 <=22` is a peerDependency. `jest-image-snapshot` will **not** work with anything below Jest 20.x.x
 
 ## Usage:
 1. Extend Jest's `expect`
@@ -31,11 +31,13 @@ Jest matcher that performs image comparisons using [pixelmatch](https://github.c
   });
 ```
 
+See [the examples](./examples/README.md) for more detailed usage
+
 ### Optional configuration:
 
 `toMatchImageSnapshot()` takes an optional options object with the following properties:
 
-* `customDiffConfig`: Custom config passed [pixelmatch](https://github.com/mapbox/pixelmatch#pixelmatchimg1-img2-output-width-height-options) (See options section)
+* `customDiffConfig`: Custom config passed to [pixelmatch](https://github.com/mapbox/pixelmatch#pixelmatchimg1-img2-output-width-height-options) (See options section)
   * By default we have set the `threshold` to 0.01, you can increase that value by passing a customDiffConfig as demonstrated below.
   * Please note the `threshold` set in the `customDiffConfig` is the per pixel sensitivity threshold. For example with a source pixel colour of `#ffffff` (white) and a comparison pixel colour of `#fcfcfc` (really light grey) if you set the threshold to 0 then it would trigger a failure *on that pixel*. However if you were to use say 0.5 then it wouldn't, the colour difference would need to be much more extreme to trigger a failure on that pixel, say `#000000` (black)
 * `customSnapshotsDir`: A custom absolute path of a directory to keep this snapshot in
@@ -51,7 +53,7 @@ Jest matcher that performs image comparisons using [pixelmatch](https://github.c
     expect(image).toMatchImageSnapshot({
       customDiffConfig: customConfig,
       customSnapshotIdentifier: 'customSnapshotName',
-      noColors: true // the default is false
+      noColors: true
     });
   });
 ```
@@ -68,7 +70,7 @@ The failure threshold can be set in percent, in this case if the difference is o
   });
 ```
 
-Custom defaults can be set with a configurable extension. This will allow for customization of this module's defaults. For example, a 0% default threshold can be shared across all tests with the configuration below.
+Custom defaults can be set with a configurable extension. This will allow for customization of this module's defaults. For example, a 0% default threshold can be shared across all tests with the configuration below:
 
 ```javascript
 const { configureToMatchImageSnapshot } = require('jest-image-snapshot');
@@ -77,27 +79,29 @@ const customConfig = { threshold: 0 };
 const toMatchImageSnapshot = configureToMatchImageSnapshot({
   customDiffConfig: customConfig,
   noColors: true,
-})
+});
 expect.extend({ toMatchImageSnapshot });
 ```
 
 ## How it works
-  Given an image (should be either a PNGImage instance or a Buffer instance with PNG data) the `toMatchImageSnapshot()` matcher will create a `__image_snapshots__` directory in the directory the test is in and will store the baseline snapshot image there on the first run. Note that if `customSnapshotsDir` option is given then it will store baseline snapshot there instead.
+  Given an image (Buffer instance with PNG image data) the `toMatchImageSnapshot()` matcher will create a `__image_snapshots__` directory in the directory the test is in and will store the baseline snapshot image there on the first run. Note that if `customSnapshotsDir` option is given then it will store baseline snapshot there instead.
 
   On subsequent test runs the matcher will compare the image being passed against the stored snapshot.
 
-  To update the stored image snapshot run jest with `--updateSnapshot` or `-u` argument. All this works the same way as [Jest snapshots](https://facebook.github.io/jest/docs/snapshot-testing.html).
+  To update the stored image snapshot run Jest with `--updateSnapshot` or `-u` argument. All this works the same way as [Jest snapshots](https://facebook.github.io/jest/docs/snapshot-testing.html).
 
 ## See it in action
   Typically this matcher is used to for visual tests that run on a browser. For example let's say I finish working on a feature and want to write a test to prevent visual regressions:
   ```javascript
+    ...
     it('renders correctly', async () => {
-      const browser = await launchChromeHeadless();
-      await browser.goTo('https://localhost:3000');
-      const screenshot = await browser.takeScreenshot();
+      const page = await browser.newPage();
+      await page.goto('https://localhost:3000');
+      const image = await page.screenshot();
 
-      expect(screenshot).toMatchImageSnapshot();
+      expect(image).toMatchImageSnapshot();
     });
+    ...
   ```
 
   <img title="Adding an image snapshot" src="./images/create-snapshot.gif" width="50%">
@@ -123,7 +127,7 @@ expect.extend({ toMatchImageSnapshot });
   right, title, and interest, if any, in and to Your Contributions. Please [fill
   out the Agreement](https://cla-assistant.io/americanexpress/jest-image-snapshot).
 
-  Please feel free to open pull requests and see `CONTRIBUTING.md` for commit formatting details.
+  Please feel free to open pull requests and see [CONTRIBUTING.md](./CONTRIBUTING.md) for commit formatting details.
 
   ## License
   Any contributions made under this project will be governed by the [Apache License
