@@ -15,6 +15,7 @@
 /* eslint-disable global-require */
 const fs = require('fs');
 const path = require('path');
+const mockSpawn = require('mock-spawn')();
 
 describe('diff-snapshot', () => {
   beforeEach(() => {
@@ -47,6 +48,9 @@ describe('diff-snapshot', () => {
         writeFileSync: mockWriteFileSync,
         readFileSync: jest.fn(),
       });
+
+      mockSpawn.setDefault(mockSpawn.simple(0));
+      jest.mock('child_process', () => ({ spawnSync: mockSpawn }));
       jest.mock('fs', () => mockFs);
       jest.mock('mkdirp', () => ({ sync: mockMkdirpSync }));
       const { diffImageToSnapshot } = require('../src/diff-snapshot');
@@ -127,7 +131,7 @@ describe('diff-snapshot', () => {
       // Check that pixelmatch was called
       expect(mockPixelMatch).toHaveBeenCalledTimes(1);
       // Check that that it did not attempt to write a diff
-      expect(mockWriteFileSync).not.toHaveBeenCalled();
+      expect(mockSpawn.calls).toEqual([]);
     });
 
     it('should write a diff image if the test fails', () => {
@@ -156,11 +160,10 @@ describe('diff-snapshot', () => {
         100,
         { threshold: 0.01 }
       );
-      expect(mockWriteFileSync).toHaveBeenCalledTimes(1);
-      expect(mockWriteFileSync).toHaveBeenCalledWith(
-        path.join(mockSnapshotsDir, '__diff_output__', 'id1-diff.png'),
-        expect.any(Buffer)
-      );
+
+      expect(mockSpawn.calls[0].args[0]).toBe(path.resolve('./src/write-result-diff-image.js'));
+      expect(mockSpawn.calls[0].command).toBe('node');
+      expect(mockSpawn.calls[0].opts.input).toEqual(expect.any(Buffer));
     });
 
     it('should pass <= failureThreshold pixel', () => {

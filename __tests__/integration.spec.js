@@ -16,6 +16,7 @@ const fs = require('fs');
 const path = require('path');
 const rimraf = require('rimraf');
 const uniqueId = require('lodash/uniqueId');
+const isPng = require('is-png');
 
 describe('toMatchImageSnapshot', () => {
   const imagePath = path.resolve(__dirname, './stubs', 'TestImage.png');
@@ -122,7 +123,7 @@ describe('toMatchImageSnapshot', () => {
 
     it('writes a result image for failing tests', () => {
       const customSnapshotIdentifier = getIdentifierIndicatingCleanupIsRequired();
-
+      const pathToResultImage = path.join(__dirname, diffOutputDir(), `${customSnapshotIdentifier}-diff.png`);
       // First we need to write a new snapshot image
       expect(
         () => expect(imageData).toMatchImageSnapshot({ customSnapshotIdentifier })
@@ -133,9 +134,11 @@ describe('toMatchImageSnapshot', () => {
         () => expect(failImageData).toMatchImageSnapshot({ customSnapshotIdentifier })
       ).toThrow();
 
-      expect(
-        fs.existsSync(path.join(__dirname, diffOutputDir(), `${customSnapshotIdentifier}-diff.png`))
-      ).toBe(true);
+      expect(fs.existsSync(pathToResultImage)).toBe(true);
+
+      const imageBuffer = fs.readFileSync(pathToResultImage);
+      // just because file was written does not mean it is a png image
+      expect(isPng(imageBuffer)).toBe(true);
     });
   });
 });
