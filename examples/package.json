@@ -1,0 +1,29 @@
+{
+  "name": "jest-image-snapshot-examples",
+  "version": "0.0.0",
+  "description": "Example jest-image-snapshot usage",
+  "scripts": {
+    "test": "jest"
+  },
+  "keywords": [
+    "jest-image-snapshot",
+    "examples"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/americanexpress/jest-image-snapshot.git"
+  },
+  "author": "Andres Escobar <andres.escobar@aexp.com> (https://github.com/anescobar1991)",
+  "license": "Apache-2.0",
+  "dependencies": {
+    "jest": "^22.0.0",
+    "puppeteer": "^0.13.0"
+  },
+  "jest": {
+    "setupTestFrameworkScriptFile": "<rootDir>/jest-setup.js"
+  },
+  "devDependencies": {
+    "babel-cli": "^6.26.0",
+    "babel-preset-env": "^1.6.1"
+  }
+}
