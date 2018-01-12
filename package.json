@@ -20,7 +20,9 @@
     "browser testing"
   ],
   "jest": {
-    "preset": "amex-jest-preset"
+    "preset": "amex-jest-preset",
+    "testMatch": ["<rootDir>/__tests__/**/*.js"],
+    "coveragePathIgnorePatterns": ["/node_modules/", "<rootDir>/examples"] 
   },
   "repository": {
     "type": "git",
