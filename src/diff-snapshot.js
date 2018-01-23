@@ -29,8 +29,8 @@ function renderImages(sourceImages, imageWidth, imageHeight, isVertical) {
     PNG.bitblt(
       sourceImages[i], compositeResultImage,
       0, 0, imageWidth, imageHeight,
-      isVertical ? 0 : imageHeight * i,
-      isVertical ? imageWidth * i : 0
+      isVertical ? 0 : imageWidth * i,
+      isVertical ? imageHeight * i : 0
     );
   }
   return compositeResultImage;
