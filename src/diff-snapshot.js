@@ -20,11 +20,12 @@ const mkdirp = require('mkdirp');
 const { PNG } = require('pngjs');
 
 function renderImages(sourceImages, imageWidth, imageHeight) {
+  const imagesCount = sourceImages.length;
   const compositeResultImage = new PNG({
-    width: imageWidth * sourceImages.length,
+    width: imageWidth * imagesCount,
     height: imageHeight,
   });
-  for (let i = 0; i < sourceImages.length; i += 1) {
+  for (let i = 0; i < imagesCount; i += 1) {
     PNG.bitblt(
       sourceImages[i], compositeResultImage,
       0, 0, imageWidth, imageHeight,
