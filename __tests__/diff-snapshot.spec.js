@@ -166,6 +166,72 @@ describe('diff-snapshot', () => {
       expect(mockSpawn.calls[0].opts.input).toEqual(expect.any(Buffer));
     });
 
+    it('should write a diff image if the test fails with vertical diff arrange', () => {
+      const diffImageToSnapshot = setupTest({ snapshotExists: true, pixelmatchResult: 5000 });
+      const result = diffImageToSnapshot({
+        receivedImageBuffer: mockFailImageBuffer,
+        snapshotIdentifier: mockSnapshotIdentifier,
+        snapshotsDir: mockSnapshotsDir,
+        updateSnapshot: false,
+        failureThreshold: 0,
+        failureThresholdType: 'pixel',
+        verticalDiffArrange: true,
+      });
+
+      expect(result).toMatchObject({
+        diffOutputPath: path.join(mockSnapshotsDir, '__diff_output__', 'id1-diff.png'),
+        diffRatio: 0.5,
+        diffPixelCount: 5000,
+        pass: false,
+      });
+      expect(mockPixelMatch).toHaveBeenCalledTimes(1);
+      expect(mockPixelMatch).toHaveBeenCalledWith(
+        expect.any(Buffer),
+        expect.any(Buffer),
+        expect.any(Buffer),
+        100,
+        100,
+        { threshold: 0.01 }
+      );
+
+      expect(mockSpawn.calls[0].args[0]).toBe(path.resolve('./src/write-result-diff-image.js'));
+      expect(mockSpawn.calls[0].command).toBe('node');
+      expect(mockSpawn.calls[0].opts.input).toEqual(expect.any(Buffer));
+    });
+
+    it('should write a diff image if the test fails with horizontal diff arrange', () => {
+      const diffImageToSnapshot = setupTest({ snapshotExists: true, pixelmatchResult: 5000 });
+      const result = diffImageToSnapshot({
+        receivedImageBuffer: mockFailImageBuffer,
+        snapshotIdentifier: mockSnapshotIdentifier,
+        snapshotsDir: mockSnapshotsDir,
+        updateSnapshot: false,
+        failureThreshold: 0,
+        failureThresholdType: 'pixel',
+        verticalDiffArrange: false,
+      });
+
+      expect(result).toMatchObject({
+        diffOutputPath: path.join(mockSnapshotsDir, '__diff_output__', 'id1-diff.png'),
+        diffRatio: 0.5,
+        diffPixelCount: 5000,
+        pass: false,
+      });
+      expect(mockPixelMatch).toHaveBeenCalledTimes(1);
+      expect(mockPixelMatch).toHaveBeenCalledWith(
+        expect.any(Buffer),
+        expect.any(Buffer),
+        expect.any(Buffer),
+        100,
+        100,
+        { threshold: 0.01 }
+      );
+
+      expect(mockSpawn.calls[0].args[0]).toBe(path.resolve('./src/write-result-diff-image.js'));
+      expect(mockSpawn.calls[0].command).toBe('node');
+      expect(mockSpawn.calls[0].opts.input).toEqual(expect.any(Buffer));
+    });
+
     it('should pass <= failureThreshold pixel', () => {
       const diffImageToSnapshot = setupTest({ snapshotExists: true, pixelmatchResult: 250 });
       const result = diffImageToSnapshot({

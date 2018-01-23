@@ -19,17 +19,18 @@ const pixelmatch = require('pixelmatch');
 const mkdirp = require('mkdirp');
 const { PNG } = require('pngjs');
 
-function renderImages(sourceImages, imageWidth, imageHeight) {
+function renderImages(sourceImages, imageWidth, imageHeight, isVertical) {
   const imagesCount = sourceImages.length;
   const compositeResultImage = new PNG({
-    width: imageWidth * imagesCount,
-    height: imageHeight,
+    width: imageWidth * (isVertical ? 1 : imagesCount),
+    height: imageHeight * (isVertical ? imagesCount : 1),
   });
   for (let i = 0; i < imagesCount; i += 1) {
     PNG.bitblt(
       sourceImages[i], compositeResultImage,
       0, 0, imageWidth, imageHeight,
-      imageHeight * i, 0
+      isVertical ? 0 : imageHeight * i,
+      isVertical ? imageWidth * i : 0
     );
   }
   return compositeResultImage;
@@ -44,6 +45,7 @@ function diffImageToSnapshot(options) {
     customDiffConfig = {},
     failureThreshold,
     failureThresholdType,
+    verticalDiffArrange,
   } = options;
 
   let result = {};
@@ -93,8 +95,11 @@ function diffImageToSnapshot(options) {
     if (!pass) {
       mkdirp.sync(outputDir);
       const compositeResultImage = renderImages(
-        [baselineImage, diffImage, receivedImage],
-        imageWidth, imageHeight
+        verticalDiffArrange == null ?
+          [diffImage] :
+          [baselineImage, diffImage, receivedImage],
+        imageWidth, imageHeight,
+        verticalDiffArrange
       );
 
       const input = { imagePath: diffOutputPath, image: compositeResultImage };
