@@ -308,6 +308,7 @@ describe('toMatchImageSnapshot', () => {
       updateSnapshot: false,
       failureThreshold: 0,
       failureThresholdType: 'pixel',
+      verticalDiffArrange: null,
     });
     expect(Chalk).toHaveBeenCalledWith({
       enabled: false,
