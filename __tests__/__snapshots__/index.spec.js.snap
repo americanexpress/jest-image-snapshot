@@ -9,6 +9,7 @@ Object {
   "snapshotIdentifier": "test-spec-js-test-1",
   "snapshotsDir": "path/to/__image_snapshots__",
   "updateSnapshot": false,
+  "verticalDiffArrange": null,
 }
 `;
 
