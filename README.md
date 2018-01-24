@@ -45,6 +45,7 @@ See [the examples](./examples/README.md) for more detailed usage
 * `noColors`: (default `false`) Removes colouring from console output, useful if storing the results in a file
 * `failureThreshold`: (default `0`) Sets the threshold that would trigger a test failure based on the `failureThresholdType` selected. This is different to the `customDiffConfig.threshold` above, that is the per pixel failure threshold, this is the failure threshold for the entire comparison.
 * `failureThresholdType`: (default `pixel`) (options `percent` or `pixel`) Sets the type of threshold that would trigger a failure.
+* `verticalDiffArrange`: (default `null`) Sets type of diff images arrange. `true` for vertically places images: original, diff and current. 'false' for horizontally aligned images. 'null' for saving diff image only.
 
 ```javascript
   it('should demonstrate this matcher`s usage with a custom pixelmatch config', () => {
