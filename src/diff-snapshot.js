@@ -28,6 +28,7 @@ function diffImageToSnapshot(options) {
     customDiffConfig = {},
     failureThreshold,
     failureThresholdType,
+    beforeComparison = (received, baseline) => ({ received, baseline }),
   } = options;
 
   let result = {};
@@ -41,8 +42,11 @@ function diffImageToSnapshot(options) {
 
     const diffConfig = Object.assign({}, defaultDiffConfig, customDiffConfig);
 
-    const receivedImage = PNG.sync.read(receivedImageBuffer);
-    const baselineImage = PNG.sync.read(fs.readFileSync(baselineSnapshotPath));
+    const rawReceivedImage = PNG.sync.read(receivedImageBuffer);
+    const rawBaselineImage = PNG.sync.read(fs.readFileSync(baselineSnapshotPath));
+    const processedResult = beforeComparison(rawReceivedImage, rawBaselineImage);
+    const receivedImage = processedResult.received;
+    const baselineImage = processedResult.baseline;
 
     if (
       receivedImage.height !== baselineImage.height || receivedImage.width !== baselineImage.width

@@ -412,5 +412,25 @@ describe('diff-snapshot', () => {
         });
       }).toThrowErrorMatchingSnapshot();
     });
+
+    it('should call custom preprocessing function', () => {
+      const diffImageToSnapshot = setupTest({ snapshotExists: true });
+      const beforeComparison = jest.fn((received, baseline) => ({ received, baseline }));
+
+      diffImageToSnapshot({
+        receivedImageBuffer: mockImageBuffer,
+        snapshotIdentifier: mockSnapshotIdentifier,
+        snapshotsDir: mockSnapshotsDir,
+        updateSnapshot: false,
+        failureThreshold: 0,
+        failureThresholdType: 'pixel',
+        beforeComparison,
+      });
+
+      expect(beforeComparison).toHaveBeenCalledWith(
+        expect.any(Object),
+        expect.any(Object)
+      );
+    });
   });
 });

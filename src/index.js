@@ -29,6 +29,7 @@ function configureToMatchImageSnapshot({
   noColors: commonNoColors = false,
   failureThreshold: commonFailureThreshold = 0,
   failureThresholdType: commonFailureThresholdType = 'pixel',
+  beforeComparison: commonBeforeComparison = (received, baseline) => ({ received, baseline }),
 } = {}) {
   return function toMatchImageSnapshot(received, {
     customSnapshotIdentifier = '',
@@ -37,6 +38,7 @@ function configureToMatchImageSnapshot({
     noColors = commonNoColors,
     failureThreshold = commonFailureThreshold,
     failureThresholdType = commonFailureThresholdType,
+    beforeComparison = commonBeforeComparison,
   } = {}) {
     const { testPath, currentTestName, isNot } = this;
     const chalk = new Chalk({ enabled: !noColors });
@@ -55,6 +57,7 @@ function configureToMatchImageSnapshot({
       customDiffConfig: Object.assign({}, commonCustomDiffConfig, customDiffConfig),
       failureThreshold,
       failureThresholdType,
+      beforeComparison,
     });
 
     let pass = true;
