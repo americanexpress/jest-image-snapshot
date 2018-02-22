@@ -47,8 +47,7 @@ function configureToMatchImageSnapshot({
     if (isNot) { throw new Error('Jest: `.not` cannot be used with `.toMatchImageSnapshot()`.'); }
 
     updateSnapshotState(snapshotState, { _counters: snapshotState._counters.set(currentTestName, (snapshotState._counters.get(currentTestName) || 0) + 1) }); // eslint-disable-line max-len
-    const commonCustomSnapshotsIdentifier = commonCustomSnapshotIdentifier ? `${commonCustomSnapshotIdentifier}-` : '';
-    const snapshotIdentifier = customSnapshotIdentifier || kebabCase(`${commonCustomSnapshotsIdentifier}${path.basename(testPath)}-${currentTestName}-${snapshotState._counters.get(currentTestName)}`);
+    const snapshotIdentifier = customSnapshotIdentifier || kebabCase(`${commonCustomSnapshotIdentifier || path.basename(testPath)}-${currentTestName}-${snapshotState._counters.get(currentTestName)}`);
 
     const result = diffImageToSnapshot({
       receivedImageBuffer: received,
