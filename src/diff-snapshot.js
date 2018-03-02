@@ -15,6 +15,7 @@
 const fs = require('fs');
 const path = require('path');
 const childProcess = require('child_process');
+const rimraf = require('rimraf');
 const pixelmatch = require('pixelmatch');
 const mkdirp = require('mkdirp');
 const { PNG } = require('pngjs');
@@ -35,6 +36,9 @@ function diffImageToSnapshot(options) {
   if (fs.existsSync(baselineSnapshotPath) && !updateSnapshot) {
     const outputDir = path.join(snapshotsDir, '__diff_output__');
     const diffOutputPath = path.join(outputDir, `${snapshotIdentifier}-diff.png`);
+
+    rimraf.sync(diffOutputPath);
+
     const defaultDiffConfig = {
       threshold: 0.01,
     };
