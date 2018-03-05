@@ -140,5 +140,26 @@ describe('toMatchImageSnapshot', () => {
       // just because file was written does not mean it is a png image
       expect(isPng(imageBuffer)).toBe(true);
     });
+
+    it('removes result image from previous test runs for the same snapshot', () => {
+      const customSnapshotIdentifier = getIdentifierIndicatingCleanupIsRequired();
+      const pathToResultImage = path.join(__dirname, diffOutputDir(), `${customSnapshotIdentifier}-diff.png`);
+      // First we need to write a new snapshot image
+      expect(
+        () => expect(imageData).toMatchImageSnapshot({ customSnapshotIdentifier })
+      ).not.toThrowError();
+
+      // then test against a different image (to generate a results image)
+      expect(
+        () => expect(failImageData).toMatchImageSnapshot({ customSnapshotIdentifier })
+      ).toThrow();
+
+      // then test against image that should not generate results image (as it is passing test)
+      expect(
+        () => expect(imageData).toMatchImageSnapshot({ customSnapshotIdentifier })
+      ).not.toThrowError();
+
+      expect(fs.existsSync(pathToResultImage)).toBe(false);
+    });
   });
 });
