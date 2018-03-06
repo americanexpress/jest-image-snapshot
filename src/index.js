@@ -25,6 +25,8 @@ function updateSnapshotState(oldSnapshotState, newSnapshotState) {
 }
 
 function configureToMatchImageSnapshot({
+  customSnapshotIdentifier: commonCustomSnapshotIdentifier = '',
+  customSnapshotsDir: commonCustomSnapshotsDir,
   customDiffConfig: commonCustomDiffConfig = {},
   noColors: commonNoColors = false,
   failureThreshold: commonFailureThreshold = 0,
@@ -45,12 +47,12 @@ function configureToMatchImageSnapshot({
     if (isNot) { throw new Error('Jest: `.not` cannot be used with `.toMatchImageSnapshot()`.'); }
 
     updateSnapshotState(snapshotState, { _counters: snapshotState._counters.set(currentTestName, (snapshotState._counters.get(currentTestName) || 0) + 1) }); // eslint-disable-line max-len
-    const snapshotIdentifier = customSnapshotIdentifier || kebabCase(`${path.basename(testPath)}-${currentTestName}-${snapshotState._counters.get(currentTestName)}`);
+    const snapshotIdentifier = customSnapshotIdentifier || kebabCase(`${commonCustomSnapshotIdentifier || path.basename(testPath)}-${currentTestName}-${snapshotState._counters.get(currentTestName)}`);
 
     const result = diffImageToSnapshot({
       receivedImageBuffer: received,
       snapshotIdentifier,
-      snapshotsDir: customSnapshotsDir || path.join(path.dirname(testPath), SNAPSHOTS_DIR),
+      snapshotsDir: customSnapshotsDir || commonCustomSnapshotsDir || path.join(path.dirname(testPath), SNAPSHOTS_DIR),
       updateSnapshot: snapshotState._updateSnapshot === 'all',
       customDiffConfig: Object.assign({}, commonCustomDiffConfig, customDiffConfig),
       failureThreshold,
