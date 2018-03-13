@@ -19,14 +19,14 @@ const uniqueId = require('lodash/uniqueId');
 const isPng = require('is-png');
 
 describe('toMatchImageSnapshot', () => {
-  const imagePath = path.resolve(__dirname, './stubs', 'TestImage.png');
-  const imageData = fs.readFileSync(imagePath);
+  const fromStubs = file => path.resolve(__dirname, './stubs', file);
+  const imageData = fs.readFileSync(fromStubs('TestImage.png'));
   const diffOutputDir = (snapshotsDir = '__image_snapshots__') => path.join(snapshotsDir, '/__diff_output__/');
   const customSnapshotsDir = path.resolve(__dirname, '__custom_snapshots_dir__');
   const cleanupRequiredIndicator = 'cleanup-required-';
-
   const getIdentifierIndicatingCleanupIsRequired = () => uniqueId(cleanupRequiredIndicator);
   const getSnapshotFilename = identifier => `${identifier}-snap.png`;
+  const diffExists = identifier => fs.existsSync(path.join(__dirname, diffOutputDir(), `${identifier}-diff.png`));
 
   beforeAll(() => {
     const { toMatchImageSnapshot } = require('../src'); // eslint-disable-line global-require
@@ -79,18 +79,14 @@ describe('toMatchImageSnapshot', () => {
         () => expect(imageData).toMatchImageSnapshot({ customSnapshotIdentifier })
       ).not.toThrowError();
 
-      expect(
-        fs.existsSync(path.join(__dirname, diffOutputDir(), `${customSnapshotIdentifier}-diff.png`))
-      ).toBe(false);
+      expect(diffExists(customSnapshotIdentifier)).toBe(false);
     });
   });
 
   describe('failures', () => {
-    const failImagePath = path.resolve(__dirname, './stubs', 'TestImageFailure.png');
-    const failImageData = fs.readFileSync(failImagePath);
-
-    const oversizeImagePath = path.resolve(__dirname, './stubs', 'TestImageFailureOversize.png');
-    const oversizeImageData = fs.readFileSync(oversizeImagePath);
+    const failImageData = fs.readFileSync(fromStubs('TestImageFailure.png'));
+    const oversizeImageData = fs.readFileSync(fromStubs('TestImageFailureOversize.png'));
+    const biggerImageData = fs.readFileSync(fromStubs('TestImage150x150.png'));
 
     it('fails for a different snapshot', () => {
       const expectedError = /^Expected image to match or be a close match to snapshot but was 86\.55000000000001% different from snapshot \(8655 differing pixels\)\./;
@@ -107,7 +103,7 @@ describe('toMatchImageSnapshot', () => {
       ).toThrowError(expectedError);
     });
 
-    it('fails gracefully with a differently sized image', () => {
+    it('fails with a differently sized images and outputs diff', () => {
       const customSnapshotIdentifier = getIdentifierIndicatingCleanupIsRequired();
 
       // First we need to write a new snapshot image
@@ -118,7 +114,23 @@ describe('toMatchImageSnapshot', () => {
       // Test against an image much larger than the snapshot.
       expect(
         () => expect(oversizeImageData).toMatchImageSnapshot({ customSnapshotIdentifier })
-      ).toThrowErrorMatchingSnapshot();
+      ).toThrowError(/Expected image to match or be a close match to snapshot but was 83\.85395537525355% different from snapshot/);
+
+      expect(diffExists(customSnapshotIdentifier)).toBe(true);
+    });
+
+    it('fails with images without diff pixels after being resized', () => {
+      const customSnapshotIdentifier = getIdentifierIndicatingCleanupIsRequired();
+
+      expect(
+        () => expect(imageData).toMatchImageSnapshot({ customSnapshotIdentifier })
+      ).not.toThrowError();
+
+      expect(
+        () => expect(biggerImageData).toMatchImageSnapshot({ customSnapshotIdentifier })
+      ).toThrowError(/Expected image to match or be a close match to snapshot but was 54\.662222222222226% different from snapshot/);
+
+      expect(diffExists(customSnapshotIdentifier)).toBe(true);
     });
 
     it('writes a result image for failing tests', () => {
@@ -143,7 +155,6 @@ describe('toMatchImageSnapshot', () => {
 
     it('removes result image from previous test runs for the same snapshot', () => {
       const customSnapshotIdentifier = getIdentifierIndicatingCleanupIsRequired();
-      const pathToResultImage = path.join(__dirname, diffOutputDir(), `${customSnapshotIdentifier}-diff.png`);
       // First we need to write a new snapshot image
       expect(
         () => expect(imageData).toMatchImageSnapshot({ customSnapshotIdentifier })
@@ -159,7 +170,7 @@ describe('toMatchImageSnapshot', () => {
         () => expect(imageData).toMatchImageSnapshot({ customSnapshotIdentifier })
       ).not.toThrowError();
 
-      expect(fs.existsSync(pathToResultImage)).toBe(false);
+      expect(diffExists(customSnapshotIdentifier)).toBe(false);
     });
   });
 });
