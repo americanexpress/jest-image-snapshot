@@ -75,7 +75,6 @@ function configureToMatchImageSnapshot({
 
       if (!pass) {
         const differencePercentage = result.diffRatio * 100;
-
         message = () => `Expected image to match or be a close match to snapshot but was ${differencePercentage}% different from snapshot (${result.diffPixelCount} differing pixels).\n`
                   + `${chalk.bold.red('See diff for details:')} ${chalk.red(result.diffOutputPath)}`;
       }
