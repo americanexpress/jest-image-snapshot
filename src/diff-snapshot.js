@@ -20,6 +20,61 @@ const pixelmatch = require('pixelmatch');
 const mkdirp = require('mkdirp');
 const { PNG } = require('pngjs');
 
+/**
+ * Helper function to create reusable image resizer
+ */
+const createImageResizer = (width, height) => (source) => {
+  const resized = new PNG({ width, height, fill: true });
+  PNG.bitblt(source, resized, 0, 0, source.width, source.height, 0, 0);
+  return resized;
+};
+
+/**
+ * Fills diff area with black transparent color for meaningful diff
+ */
+/* eslint-disable no-plusplus, no-param-reassign, no-bitwise */
+const fillSizeDifference = (width, height) => (image) => {
+  const inArea = (x, y) => y > height || x > width;
+  for (let y = 0; y < image.height; y++) {
+    for (let x = 0; x < image.width; x++) {
+      if (inArea(x, y)) {
+        const idx = ((image.width * y) + x) << 2;
+        image.data[idx] = 0;
+        image.data[idx + 1] = 0;
+        image.data[idx + 2] = 0;
+        image.data[idx + 3] = 64;
+      }
+    }
+  }
+  return image;
+};
+/* eslint-enabled */
+
+/**
+ * Aligns images sizes to biggest common value
+ * and fills new pixels with transparent pixels
+ */
+const alignImagesToSameSize = (firstImage, secondImage) => {
+  // Keep original sizes to fill extended area later
+  const firstImageWidth = firstImage.width;
+  const firstImageHeight = firstImage.height;
+  const secondImageWidth = secondImage.width;
+  const secondImageHeight = secondImage.height;
+  // Calculate biggest common values
+  const resizeToSameSize = createImageResizer(
+    Math.max(firstImageWidth, secondImageWidth),
+    Math.max(firstImageHeight, secondImageHeight)
+  );
+  // Resize both images
+  const resizedFirst = resizeToSameSize(firstImage);
+  const resizedSecond = resizeToSameSize(secondImage);
+  // Fill resized area with black transparent pixels
+  return [
+    fillSizeDifference(firstImageWidth, firstImageHeight)(resizedFirst),
+    fillSizeDifference(secondImageWidth, secondImageHeight)(resizedSecond),
+  ];
+};
+
 function diffImageToSnapshot(options) {
   const {
     receivedImageBuffer,
@@ -45,14 +100,16 @@ function diffImageToSnapshot(options) {
 
     const diffConfig = Object.assign({}, defaultDiffConfig, customDiffConfig);
 
-    const receivedImage = PNG.sync.read(receivedImageBuffer);
-    const baselineImage = PNG.sync.read(fs.readFileSync(baselineSnapshotPath));
-
-    if (
-      receivedImage.height !== baselineImage.height || receivedImage.width !== baselineImage.width
-    ) {
-      throw new Error('toMatchImageSnapshot(): Received image size must match baseline snapshot size in order to make comparison.');
-    }
+    const rawReceivedImage = PNG.sync.read(receivedImageBuffer);
+    const rawBaselineImage = PNG.sync.read(fs.readFileSync(baselineSnapshotPath));
+    const hasSizeMismatch = (
+      rawReceivedImage.height !== rawBaselineImage.height ||
+      rawReceivedImage.width !== rawBaselineImage.width
+    );
+    // Align images in size if different
+    const [receivedImage, baselineImage] = hasSizeMismatch
+      ? alignImagesToSameSize(rawReceivedImage, rawBaselineImage)
+      : [rawReceivedImage, rawBaselineImage];
     const imageWidth = receivedImage.width;
     const imageHeight = receivedImage.height;
     const diffImage = new PNG({ width: imageWidth, height: imageHeight });
@@ -70,7 +127,10 @@ function diffImageToSnapshot(options) {
     const diffRatio = diffPixelCount / totalPixels;
 
     let pass = false;
-    if (failureThresholdType === 'pixel') {
+    if (hasSizeMismatch) {
+      // Always fail test on image size mismatch
+      pass = false;
+    } else if (failureThresholdType === 'pixel') {
       pass = diffPixelCount <= failureThreshold;
     } else if (failureThresholdType === 'percent') {
       pass = diffRatio <= failureThreshold;
