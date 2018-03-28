@@ -26,13 +26,14 @@ function updateSnapshotState(oldSnapshotState, newSnapshotState) {
 
 function configureToMatchImageSnapshot({
   customDiffConfig: commonCustomDiffConfig = {},
+  customSnapshotsDir: commonCustomSnapshotsDir,
   noColors: commonNoColors = false,
   failureThreshold: commonFailureThreshold = 0,
   failureThresholdType: commonFailureThresholdType = 'pixel',
 } = {}) {
   return function toMatchImageSnapshot(received, {
     customSnapshotIdentifier = '',
-    customSnapshotsDir,
+    customSnapshotsDir = commonCustomSnapshotsDir,
     customDiffConfig = {},
     noColors = commonNoColors,
     failureThreshold = commonFailureThreshold,
