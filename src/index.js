@@ -17,6 +17,7 @@ const merge = require('lodash/merge');
 const path = require('path');
 const Chalk = require('chalk').constructor;
 const { diffImageToSnapshot } = require('./diff-snapshot');
+const fs = require('fs');
 
 const SNAPSHOTS_DIR = '__image_snapshots__';
 
@@ -47,15 +48,20 @@ function configureToMatchImageSnapshot({
     updateSnapshotState(snapshotState, { _counters: snapshotState._counters.set(currentTestName, (snapshotState._counters.get(currentTestName) || 0) + 1) }); // eslint-disable-line max-len
     const snapshotIdentifier = customSnapshotIdentifier || kebabCase(`${path.basename(testPath)}-${currentTestName}-${snapshotState._counters.get(currentTestName)}`);
 
-    const result = diffImageToSnapshot({
-      receivedImageBuffer: received,
-      snapshotIdentifier,
-      snapshotsDir: customSnapshotsDir || path.join(path.dirname(testPath), SNAPSHOTS_DIR),
-      updateSnapshot: snapshotState._updateSnapshot === 'all',
-      customDiffConfig: Object.assign({}, commonCustomDiffConfig, customDiffConfig),
-      failureThreshold,
-      failureThresholdType,
-    });
+    const snapshotsDir = customSnapshotsDir || path.join(path.dirname(testPath), SNAPSHOTS_DIR);
+    const baselineSnapshotPath = path.join(snapshotsDir, `${snapshotIdentifier}-snap.png`);
+
+    const result = (snapshotState._updateSnapshot === 'none' && !fs.existsSync(baselineSnapshotPath)) ?
+      { pass: false } :
+      diffImageToSnapshot({
+        receivedImageBuffer: received,
+        snapshotsDir,
+        snapshotIdentifier,
+        updateSnapshot: snapshotState._updateSnapshot === 'all',
+        customDiffConfig: Object.assign({}, commonCustomDiffConfig, customDiffConfig),
+        failureThreshold,
+        failureThresholdType,
+      });
 
     let pass = true;
     /*
