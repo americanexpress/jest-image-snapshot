@@ -19,6 +19,7 @@ const rimraf = require('rimraf');
 const pixelmatch = require('pixelmatch');
 const mkdirp = require('mkdirp');
 const { PNG } = require('pngjs');
+const { isCI } = require('./is-ci');
 
 /**
  * Helper function to create reusable image resizer
@@ -73,6 +74,15 @@ const alignImagesToSameSize = (firstImage, secondImage) => {
     fillSizeDifference(firstImageWidth, firstImageHeight)(resizedFirst),
     fillSizeDifference(secondImageWidth, secondImageHeight)(resizedSecond),
   ];
+};
+
+const createSnapshot = ({ snapshotsDir, baselineSnapshotPath, receivedImageBuffer }) => {
+  if (isCI()) {
+    throw new Error(`Snapshot on ${baselineSnapshotPath} path do not exist. Run tests gain on non-ci environment to create it`);
+  }
+
+  mkdirp.sync(snapshotsDir);
+  fs.writeFileSync(baselineSnapshotPath, receivedImageBuffer);
 };
 
 function diffImageToSnapshot(options) {
@@ -170,8 +180,7 @@ function diffImageToSnapshot(options) {
       diffPixelCount,
     };
   } else {
-    mkdirp.sync(snapshotsDir);
-    fs.writeFileSync(baselineSnapshotPath, receivedImageBuffer);
+    createSnapshot({ snapshotsDir, baselineSnapshotPath, receivedImageBuffer });
 
     result = updateSnapshot ? { updated: true } : { added: true };
   }
