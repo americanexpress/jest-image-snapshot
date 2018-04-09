@@ -14,3 +14,5 @@ Object {
 `;
 
 exports[`diff-snapshot diffImageToSnapshot should throw an error if an unknown threshold type is supplied 1`] = `"Unknown failureThresholdType: banana. Valid options are \\"pixel\\" or \\"percent\\"."`;
+
+exports[`diff-snapshot diffImageToSnapshot should throw an error if snapshot not exists and environment is CI 1`] = `"Snapshot on /path/to/snapshots/id1-snap.png path do not exist. Run tests gain on non-ci environment to create it"`;
