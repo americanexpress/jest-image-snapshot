@@ -17,6 +17,8 @@ const fs = require('fs');
 const path = require('path');
 const mockSpawn = require('mock-spawn')();
 
+jest.mock('../src/is-ci', () => ({ isCI: jest.fn().mockReturnValue(false) }));
+
 describe('diff-snapshot', () => {
   beforeEach(() => {
     jest.resetModules();
@@ -409,6 +411,23 @@ describe('diff-snapshot', () => {
           updateSnapshot: false,
           failureThreshold: 0,
           failureThresholdType: 'banana',
+        });
+      }).toThrowErrorMatchingSnapshot();
+    });
+
+    it('should throw an error if snapshot not exists and environment is CI', () => {
+      require('../src/is-ci').isCI.mockReturnValueOnce(true);
+
+      const diffImageToSnapshot = setupTest({ snapshotExists: false });
+
+      expect(() => {
+        diffImageToSnapshot({
+          receivedImageBuffer: mockImageBuffer,
+          snapshotIdentifier: mockSnapshotIdentifier,
+          snapshotsDir: mockSnapshotsDir,
+          updateSnapshot: false,
+          failureThreshold: 0,
+          failureThresholdType: 'pixel',
         });
       }).toThrowErrorMatchingSnapshot();
     });
