@@ -16,7 +16,8 @@
 const fs = require('fs');
 const path = require('path');
 const mockSpawn = require('mock-spawn')();
-jest.mock('../src/is-ci');
+
+jest.mock('../src/is-ci', () => ({ isCI: jest.fn().mockReturnValue(false) }));
 
 describe('diff-snapshot', () => {
   beforeEach(() => {
