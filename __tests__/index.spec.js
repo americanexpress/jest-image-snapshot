@@ -286,7 +286,10 @@ describe('toMatchImageSnapshot', () => {
 
     const { toMatchImageSnapshot } = require('../src/index');
     const matcherAtTest = toMatchImageSnapshot.bind(mockTestContext);
-    expect(matcherAtTest('pretendthisisanimagebuffer')).toHaveProperty('pass', false);
+    const result = matcherAtTest('pretendthisisanimagebuffer');
+    expect(result).toHaveProperty('pass', false);
+    expect(result).toHaveProperty('message');
+    expect(result.message()).toContain('continuous integration');
     expect(mockDiff).not.toHaveBeenCalled();
   });
 

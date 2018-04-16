@@ -51,8 +51,16 @@ function configureToMatchImageSnapshot({
     const snapshotsDir = customSnapshotsDir || path.join(path.dirname(testPath), SNAPSHOTS_DIR);
     const baselineSnapshotPath = path.join(snapshotsDir, `${snapshotIdentifier}-snap.png`);
 
-    const result = (snapshotState._updateSnapshot === 'none' && !fs.existsSync(baselineSnapshotPath)) ?
-      { pass: false } :
+    if (snapshotState._updateSnapshot === 'none' && !fs.existsSync(baselineSnapshotPath)) {
+      return {
+        pass: false,
+        message: () => `New snapshot was ${chalk.bold.red('not written')}. The update flag must be explicitly ` +
+        'passed to write a new snapshot.\n\n + This is likely because this test is run in a continuous ' +
+        'integration (CI) environment in which snapshots are not written by default.\n\n',
+      };
+    }
+
+    const result =
       diffImageToSnapshot({
         receivedImageBuffer: received,
         snapshotsDir,
