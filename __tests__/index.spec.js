@@ -114,7 +114,7 @@ describe('toMatchImageSnapshot', () => {
       isNot: false,
       snapshotState: {
         _counters: new Map(),
-        _updateSnapshot: 'none',
+        _updateSnapshot: 'new',
         updated: undefined,
         added: true,
       },
@@ -144,7 +144,7 @@ describe('toMatchImageSnapshot', () => {
       isNot: false,
       snapshotState: {
         _counters: new Map(),
-        _updateSnapshot: 'none',
+        _updateSnapshot: 'new',
         updated: undefined,
         added: true,
       },
@@ -178,7 +178,7 @@ describe('toMatchImageSnapshot', () => {
       isNot: false,
       snapshotState: {
         _counters: new Map(),
-        _updateSnapshot: 'none',
+        _updateSnapshot: 'new',
         updated: undefined,
         added: true,
       },
@@ -233,16 +233,64 @@ describe('toMatchImageSnapshot', () => {
       snapshotState: {
         _counters: new Map(),
         update: false,
+        _updateSnapshot: 'new',
         updated: undefined,
         added: true,
       },
     };
-    const mockDiffResult = { added: true };
+    const mockDiff = jest.fn();
+    jest.doMock('../src/diff-snapshot', () => ({
+      diffImageToSnapshot: mockDiff,
+    }));
 
-    setupMock(mockDiffResult);
+    const mockFs = Object.assign({}, fs, {
+      existsSync: jest.fn(),
+      unlinkSync: jest.fn(),
+    });
+
+    mockFs.existsSync.mockReturnValueOnce(false);
+    mockDiff.mockReturnValueOnce({ added: true });
+
     const { toMatchImageSnapshot } = require('../src/index');
     const matcherAtTest = toMatchImageSnapshot.bind(mockTestContext);
-    expect(() => matcherAtTest('pretendthisisanimagebuffer')).not.toThrow();
+    expect(matcherAtTest('pretendthisisanimagebuffer')).toHaveProperty('pass', true);
+    expect(mockDiff).toHaveBeenCalled();
+  });
+
+  it('should fail when a new snapshot is added in ci', () => {
+    const mockTestContext = {
+      testPath: 'path/to/test.spec.js',
+      currentTestName: 'test1',
+      isNot: false,
+      snapshotState: {
+        _counters: new Map(),
+        update: false,
+        _updateSnapshot: 'none',
+        updated: undefined,
+        added: true,
+      },
+    };
+
+    const mockDiff = jest.fn();
+    jest.doMock('../src/diff-snapshot', () => ({
+      diffImageToSnapshot: mockDiff,
+    }));
+
+    const mockFs = Object.assign({}, fs, {
+      existsSync: jest.fn(),
+      unlinkSync: jest.fn(),
+    });
+
+    mockFs.existsSync.mockReturnValueOnce(false);
+
+
+    const { toMatchImageSnapshot } = require('../src/index');
+    const matcherAtTest = toMatchImageSnapshot.bind(mockTestContext);
+    const result = matcherAtTest('pretendthisisanimagebuffer');
+    expect(result).toHaveProperty('pass', false);
+    expect(result).toHaveProperty('message');
+    expect(result.message()).toContain('continuous integration');
+    expect(mockDiff).not.toHaveBeenCalled();
   });
 
   it('should work when a snapshot is updated', () => {
