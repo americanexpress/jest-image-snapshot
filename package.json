@@ -8,7 +8,7 @@
   },
   "scripts": {
     "lint": "eslint ./ --ignore-path .gitignore --ext .js",
-    "test": "jest",
+    "test": "jest --ci=false",
     "posttest": "npm run lint"
   },
   "keywords": [
