@@ -55,7 +55,6 @@
     "lodash": "^4.17.4",
     "mkdirp": "^0.5.1",
     "pixelmatch": "^4.0.2",
-    "//": "DO NOT SUBMIT: Remove after the PR is merged.",
     "pngjs": "https://github.com/skywhale/pngjs/archive/fixnode9.tar.gz",
     "rimraf": "^2.6.2"
   },
