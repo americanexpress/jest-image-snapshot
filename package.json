@@ -55,7 +55,7 @@
     "lodash": "^4.17.4",
     "mkdirp": "^0.5.1",
     "pixelmatch": "^4.0.2",
-    "pngjs": "https://github.com/skywhale/pngjs/archive/fixnode9.tar.gz",
+    "pngjs": "^3.3.3",
     "rimraf": "^2.6.2"
   },
   "peerDependencies": {
