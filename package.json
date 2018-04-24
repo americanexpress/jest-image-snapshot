@@ -55,7 +55,7 @@
     "lodash": "^4.17.4",
     "mkdirp": "^0.5.1",
     "pixelmatch": "^4.0.2",
-    "pngjs": "^3.3.0",
+    "pngjs": "^3.3.3",
     "rimraf": "^2.6.2"
   },
   "peerDependencies": {
