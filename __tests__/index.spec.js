@@ -84,11 +84,10 @@ describe('toMatchImageSnapshot', () => {
     };
 
     setupMock(mockDiffResult);
-    const { toMatchImageSnapshot } = require('../src/index');
-    expect.extend({ toMatchImageSnapshot });
+    const { toThrowErrorMatchingImageSnapshot } = require('../src/index');
+    expect.extend({ toThrowErrorMatchingImageSnapshot });
 
-    expect(() => expect('pretendthisisanimagebuffer').toMatchImageSnapshot())
-      .toThrowErrorMatchingSnapshot();
+    expect('pretendthisisanimagebuffer').toThrowErrorMatchingImageSnapshot();
   });
 
   it('should use noColors options if passed as true and not style error message', () => {
@@ -100,11 +99,10 @@ describe('toMatchImageSnapshot', () => {
     };
 
     setupMock(mockDiffResult);
-    const { toMatchImageSnapshot } = require('../src/index');
-    expect.extend({ toMatchImageSnapshot });
+    const { toThrowErrorMatchingImageSnapshot } = require('../src/index');
+    expect.extend({ toThrowErrorMatchingImageSnapshot });
 
-    expect(() => expect('pretendthisisanimagebuffer').toMatchImageSnapshot({ noColors: true }))
-      .toThrowErrorMatchingSnapshot();
+    expect('pretendthisisanimagebuffer').toThrowErrorMatchingImageSnapshot({ noColors: true });
   });
 
   it('should use custom pixelmatch configuration if passed in', () => {
@@ -338,7 +336,7 @@ describe('toMatchImageSnapshot', () => {
     }));
     const { configureToMatchImageSnapshot } = require('../src/index');
     const customConfig = { perceptual: true };
-    const toMatchImageSnapshot = configureToMatchImageSnapshot({
+    const { toMatchImageSnapshot } = configureToMatchImageSnapshot({
       customDiffConfig: customConfig,
       noColors: true,
     });
