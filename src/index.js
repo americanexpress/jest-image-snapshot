@@ -21,8 +21,8 @@ const fs = require('fs');
 
 const SNAPSHOTS_DIR = '__image_snapshots__';
 
-function updateSnapshotState(oldSnapshotState, newSnapshotState) {
-  return merge({}, oldSnapshotState, newSnapshotState);
+function updateSnapshotState(originalSnapshotState, partialSnapshotState) {
+  return merge(originalSnapshotState, partialSnapshotState);
 }
 
 function configureToMatchImageSnapshot({
@@ -42,7 +42,7 @@ function configureToMatchImageSnapshot({
     const { testPath, currentTestName, isNot } = this;
     const chalk = new Chalk({ enabled: !noColors });
 
-    let { snapshotState } = this;
+    const { snapshotState } = this;
     if (isNot) { throw new Error('Jest: `.not` cannot be used with `.toMatchImageSnapshot()`.'); }
 
     updateSnapshotState(snapshotState, { _counters: snapshotState._counters.set(currentTestName, (snapshotState._counters.get(currentTestName) || 0) + 1) }); // eslint-disable-line max-len
@@ -81,13 +81,14 @@ function configureToMatchImageSnapshot({
     if (result.updated) {
       // once transition away from jasmine is done this will be a lot more elegant and pure
       // https://github.com/facebook/jest/pull/3668
-      snapshotState = updateSnapshotState(snapshotState, { updated: snapshotState.updated += 1 });
+      updateSnapshotState(snapshotState, { updated: snapshotState.updated + 1 });
     } else if (result.added) {
-      snapshotState = updateSnapshotState(snapshotState, { added: snapshotState.added += 1 });
+      updateSnapshotState(snapshotState, { added: snapshotState.added + 1 });
     } else {
       ({ pass } = result);
 
       if (!pass) {
+        updateSnapshotState(snapshotState, { unmatched: snapshotState.unmatched + 1 });
         const differencePercentage = result.diffRatio * 100;
         message = () => `Expected image to match or be a close match to snapshot but was ${differencePercentage}% different from snapshot (${result.diffPixelCount} differing pixels).\n`
                   + `${chalk.bold.red('See diff for details:')} ${chalk.red(result.diffOutputPath)}`;
