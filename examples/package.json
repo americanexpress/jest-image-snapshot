@@ -16,8 +16,9 @@
   "author": "Andres Escobar <andres.escobar@aexp.com> (https://github.com/anescobar1991)",
   "license": "Apache-2.0",
   "dependencies": {
-    "jest": "^22.0.0",
-    "puppeteer": "^0.13.0"
+    "jest": "*",
+    "jest-image-snapshot": "*",
+    "puppeteer": "*"
   },
   "jest": {
     "setupTestFrameworkScriptFile": "<rootDir>/jest-setup.js"
