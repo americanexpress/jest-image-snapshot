@@ -336,7 +336,7 @@ describe('toMatchImageSnapshot', () => {
     }));
     const { configureToMatchImageSnapshot } = require('../src/index');
     const customConfig = { perceptual: true };
-    const { toMatchImageSnapshot } = configureToMatchImageSnapshot({
+    const toMatchImageSnapshot = configureToMatchImageSnapshot({
       customDiffConfig: customConfig,
       noColors: true,
     });
@@ -358,5 +358,181 @@ describe('toMatchImageSnapshot', () => {
     expect(Chalk).toHaveBeenCalledWith({
       enabled: false,
     });
+  });
+
+  it('should fail when wrong exception expected using toThrowMatchingImageSnapshot', () => {
+    jest.unmock('chalk');
+    const mockDiffResult = {
+      pass: false,
+      diffOutputPath: 'path/to/result.png',
+      diffRatio: 5,
+      diffPixelCount: 8000,
+    };
+    setupMock(mockDiffResult);
+
+    const { toThrowErrorMatchingImageSnapshot } = require('../src/index');
+    expect.extend({ toThrowErrorMatchingImageSnapshot });
+
+    expect(() =>
+      expect('pretendthisisanimagebuffer')
+        .toThrowErrorMatchingImageSnapshot({ expectedException: /Expected exception is something really weird/ })
+    ).toThrow();
+  });
+
+  it('should work when no exception expected using toThrowMatchingImageSnapshot', () => {
+    jest.unmock('chalk');
+    const mockDiffResult = {
+      pass: false,
+      diffOutputPath: 'path/to/result.png',
+      diffRatio: 5,
+      diffPixelCount: 8000,
+    };
+    setupMock(mockDiffResult);
+
+    const { toThrowErrorMatchingImageSnapshot } = require('../src/index');
+    expect.extend({ toThrowErrorMatchingImageSnapshot });
+
+
+    expect('pretendthisisanimagebuffer')
+      .toThrowErrorMatchingImageSnapshot();
+  });
+
+  it('should fail when same snapshots using toThrowMatchingImageSnapshot', () => {
+    jest.unmock('chalk');
+    const mockDiffResult = {
+      pass: true,
+      diffOutputPath: 'path/to/result.png',
+      diffRatio: 0,
+      diffPixelCount: 0,
+    };
+    setupMock(mockDiffResult);
+
+    const { toThrowErrorMatchingImageSnapshot } = require('../src/index');
+    expect.extend({ toThrowErrorMatchingImageSnapshot });
+
+    expect(() => expect('pretendthisisanimagebuffer').toThrowErrorMatchingImageSnapshot())
+      .toThrow();
+  });
+
+  it('should match regexp exception using toThrowMatchingImageSnapshot', () => {
+    jest.unmock('chalk');
+    const mockDiffResult = {
+      pass: false,
+      diffOutputPath: 'path/to/result.png',
+      diffRatio: 0.8,
+      diffPixelCount: 600,
+    };
+
+    setupMock(mockDiffResult);
+    const { toThrowErrorMatchingImageSnapshot } = require('../src/index');
+    expect.extend({ toThrowErrorMatchingImageSnapshot });
+
+    expect('pretendthisisanimagebuffer').toThrowErrorMatchingImageSnapshot(
+      { expectedException: /Expected image/ }
+    );
+  });
+
+  it('should fail when exception does not match regexp using toThrowMatchingImageSnapshot', () => {
+    jest.unmock('chalk');
+    const mockDiffResult = {
+      pass: false,
+      diffOutputPath: 'path/to/result.png',
+      diffRatio: 0.8,
+      diffPixelCount: 600,
+    };
+
+    setupMock(mockDiffResult);
+    const { toThrowErrorMatchingImageSnapshot } = require('../src/index');
+    expect.extend({ toThrowErrorMatchingImageSnapshot });
+
+    expect(() => expect('pretendthisisanimagebuffer').toThrowErrorMatchingImageSnapshot(
+      { expectedException: /Expected another exception/ }
+    )).toThrow(/Expected exception is not matching received exception/);
+  });
+
+  it('should match string exception using toThrowMatchingImageSnapshot', () => {
+    jest.unmock('chalk');
+    const mockDiffResult = {
+      pass: false,
+      diffOutputPath: 'path/to/result.png',
+      diffRatio: 0.8,
+      diffPixelCount: 600,
+    };
+
+    const Chalk = function () {
+      return {
+        bold: { red: text => text },
+        red: text => text,
+      };
+    };
+
+    jest.doMock('chalk', () => ({
+      constructor: Chalk,
+    }));
+
+    setupMock(mockDiffResult);
+    const { toThrowErrorMatchingImageSnapshot } = require('../src/index');
+    expect.extend({ toThrowErrorMatchingImageSnapshot });
+
+    expect('pretendthisisanimagebuffer').toThrowErrorMatchingImageSnapshot(
+      { expectedException: 'Expected image to match or be a close match to snapshot but was 80% different from snapshot (600 differing pixels).\nSee diff for details: path/to/result.png' }
+    );
+  });
+
+  it('should work when a new snapshot in CI using toThrowMatchingImageSnapshot', () => {
+    jest.unmock('chalk');
+
+    const mockTestContext = {
+      testPath: 'path/to/test.spec.js',
+      currentTestName: 'test1',
+      isNot: false,
+      snapshotState: {
+        _counters: new Map(),
+        update: false,
+        _updateSnapshot: 'none',
+        updated: undefined,
+        added: true,
+      },
+    };
+
+    const mockDiff = jest.fn();
+    jest.doMock('../src/diff-snapshot', () => ({
+      diffImageToSnapshot: mockDiff,
+    }));
+
+    const mockFs = Object.assign({}, fs, {
+      existsSync: jest.fn(),
+      unlinkSync: jest.fn(),
+    });
+
+    mockFs.existsSync.mockReturnValueOnce(false);
+
+    const { toThrowErrorMatchingImageSnapshot } = require('../src/index');
+    const matcherAtTest = toThrowErrorMatchingImageSnapshot.bind(mockTestContext);
+    const result = matcherAtTest('pretendthisisanimagebuffer');
+    expect(result).toHaveProperty('pass', true);
+    expect(result).toHaveProperty('message');
+    expect(result.message()).toContain('continuous integration');
+    expect(mockDiff).not.toHaveBeenCalled();
+
+    const resultWithException = matcherAtTest('pretendthisisanimagebuffer', { expectedException: /New snapshot was/ });
+    expect(resultWithException).toHaveProperty('pass', true);
+    expect(resultWithException).toHaveProperty('message');
+  });
+
+  it('should throw an error if used with .not matcher using toThrowMatchingImageSnapshot', () => {
+    const mockDiffResult = {
+      pass: true,
+      diffOutputPath: 'path/to/result.png',
+      diffRatio: 0,
+      diffPixelCount: 0,
+    };
+
+    setupMock(mockDiffResult);
+    const { toThrowErrorMatchingImageSnapshot } = require('../src/index');
+    expect.extend({ toThrowErrorMatchingImageSnapshot });
+
+    expect(() => expect('pretendthisisanimagebuffer').not.toThrowErrorMatchingImageSnapshot())
+      .toThrow();
   });
 });

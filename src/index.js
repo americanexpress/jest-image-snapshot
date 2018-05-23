@@ -35,14 +35,14 @@ function getInconsistentSnapshotsMessage(
   + `${chalk.bold.red('See diff for details:')} ${chalk.red(diffOutputPath)}`;
 }
 
-function matchesException(expected, received) {
+const matchesException = (expected, received) => {
   if (isRegExp(expected)) {
     return expected.test(received);
   }
 
   // eslint-disable-next-line eqeqeq
   return expected == received;
-}
+};
 
 function updateSnapshotState(originalSnapshotState, partialSnapshotState) {
   return merge(originalSnapshotState, partialSnapshotState);
@@ -54,37 +54,36 @@ function configureToMatchImageSnapshot({
   failureThreshold: commonFailureThreshold = 0,
   failureThresholdType: commonFailureThresholdType = 'pixel',
 } = {}) {
-  return {
-    toMatchImageSnapshot: function toMatchImageSnapshot(received, {
-      customSnapshotIdentifier = '',
-      customSnapshotsDir,
-      customDiffConfig = {},
-      noColors = commonNoColors,
-      failureThreshold = commonFailureThreshold,
-      failureThresholdType = commonFailureThresholdType,
-    } = {}) {
-      const { testPath, currentTestName, isNot } = this;
-      const chalk = new Chalk({ enabled: !noColors });
+  return function toMatchImageSnapshot(received, {
+    customSnapshotIdentifier = '',
+    customSnapshotsDir,
+    customDiffConfig = {},
+    noColors = commonNoColors,
+    failureThreshold = commonFailureThreshold,
+    failureThresholdType = commonFailureThresholdType,
+  } = {}) {
+    const { testPath, currentTestName, isNot } = this;
+    const chalk = new Chalk({ enabled: !noColors });
 
-      const { snapshotState } = this;
-      if (isNot) {
-        throw new Error('Jest: `.not` cannot be used with `.toMatchImageSnapshot()`.');
-      }
+    const { snapshotState } = this;
+    if (isNot) {
+      throw new Error('Jest: `.not` cannot be used with `.toMatchImageSnapshot()`.');
+    }
 
-      updateSnapshotState(snapshotState, { _counters: snapshotState._counters.set(currentTestName, (snapshotState._counters.get(currentTestName) || 0) + 1) }); // eslint-disable-line max-len
-      const snapshotIdentifier = customSnapshotIdentifier || kebabCase(`${path.basename(testPath)}-${currentTestName}-${snapshotState._counters.get(currentTestName)}`);
+    updateSnapshotState(snapshotState, { _counters: snapshotState._counters.set(currentTestName, (snapshotState._counters.get(currentTestName) || 0) + 1) }); // eslint-disable-line max-len
+    const snapshotIdentifier = customSnapshotIdentifier || kebabCase(`${path.basename(testPath)}-${currentTestName}-${snapshotState._counters.get(currentTestName)}`);
 
-      const snapshotsDir = customSnapshotsDir || path.join(path.dirname(testPath), SNAPSHOTS_DIR);
-      const baselineSnapshotPath = path.join(snapshotsDir, `${snapshotIdentifier}-snap.png`);
+    const snapshotsDir = customSnapshotsDir || path.join(path.dirname(testPath), SNAPSHOTS_DIR);
+    const baselineSnapshotPath = path.join(snapshotsDir, `${snapshotIdentifier}-snap.png`);
 
-      if (snapshotState._updateSnapshot === 'none' && !fs.existsSync(baselineSnapshotPath)) {
-        return {
-          pass: false,
-          message: () => getReadOnlyMessage(chalk),
-        };
-      }
+    if (snapshotState._updateSnapshot === 'none' && !fs.existsSync(baselineSnapshotPath)) {
+      return {
+        pass: false,
+        message: () => getReadOnlyMessage(chalk),
+      };
+    }
 
-      const result =
+    const result =
         diffImageToSnapshot({
           receivedImageBuffer: received,
           snapshotsDir,
@@ -95,107 +94,120 @@ function configureToMatchImageSnapshot({
           failureThresholdType,
         });
 
-      let pass = true;
-      /*
+    let pass = true;
+    /*
         istanbul ignore next
         `message` is implementation detail. Actual behavior is tested in integration.spec.js
       */
-      let message = () => '';
+    let message = () => '';
 
-      if (result.updated) {
-        // once transition away from jasmine is done this will be a lot more elegant and pure
-        // https://github.com/facebook/jest/pull/3668
-        updateSnapshotState(snapshotState, { updated: snapshotState.updated + 1 });
-      } else if (result.added) {
-        updateSnapshotState(snapshotState, { added: snapshotState.added + 1 });
-      } else {
-        ({ pass } = result);
+    if (result.updated) {
+      // once transition away from jasmine is done this will be a lot more elegant and pure
+      // https://github.com/facebook/jest/pull/3668
+      updateSnapshotState(snapshotState, { updated: snapshotState.updated + 1 });
+    } else if (result.added) {
+      updateSnapshotState(snapshotState, { added: snapshotState.added + 1 });
+    } else {
+      ({ pass } = result);
 
-        if (!pass) {
-          updateSnapshotState(snapshotState, { unmatched: snapshotState.unmatched + 1 });
-          const differencePercentage = result.diffRatio * 100;
-          message = () => getInconsistentSnapshotsMessage(chalk, {
-            diffOutputPath: result.diffOutputPath,
-            differencePercentage,
-            diffPixelCount: result.diffPixelCount,
-          });
-        }
-      }
-
-      return {
-        message,
-        pass,
-      };
-    },
-    toThrowErrorMatchingImageSnapshot: function toThrowErrorMatchingImageSnapshot(received, {
-      customSnapshotIdentifier = '',
-      customSnapshotsDir,
-      customDiffConfig = {},
-      noColors = commonNoColors,
-      failureThreshold = commonFailureThreshold,
-      failureThresholdType = commonFailureThresholdType,
-      expectedException,
-    } = {}) {
-      const { testPath, currentTestName, isNot } = this;
-      const chalk = new Chalk({ enabled: !noColors });
-
-      const { snapshotState } = this;
-      if (isNot) {
-        throw new Error('Jest: `.not` cannot be used with `.toMatchImageSnapshot()`.');
-      }
-
-      updateSnapshotState(snapshotState, { _counters: snapshotState._counters.set(currentTestName, (snapshotState._counters.get(currentTestName) || 0) + 1) }); // eslint-disable-line max-len
-      const snapshotIdentifier = customSnapshotIdentifier || kebabCase(`${path.basename(testPath)}-${currentTestName}-${snapshotState._counters.get(currentTestName)}`);
-
-      const snapshotsDir = customSnapshotsDir || path.join(path.dirname(testPath), SNAPSHOTS_DIR);
-      const baselineSnapshotPath = path.join(snapshotsDir, `${snapshotIdentifier}-snap.png`);
-
-      if (snapshotState._updateSnapshot === 'none' && !fs.existsSync(baselineSnapshotPath)) {
-        const readOnlyMessage = getReadOnlyMessage(chalk);
-        return {
-          pass: expectedException ? matchesException(expectedException, readOnlyMessage) : true,
-          message: () => readOnlyMessage,
-        };
-      }
-
-      const result =
-        diffImageToSnapshot({
-          receivedImageBuffer: received,
-          snapshotsDir,
-          snapshotIdentifier,
-          updateSnapshot: snapshotState._updateSnapshot === 'all',
-          customDiffConfig: Object.assign({}, commonCustomDiffConfig, customDiffConfig),
-          failureThreshold,
-          failureThresholdType,
-        });
-
-      if (!result.updated && !result.added && !result.pass) {
+      if (!pass) {
+        updateSnapshotState(snapshotState, { unmatched: snapshotState.unmatched + 1 });
         const differencePercentage = result.diffRatio * 100;
-        const message = getInconsistentSnapshotsMessage(chalk, {
+        message = () => getInconsistentSnapshotsMessage(chalk, {
           diffOutputPath: result.diffOutputPath,
           differencePercentage,
           diffPixelCount: result.diffPixelCount,
         });
-
-        const shouldPass = expectedException ? matchesException(expectedException, message) : true;
-        return {
-          message: () => (shouldPass ? '' : `Expected exception is not matching received exception: ${message}`),
-          pass: shouldPass,
-        };
       }
+    }
 
-      return {
-        message: () => 'Expected image comparison to throw but snapshots were the same.\n',
-        pass: false,
-      };
-    },
+    return {
+      message,
+      pass,
+    };
   };
 }
 
-const defaultMatchers = configureToMatchImageSnapshot();
+
+function configureToThrowErrorMatchingImageSnapshot({
+  customDiffConfig: commonCustomDiffConfig = {},
+  noColors: commonNoColors = false,
+  failureThreshold: commonFailureThreshold = 0,
+  failureThresholdType: commonFailureThresholdType = 'pixel',
+} = {}) {
+  return function toThrowErrorMatchingImageSnapshot(received, {
+    customSnapshotIdentifier = '',
+    customSnapshotsDir,
+    customDiffConfig = {},
+    noColors = commonNoColors,
+    failureThreshold = commonFailureThreshold,
+    failureThresholdType = commonFailureThresholdType,
+    expectedException,
+  } = {}) {
+    const { testPath, currentTestName, isNot } = this;
+    const chalk = new Chalk({ enabled: !noColors });
+
+    const { snapshotState } = this;
+    if (isNot) {
+      throw new Error('Jest: `.not` cannot be used with `.toThrowErrorMatchingImageSnapshot()`.');
+    }
+
+    updateSnapshotState(snapshotState, { _counters: snapshotState._counters.set(currentTestName, (snapshotState._counters.get(currentTestName) || 0) + 1) }); // eslint-disable-line max-len
+    const snapshotIdentifier = customSnapshotIdentifier || kebabCase(`${path.basename(testPath)}-${currentTestName}-${snapshotState._counters.get(currentTestName)}`);
+
+    const snapshotsDir = customSnapshotsDir || path.join(path.dirname(testPath), SNAPSHOTS_DIR);
+    const baselineSnapshotPath = path.join(snapshotsDir, `${snapshotIdentifier}-snap.png`);
+
+    if (snapshotState._updateSnapshot === 'none' && !fs.existsSync(baselineSnapshotPath)) {
+      const readOnlyMessage = getReadOnlyMessage(chalk);
+      return {
+        pass: expectedException ? matchesException(expectedException, readOnlyMessage) : true,
+        message: () => readOnlyMessage,
+      };
+    }
+
+    const result =
+        diffImageToSnapshot({
+          receivedImageBuffer: received,
+          snapshotsDir,
+          snapshotIdentifier,
+          updateSnapshot: snapshotState._updateSnapshot === 'all',
+          customDiffConfig: Object.assign({}, commonCustomDiffConfig, customDiffConfig),
+          failureThreshold,
+          failureThresholdType,
+        });
+
+    if (!result.updated && !result.added && !result.pass) {
+      const differencePercentage = result.diffRatio * 100;
+      const message = getInconsistentSnapshotsMessage(chalk, {
+        diffOutputPath: result.diffOutputPath,
+        differencePercentage,
+        diffPixelCount: result.diffPixelCount,
+      });
+
+      const shouldPass = expectedException ? matchesException(expectedException, message) : true;
+      const errorMessage = shouldPass ?
+        '' :
+        `Expected exception is not matching received exception. Expected: "${message}" but received: "${expectedException}"`;
+
+      return {
+        message: () => errorMessage,
+        pass: shouldPass,
+      };
+    }
+
+    return {
+      message: () => 'Expected image comparison to throw but snapshots were the same.\n',
+      pass: false,
+    };
+  };
+}
+
+const toMatchImageSnapshot = configureToMatchImageSnapshot();
+const toThrowErrorMatchingImageSnapshot = configureToThrowErrorMatchingImageSnapshot();
 
 module.exports = {
-  toMatchImageSnapshot: defaultMatchers.toMatchImageSnapshot,
-  toThrowErrorMatchingImageSnapshot: defaultMatchers.toThrowErrorMatchingImageSnapshot,
+  toMatchImageSnapshot,
+  toThrowErrorMatchingImageSnapshot,
   configureToMatchImageSnapshot,
 };
