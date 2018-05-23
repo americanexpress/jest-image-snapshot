@@ -255,6 +255,33 @@ describe('toMatchImageSnapshot', () => {
     expect(mockDiff).toHaveBeenCalled();
   });
 
+  it('should fail when a snapshot is beyond threshold', () => {
+    const mockTestContext = {
+      testPath: 'path/to/test.spec.js',
+      currentTestName: 'test1',
+      isNot: false,
+      snapshotState: {
+        _counters: new Map(),
+        update: false,
+        pass: false,
+        updated: undefined,
+        added: false,
+      },
+    };
+
+    const mockDiffResult = { updated: false, pass: false };
+
+    setupMock(mockDiffResult);
+
+    const { toMatchImageSnapshot } = require('../src/index');
+    const matcherAtTest = toMatchImageSnapshot.bind(mockTestContext);
+    const result = matcherAtTest('pretendthisisanimagebuffer');
+
+    expect(result).toHaveProperty('pass', false);
+    expect(result).toHaveProperty('message');
+    expect(result.message()).toContain('Expected image to match');
+  });
+
   it('should fail when a new snapshot is added in ci', () => {
     const mockTestContext = {
       testPath: 'path/to/test.spec.js',
@@ -459,7 +486,7 @@ describe('toMatchImageSnapshot', () => {
       diffPixelCount: 600,
     };
 
-    const Chalk = function () {
+    const Chalk = function Chalk() {
       return {
         bold: { red: text => text },
         red: text => text,

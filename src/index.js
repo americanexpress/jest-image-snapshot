@@ -48,6 +48,33 @@ function updateSnapshotState(originalSnapshotState, partialSnapshotState) {
   return merge(originalSnapshotState, partialSnapshotState);
 }
 
+function throwIfIsNot(isNot, matcherName) {
+  if (isNot) {
+    throw new Error(`Jest: \`.not\` cannot be used with \`.${matcherName}()\`.`);
+  }
+}
+
+function getSnapshotIdentifier(customSnapshotIdentifier, testPath, snapshotState, currentTestName) {
+  return customSnapshotIdentifier || kebabCase(`${path.basename(testPath)}-${currentTestName}-${snapshotState._counters.get(currentTestName)}`);
+}
+
+function getSnapshotDir(customSnapshotsDir, testPath) {
+  return customSnapshotsDir || path.join(path.dirname(testPath), SNAPSHOTS_DIR);
+}
+
+function getSnapshotPath(snapshotsDir, snapshotIdentifier) {
+  return path.join(snapshotsDir, `${snapshotIdentifier}-snap.png`);
+}
+
+function updateCountersInSnapshotState(snapshotState, currentTestName) {
+  return updateSnapshotState(snapshotState, { _counters: snapshotState._counters.set(currentTestName, (snapshotState._counters.get(currentTestName) || 0) + 1) }); // eslint-disable-line max-len
+}
+
+function isReadonlyButNewSnapshotAdded(snapshotState, snapshotPath) {
+  return snapshotState._updateSnapshot === 'none' && !fs.existsSync(snapshotPath);
+}
+
+
 function configureToMatchImageSnapshot({
   customDiffConfig: commonCustomDiffConfig = {},
   noColors: commonNoColors = false,
@@ -62,21 +89,19 @@ function configureToMatchImageSnapshot({
     failureThreshold = commonFailureThreshold,
     failureThresholdType = commonFailureThresholdType,
   } = {}) {
-    const { testPath, currentTestName, isNot } = this;
+    const {
+      testPath, currentTestName, isNot, snapshotState,
+    } = this;
     const chalk = new Chalk({ enabled: !noColors });
 
-    const { snapshotState } = this;
-    if (isNot) {
-      throw new Error('Jest: `.not` cannot be used with `.toMatchImageSnapshot()`.');
-    }
+    throwIfIsNot(isNot, 'toMatchImageSnapshot');
+    updateCountersInSnapshotState(snapshotState, currentTestName);
 
-    updateSnapshotState(snapshotState, { _counters: snapshotState._counters.set(currentTestName, (snapshotState._counters.get(currentTestName) || 0) + 1) }); // eslint-disable-line max-len
-    const snapshotIdentifier = customSnapshotIdentifier || kebabCase(`${path.basename(testPath)}-${currentTestName}-${snapshotState._counters.get(currentTestName)}`);
+    const snapshotIdentifier = getSnapshotIdentifier(customSnapshotIdentifier, testPath, snapshotState, currentTestName); // eslint-disable-line max-len
+    const snapshotsDir = getSnapshotDir(customSnapshotsDir, testPath);
+    const snapshotPath = getSnapshotPath(snapshotIdentifier, snapshotsDir);
 
-    const snapshotsDir = customSnapshotsDir || path.join(path.dirname(testPath), SNAPSHOTS_DIR);
-    const baselineSnapshotPath = path.join(snapshotsDir, `${snapshotIdentifier}-snap.png`);
-
-    if (snapshotState._updateSnapshot === 'none' && !fs.existsSync(baselineSnapshotPath)) {
+    if (isReadonlyButNewSnapshotAdded(snapshotState, snapshotPath)) {
       return {
         pass: false,
         message: () => getReadOnlyMessage(chalk),
@@ -128,7 +153,6 @@ function configureToMatchImageSnapshot({
   };
 }
 
-
 function configureToThrowErrorMatchingImageSnapshot({
   customDiffConfig: commonCustomDiffConfig = {},
   noColors: commonNoColors = false,
@@ -144,21 +168,19 @@ function configureToThrowErrorMatchingImageSnapshot({
     failureThresholdType = commonFailureThresholdType,
     expectedException,
   } = {}) {
-    const { testPath, currentTestName, isNot } = this;
+    const {
+      testPath, currentTestName, isNot, snapshotState,
+    } = this;
     const chalk = new Chalk({ enabled: !noColors });
 
-    const { snapshotState } = this;
-    if (isNot) {
-      throw new Error('Jest: `.not` cannot be used with `.toThrowErrorMatchingImageSnapshot()`.');
-    }
+    throwIfIsNot(isNot, 'toThrowErrorMatchingImageSnapshot');
+    updateCountersInSnapshotState(snapshotState, currentTestName);
 
-    updateSnapshotState(snapshotState, { _counters: snapshotState._counters.set(currentTestName, (snapshotState._counters.get(currentTestName) || 0) + 1) }); // eslint-disable-line max-len
-    const snapshotIdentifier = customSnapshotIdentifier || kebabCase(`${path.basename(testPath)}-${currentTestName}-${snapshotState._counters.get(currentTestName)}`);
+    const snapshotIdentifier = getSnapshotIdentifier(customSnapshotIdentifier, testPath, snapshotState, currentTestName); // eslint-disable-line max-len
+    const snapshotsDir = getSnapshotDir(customSnapshotsDir, testPath);
+    const snapshotPath = getSnapshotPath(snapshotIdentifier, snapshotsDir);
 
-    const snapshotsDir = customSnapshotsDir || path.join(path.dirname(testPath), SNAPSHOTS_DIR);
-    const baselineSnapshotPath = path.join(snapshotsDir, `${snapshotIdentifier}-snap.png`);
-
-    if (snapshotState._updateSnapshot === 'none' && !fs.existsSync(baselineSnapshotPath)) {
+    if (isReadonlyButNewSnapshotAdded(snapshotState, snapshotPath)) {
       const readOnlyMessage = getReadOnlyMessage(chalk);
       return {
         pass: expectedException ? matchesException(expectedException, readOnlyMessage) : true,
