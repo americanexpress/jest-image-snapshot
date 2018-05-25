@@ -46,7 +46,7 @@
     "eslint": "^4.15.0",
     "eslint-config-amex": "^7.0.0",
     "is-png": "^1.1.0",
-    "jest": "^22.0.0",
+    "jest": "^23.0.0",
     "mock-spawn": "^0.2.6"
   },
   "dependencies": {
@@ -59,6 +59,6 @@
     "rimraf": "^2.6.2"
   },
   "peerDependencies": {
-    "jest": ">=20 <=22"
+    "jest": ">=20 <=23"
   }
 }
