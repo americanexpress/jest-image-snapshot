@@ -29,7 +29,7 @@ Jest matcher that performs image comparisons using [pixelmatch](https://github.c
   });
 ```
 
-See [the examples](./examples/README.md) for more detailed usage
+See [the examples](./examples/README.md) for more detailed usage or read about an example use case in the [American Express Technology Blog](https://americanexpress.io/smile-for-the-camera/)
 
 ### Optional configuration:
 
