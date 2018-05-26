@@ -11,7 +11,7 @@ Jest matcher that performs image comparisons using [pixelmatch](https://github.c
   npm i --save-dev jest-image-snapshot
   ```
 
-  Please note that `Jest` `>=20 <=22` is a peerDependency. `jest-image-snapshot` will **not** work with anything below Jest 20.x.x
+  Please note that `Jest` `>=20 <=23` is a peerDependency. `jest-image-snapshot` will **not** work with anything below Jest 20.x.x
 
 ## Usage:
 1. Extend Jest's `expect`
@@ -29,7 +29,7 @@ Jest matcher that performs image comparisons using [pixelmatch](https://github.c
   });
 ```
 
-See [the examples](./examples/README.md) for more detailed usage
+See [the examples](./examples/README.md) for more detailed usage or read about an example use case in the [American Express Technology Blog](https://americanexpress.io/smile-for-the-camera/)
 
 ### Optional configuration:
 
