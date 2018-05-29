@@ -29,8 +29,9 @@ describe('toMatchImageSnapshot', () => {
   const diffExists = identifier => fs.existsSync(path.join(__dirname, diffOutputDir(), `${identifier}-diff.png`));
 
   beforeAll(() => {
-    const { toMatchImageSnapshot } = require('../src'); // eslint-disable-line global-require
+    const { toMatchImageSnapshot, toThrowErrorMatchingImageSnapshot } = require('../src'); // eslint-disable-line global-require
     expect.extend({ toMatchImageSnapshot });
+    expect.extend({ toThrowErrorMatchingImageSnapshot });
   });
 
   beforeEach(() => {
@@ -98,9 +99,12 @@ describe('toMatchImageSnapshot', () => {
       ).not.toThrowError();
 
       // Test against a different image
-      expect(
-        () => expect(failImageData).toMatchImageSnapshot({ customSnapshotIdentifier })
-      ).toThrowError(expectedError);
+      expect(failImageData).toThrowErrorMatchingImageSnapshot(
+        {
+          customSnapshotIdentifier,
+          expectedException: expectedError,
+        }
+      );
     });
 
     it('fails with a differently sized images and outputs diff', () => {
@@ -112,9 +116,14 @@ describe('toMatchImageSnapshot', () => {
       ).not.toThrowError();
 
       // Test against an image much larger than the snapshot.
-      expect(
-        () => expect(oversizeImageData).toMatchImageSnapshot({ customSnapshotIdentifier })
-      ).toThrowError(/Expected image to match or be a close match to snapshot but was 83\.85395537525355% different from snapshot/);
+
+      expect(oversizeImageData).toThrowErrorMatchingImageSnapshot(
+        {
+          customSnapshotIdentifier,
+          expectedException: /Expected image to match or be a close match to snapshot but was 83\.85395537525355% different from snapshot/,
+        }
+      );
+
 
       expect(diffExists(customSnapshotIdentifier)).toBe(true);
     });
@@ -126,9 +135,13 @@ describe('toMatchImageSnapshot', () => {
         () => expect(imageData).toMatchImageSnapshot({ customSnapshotIdentifier })
       ).not.toThrowError();
 
-      expect(
-        () => expect(biggerImageData).toMatchImageSnapshot({ customSnapshotIdentifier })
-      ).toThrowError(/Expected image to match or be a close match to snapshot but was 54\.662222222222226% different from snapshot/);
+
+      expect(biggerImageData).toThrowErrorMatchingImageSnapshot(
+        {
+          customSnapshotIdentifier,
+          expectedException: /Expected image to match or be a close match to snapshot but was 54\.662222222222226% different from snapshot/,
+        }
+      );
 
       expect(diffExists(customSnapshotIdentifier)).toBe(true);
     });
@@ -142,9 +155,7 @@ describe('toMatchImageSnapshot', () => {
       ).not.toThrowError();
 
       // then test against a different image
-      expect(
-        () => expect(failImageData).toMatchImageSnapshot({ customSnapshotIdentifier })
-      ).toThrow();
+      expect(failImageData).toThrowErrorMatchingImageSnapshot({ customSnapshotIdentifier });
 
       expect(fs.existsSync(pathToResultImage)).toBe(true);
 
@@ -161,9 +172,7 @@ describe('toMatchImageSnapshot', () => {
       ).not.toThrowError();
 
       // then test against a different image (to generate a results image)
-      expect(
-        () => expect(failImageData).toMatchImageSnapshot({ customSnapshotIdentifier })
-      ).toThrow();
+      expect(failImageData).toThrowErrorMatchingImageSnapshot({ customSnapshotIdentifier });
 
       // then test against image that should not generate results image (as it is passing test)
       expect(
