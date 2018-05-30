@@ -81,6 +81,10 @@ const toMatchImageSnapshot = configureToMatchImageSnapshot({
 expect.extend({ toMatchImageSnapshot });
 ```
 
+### Recipes
+
+* [Upload diff images from failed tests](https://gist.github.com/john-housser/9a9d2e50bb5217cc2f136e874bb613ac) - If you are using jest-image-snapshot in an ephemeral environment (like a Continuous Integration server) where the file system does not persist, you might want a way to retrieve those images for diagnostics or historical reference. This example shows how to use a custom [Jest Reporter](https://facebook.github.io/jest/docs/en/configuration.html#reporters-array-modulename-modulename-options) that will run after every test (assumes a [BitBucket Pipelines](https://bitbucket.org/product/features/pipelines) environment), and if there were any images created because they failed the diff test, upload those images to an [AWS S3](https://aws.amazon.com/s3/) bucket.
+
 ## How it works
   Given an image (Buffer instance with PNG image data) the `toMatchImageSnapshot()` matcher will create a `__image_snapshots__` directory in the directory the test is in and will store the baseline snapshot image there on the first run. Note that if `customSnapshotsDir` option is given then it will store baseline snapshot there instead.
 
