@@ -35,6 +35,8 @@ describe('toMatchImageSnapshot', () => {
   }
 
   beforeEach(() => {
+    // In tests, skip reporting (snapshotState update to not mess with our test report)
+    global.skipReporting = true;
     jest.resetModules();
     jest.resetAllMocks();
   });
@@ -360,5 +362,16 @@ describe('toMatchImageSnapshot', () => {
     expect(Chalk).toHaveBeenCalledWith({
       enabled: false,
     });
+  });
+});
+
+describe('updateSnapshotState', () => {
+  it('mutates original state', () => {
+    const { updateSnapshotState } = require('../src/index');
+    global.skipReporting = false;
+    const originalState = { some: 'value' };
+    updateSnapshotState(originalState, { another: 'val' });
+
+    expect(originalState).toEqual({ some: 'value', another: 'val' });
   });
 });

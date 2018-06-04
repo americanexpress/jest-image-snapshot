@@ -22,6 +22,9 @@ const fs = require('fs');
 const SNAPSHOTS_DIR = '__image_snapshots__';
 
 function updateSnapshotState(originalSnapshotState, partialSnapshotState) {
+  if (global.skipReporting) {
+    return originalSnapshotState;
+  }
   return merge(originalSnapshotState, partialSnapshotState);
 }
 
@@ -39,11 +42,13 @@ function configureToMatchImageSnapshot({
     failureThreshold = commonFailureThreshold,
     failureThresholdType = commonFailureThresholdType,
   } = {}) {
-    const { testPath, currentTestName, isNot } = this;
+    const {
+      testPath, currentTestName, isNot, snapshotState,
+    } = this;
     const chalk = new Chalk({ enabled: !noColors });
 
-    const { snapshotState } = this;
     if (isNot) { throw new Error('Jest: `.not` cannot be used with `.toMatchImageSnapshot()`.'); }
+
 
     updateSnapshotState(snapshotState, { _counters: snapshotState._counters.set(currentTestName, (snapshotState._counters.get(currentTestName) || 0) + 1) }); // eslint-disable-line max-len
     const snapshotIdentifier = customSnapshotIdentifier || kebabCase(`${path.basename(testPath)}-${currentTestName}-${snapshotState._counters.get(currentTestName)}`);
@@ -105,4 +110,5 @@ function configureToMatchImageSnapshot({
 module.exports = {
   toMatchImageSnapshot: configureToMatchImageSnapshot(),
   configureToMatchImageSnapshot,
+  updateSnapshotState,
 };

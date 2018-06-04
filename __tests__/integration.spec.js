@@ -29,6 +29,8 @@ describe('toMatchImageSnapshot', () => {
   const diffExists = identifier => fs.existsSync(path.join(__dirname, diffOutputDir(), `${identifier}-diff.png`));
 
   beforeAll(() => {
+    // In tests, skip reporting (snapshotState update to not mess with our test report)
+    global.skipReporting = true;
     const { toMatchImageSnapshot } = require('../src'); // eslint-disable-line global-require
     expect.extend({ toMatchImageSnapshot });
   });
