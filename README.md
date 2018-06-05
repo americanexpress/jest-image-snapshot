@@ -85,7 +85,7 @@ expect.extend({ toMatchImageSnapshot });
 
 #### Upload diff images from failed tests
 
-[Example Image Upload Test Reporter](image-reporter.js)
+[Example Image Upload Test Reporter](examples/image-reporter.js)
 
 If you are using jest-image-snapshot in an ephemeral environment (like a Continuous Integration server) where the file system does not persist, you might want a way to retrieve those images for diagnostics or historical reference. This example shows how to use a custom [Jest Reporter](https://facebook.github.io/jest/docs/en/configuration.html#reporters-array-modulename-modulename-options) that will run after every test, and if there were any images created because they failed the diff test, upload those images to an [AWS S3](https://aws.amazon.com/s3/) bucket.
 

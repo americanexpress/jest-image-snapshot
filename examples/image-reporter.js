@@ -1,4 +1,9 @@
-/* eslint-disable class-methods-use-this */
+/* eslint-disable */
+
+/*
+ * To enable this image reporter, add it to your `jest.config.js` "reporters" definition:
+    "reporters": [ "default", "<rootDir>/image-reporter.js" ]
+ */
 
 const chalk = require('chalk');
 const fs = require('fs');
