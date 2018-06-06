@@ -22,7 +22,7 @@ const fs = require('fs');
 const SNAPSHOTS_DIR = '__image_snapshots__';
 
 function updateSnapshotState(originalSnapshotState, partialSnapshotState) {
-  if (global.skipReporting) {
+  if (global.UNSTABLE_SKIP_REPORTING) {
     return originalSnapshotState;
   }
   return merge(originalSnapshotState, partialSnapshotState);

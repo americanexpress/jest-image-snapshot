@@ -35,8 +35,8 @@ describe('toMatchImageSnapshot', () => {
   }
 
   beforeEach(() => {
-    // In tests, skip reporting (snapshotState update to not mess with our test report)
-    global.skipReporting = true;
+    // In tests, skip reporting (skip snapshotState update to not mess with our test report)
+    global.UNSTABLE_SKIP_REPORTING = true;
     jest.resetModules();
     jest.resetAllMocks();
   });
@@ -368,7 +368,7 @@ describe('toMatchImageSnapshot', () => {
 describe('updateSnapshotState', () => {
   it('mutates original state', () => {
     const { updateSnapshotState } = require('../src/index');
-    global.skipReporting = false;
+    global.UNSTABLE_SKIP_REPORTING = false;
     const originalState = { some: 'value' };
     updateSnapshotState(originalState, { another: 'val' });
 
