@@ -366,6 +366,21 @@ describe('diff-snapshot', () => {
       expect(diffResult).toHaveProperty('updated', true);
     });
 
+    it('should return pass flag if snapshot was not updated due to updatePassedSnapshot', () => {
+      const diffImageToSnapshot = setupTest({ snapshotExists: true });
+      const diffResult = diffImageToSnapshot({
+        receivedImageBuffer: mockImageBuffer,
+        snapshotIdentifier: mockSnapshotIdentifier,
+        snapshotsDir: mockSnapshotsDir,
+        updateSnapshot: true,
+        updatePassedSnapshot: false,
+        failureThreshold: 0,
+        failureThresholdType: 'pixel',
+      });
+
+      expect(diffResult).toHaveProperty('pass', true);
+    });
+
     it('should return added flag is snapshot was added', () => {
       const diffImageToSnapshot = setupTest({ snapshotExists: false });
       const diffResult = diffImageToSnapshot({
