@@ -75,12 +75,33 @@ const alignImagesToSameSize = (firstImage, secondImage) => {
   ];
 };
 
+const handlePassedSnapshot = ({
+  baselineSnapshotExists,
+  updatePassedSnapshot,
+  snapshotsDir,
+  baselineSnapshotPath,
+  receivedImageBuffer,
+  updateSnapshot,
+}) => {
+  let result = {};
+  if (!baselineSnapshotExists || updatePassedSnapshot) {
+    mkdirp.sync(snapshotsDir);
+    fs.writeFileSync(baselineSnapshotPath, receivedImageBuffer);
+
+    result = updateSnapshot ? { updated: true } : { added: true };
+  } else {
+    result = { pass: true };
+  }
+  return result;
+};
+
 function diffImageToSnapshot(options) {
   const {
     receivedImageBuffer,
     snapshotIdentifier,
     snapshotsDir,
     updateSnapshot = false,
+    updatePassedSnapshot = true,
     customDiffConfig = {},
     failureThreshold,
     failureThresholdType,
@@ -88,7 +109,8 @@ function diffImageToSnapshot(options) {
 
   let result = {};
   const baselineSnapshotPath = path.join(snapshotsDir, `${snapshotIdentifier}-snap.png`);
-  if (fs.existsSync(baselineSnapshotPath) && !updateSnapshot) {
+  const baselineSnapshotExists = fs.existsSync(baselineSnapshotPath);
+  if (baselineSnapshotExists && !updateSnapshot) {
     const outputDir = path.join(snapshotsDir, '__diff_output__');
     const diffOutputPath = path.join(outputDir, `${snapshotIdentifier}-diff.png`);
 
@@ -173,10 +195,14 @@ function diffImageToSnapshot(options) {
       diffPixelCount,
     };
   } else {
-    mkdirp.sync(snapshotsDir);
-    fs.writeFileSync(baselineSnapshotPath, receivedImageBuffer);
-
-    result = updateSnapshot ? { updated: true } : { added: true };
+    result = handlePassedSnapshot({
+      baselineSnapshotExists,
+      updatePassedSnapshot,
+      snapshotsDir,
+      baselineSnapshotPath,
+      receivedImageBuffer,
+      updateSnapshot,
+    });
   }
   return result;
 }
