@@ -155,10 +155,24 @@ function diffImageToSnapshot(options) {
         receivedImage, compositeResultImage, 0, 0, imageWidth, imageHeight, imageWidth * 2, 0
       );
 
-      const input = { imagePath: diffOutputPath, image: compositeResultImage };
-      // image._packer property contains a circular reference since node9, causing JSON.stringify to
-      // fail. Might as well discard all the hidden properties.
-      const serializedInput = JSON.stringify(input, (name, val) => (name[0] === '_' ? undefined : val));
+      const {
+        width,
+        height,
+        data,
+        gamma,
+        writable,
+        readable,
+      } = compositeResultImage;
+
+      const imagePartial = JSON.stringify({
+        width, height, gamma, writable, readable,
+      });
+
+      const imageFull = `${imagePartial.slice(0, imagePartial.length - 1)},"data":"${data.toString('base64')}"}`;
+
+      const inputPartial = JSON.stringify({ imagePath: diffOutputPath });
+
+      const serializedInput = `${inputPartial.slice(0, inputPartial.length - 1)}, "image": ${imageFull}}`;
 
       // writing diff in separate process to avoid perf issues associated with Math in Jest VM (https://github.com/facebook/jest/issues/5163)
       const writeDiffProcess = childProcess.spawnSync('node', [`${__dirname}/write-result-diff-image.js`], { input: Buffer.from(serializedInput) });
