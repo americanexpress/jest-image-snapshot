@@ -164,15 +164,18 @@ function diffImageToSnapshot(options) {
         readable,
       } = compositeResultImage;
 
-      const imagePartial = JSON.stringify({
-        width, height, gamma, writable, readable,
-      });
-
-      const imageFull = `${imagePartial.slice(0, imagePartial.length - 1)},"data":"${data.toString('base64')}"}`;
-
-      const inputPartial = JSON.stringify({ imagePath: diffOutputPath });
-
-      const serializedInput = `${inputPartial.slice(0, inputPartial.length - 1)}, "image": ${imageFull}}`;
+      // JSON.stringify is very slow with large strings
+      const serializedInput = `{
+        "imagePath":"${diffOutputPath}",
+        "image":{
+          "width":"${width}",
+          "height":"${height}",
+          "gamma":"${gamma}",
+          "writable":"${writable}",
+          "readable":"${readable}",
+          "data":"${data.toString('base64')}"
+        }
+      }`;
 
       // writing diff in separate process to avoid perf issues associated with Math in Jest VM (https://github.com/facebook/jest/issues/5163)
       const writeDiffProcess = childProcess.spawnSync('node', [`${__dirname}/write-result-diff-image.js`], { input: Buffer.from(serializedInput) });
