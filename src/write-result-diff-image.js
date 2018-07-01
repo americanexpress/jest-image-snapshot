@@ -21,7 +21,7 @@ getStdin.buffer().then((buffer) => {
     const input = JSON.parse(buffer);
     const { imagePath, image } = input;
 
-    image.data = Buffer.from(image.data);
+    image.data = Buffer.from(image.data, 'base64');
 
     const pngBuffer = PNG.sync.write(image);
     fs.writeFileSync(imagePath, pngBuffer);
