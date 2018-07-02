@@ -14,20 +14,20 @@
 
 const getStdin = require('get-stdin');
 
-const { diffImageToSnapshot } = require('./diff-snapshot')
+const { diffImageToSnapshot } = require('./diff-snapshot');
 
 getStdin.buffer().then((buffer) => {
   try {
-    let options = JSON.parse(buffer)
-    
-    options.receivedImageBuffer = Buffer.from(options.receivedImageBuffer, 'base64')
+    const options = JSON.parse(buffer);
 
-    const result = diffImageToSnapshot(options)
-  
-    console.log(JSON.stringify(result))
-    process.exit(0)
+    options.receivedImageBuffer = Buffer.from(options.receivedImageBuffer, 'base64');
+
+    const result = diffImageToSnapshot(options);
+    /* eslint-disable no-console */
+    console.log(JSON.stringify(result));
+    process.exit(0);
   } catch (error) {
     console.error(error); // eslint-disable-line no-console
     process.exit(1);
   }
-})
+});
