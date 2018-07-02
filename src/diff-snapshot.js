@@ -178,25 +178,9 @@ function diffImageToSnapshot(options) {
 
 
 function runDiffImageToSnapshot(options) {
-  const {
-    receivedImageBuffer,
-    snapshotIdentifier,
-    snapshotsDir,
-    updateSnapshot = false,
-    customDiffConfig = {},
-    failureThreshold,
-    failureThresholdType,
-  } = options;
+  options.receivedImageBuffer = options.receivedImageBuffer.toString('base64');
 
-  const serializedInput = `{
-    "receivedImageBuffer":"${receivedImageBuffer.toString('base64')}",
-    "snapshotIdentifier":"${snapshotIdentifier}",
-    "snapshotsDir":"${snapshotsDir}",
-    "updateSnapshot":${updateSnapshot},
-    "customDiffConfig":${JSON.stringify(customDiffConfig)},
-    "failureThreshold":${failureThreshold},
-    "failureThresholdType":"${failureThresholdType}"
-  }`;
+  const serializedInput = JSON.stringify(options);
 
   let result = {};
   const writeDiffProcess = childProcess.spawnSync('node', [`${__dirname}/write-result-diff-image.js`], { input: Buffer.from(serializedInput) });
