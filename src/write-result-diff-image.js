@@ -12,22 +12,22 @@
  * the License.
  */
 
-const { PNG } = require('pngjs');
-const fs = require('fs');
 const getStdin = require('get-stdin');
+
+const { diffImageToSnapshot } = require('./diff-snapshot')
 
 getStdin.buffer().then((buffer) => {
   try {
-    const input = JSON.parse(buffer);
-    const { imagePath, image } = input;
+    let options = JSON.parse(buffer)
+    
+    options.receivedImageBuffer = Buffer.from(options.receivedImageBuffer, 'base64')
 
-    image.data = Buffer.from(image.data, 'base64');
-
-    const pngBuffer = PNG.sync.write(image);
-    fs.writeFileSync(imagePath, pngBuffer);
-    process.exit(0);
+    const result = diffImageToSnapshot(options)
+  
+    console.log(JSON.stringify(result))
+    process.exit(0)
   } catch (error) {
     console.error(error); // eslint-disable-line no-console
     process.exit(1);
   }
-});
+})

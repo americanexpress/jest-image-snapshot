@@ -12,13 +12,15 @@
  * the License.
  */
 
+const childProcess = require('child_process');
 const fs = require('fs');
 const path = require('path');
-const childProcess = require('child_process');
-const rimraf = require('rimraf');
-const pixelmatch = require('pixelmatch');
+
 const mkdirp = require('mkdirp');
+const pixelmatch = require('pixelmatch');
 const { PNG } = require('pngjs');
+const rimraf = require('rimraf');
+
 
 /**
  * Helper function to create reusable image resizer
@@ -154,33 +156,9 @@ function diffImageToSnapshot(options) {
       PNG.bitblt(
         receivedImage, compositeResultImage, 0, 0, imageWidth, imageHeight, imageWidth * 2, 0
       );
-
-      const {
-        width,
-        height,
-        data,
-        gamma,
-        writable,
-        readable,
-      } = compositeResultImage;
-
-      // JSON.stringify is very slow with large strings
-      const serializedInput = `{
-        "imagePath":"${diffOutputPath}",
-        "image":{
-          "width":"${width}",
-          "height":"${height}",
-          "gamma":"${gamma}",
-          "writable":"${writable}",
-          "readable":"${readable}",
-          "data":"${data.toString('base64')}"
-        }
-      }`;
-
-      // writing diff in separate process to avoid perf issues associated with Math in Jest VM (https://github.com/facebook/jest/issues/5163)
-      const writeDiffProcess = childProcess.spawnSync('node', [`${__dirname}/write-result-diff-image.js`], { input: Buffer.from(serializedInput) });
-      // in case of error print to console
-      if (writeDiffProcess.stderr.toString()) { console.log(writeDiffProcess.stderr.toString()); } // eslint-disable-line no-console, max-len
+      // Set filter type to Paeth to avoid expensive auto scanline filter detection
+      const pngBuffer = PNG.sync.write(compositeResultImage, {filterType: 4});
+      fs.writeFileSync(diffOutputPath, pngBuffer);
     }
 
     result = {
@@ -195,9 +173,45 @@ function diffImageToSnapshot(options) {
 
     result = updateSnapshot ? { updated: true } : { added: true };
   }
-  return result;
+  return result
+}
+
+
+function runDiffImageToSnapshot(options) {
+  const {
+    receivedImageBuffer,
+    snapshotIdentifier,
+    snapshotsDir,
+    updateSnapshot = false,
+    customDiffConfig = {},
+    failureThreshold,
+    failureThresholdType,
+  } = options;
+
+  const serializedInput = `{
+    "receivedImageBuffer":"${receivedImageBuffer.toString('base64')}",
+    "snapshotIdentifier":"${snapshotIdentifier}",
+    "snapshotsDir":"${snapshotsDir}",
+    "updateSnapshot":${updateSnapshot},
+    "customDiffConfig":${JSON.stringify(customDiffConfig)},
+    "failureThreshold":${failureThreshold},
+    "failureThresholdType":"${failureThresholdType}"
+  }`
+
+    let result = {};
+    const writeDiffProcess = childProcess.spawnSync('node', [`${__dirname}/write-result-diff-image.js`], { input: Buffer.from(serializedInput) });
+    if (writeDiffProcess.status == 0) {
+      result = JSON.parse(writeDiffProcess.stdout.toString())
+    }
+
+    if (writeDiffProcess.stderr.toString()) {
+      console.log(writeDiffProcess.stderr.toString())
+    }
+
+    return result;
 }
 
 module.exports = {
   diffImageToSnapshot,
+  runDiffImageToSnapshot,
 };
