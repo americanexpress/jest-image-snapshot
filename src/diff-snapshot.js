@@ -157,7 +157,7 @@ function diffImageToSnapshot(options) {
         receivedImage, compositeResultImage, 0, 0, imageWidth, imageHeight, imageWidth * 2, 0
       );
       // Set filter type to Paeth to avoid expensive auto scanline filter detection
-      const pngBuffer = PNG.sync.write(compositeResultImage, {filterType: 4});
+      const pngBuffer = PNG.sync.write(compositeResultImage, { filterType: 4 });
       fs.writeFileSync(diffOutputPath, pngBuffer);
     }
 
@@ -173,7 +173,7 @@ function diffImageToSnapshot(options) {
 
     result = updateSnapshot ? { updated: true } : { added: true };
   }
-  return result
+  return result;
 }
 
 
@@ -196,19 +196,20 @@ function runDiffImageToSnapshot(options) {
     "customDiffConfig":${JSON.stringify(customDiffConfig)},
     "failureThreshold":${failureThreshold},
     "failureThresholdType":"${failureThresholdType}"
-  }`
+  }`;
 
-    let result = {};
-    const writeDiffProcess = childProcess.spawnSync('node', [`${__dirname}/write-result-diff-image.js`], { input: Buffer.from(serializedInput) });
-    if (writeDiffProcess.status == 0) {
-      result = JSON.parse(writeDiffProcess.stdout.toString())
-    }
+  let result = {};
+  const writeDiffProcess = childProcess.spawnSync('node', [`${__dirname}/write-result-diff-image.js`], { input: Buffer.from(serializedInput) });
+  if (writeDiffProcess.status === 0) {
+    result = JSON.parse(writeDiffProcess.stdout.toString());
+  }
 
-    if (writeDiffProcess.stderr.toString()) {
-      console.log(writeDiffProcess.stderr.toString())
-    }
+  if (writeDiffProcess.stderr.toString()) {
+    /* eslint-disable no-console */
+    console.log(writeDiffProcess.stderr.toString());
+  }
 
-    return result;
+  return result;
 }
 
 module.exports = {

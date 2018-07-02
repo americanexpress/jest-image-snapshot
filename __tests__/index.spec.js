@@ -136,7 +136,7 @@ describe('toMatchImageSnapshot', () => {
     const customDiffConfig = { threshold: 0.3 };
     matcherAtTest('pretendthisisanimagebuffer', { customDiffConfig });
     const { runDiffImageToSnapshot } = require('../src/diff-snapshot');
-    expect( runDiffImageToSnapshot.mock.calls[0][0].customDiffConfig).toEqual(customDiffConfig);
+    expect(runDiffImageToSnapshot.mock.calls[0][0].customDiffConfig).toEqual(customDiffConfig);
   });
 
   it('passes diffImageToSnapshot everything it needs to create a snapshot and compare if needed', () => {
