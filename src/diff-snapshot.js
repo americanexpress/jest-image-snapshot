@@ -75,12 +75,66 @@ const alignImagesToSameSize = (firstImage, secondImage) => {
   ];
 };
 
+const handleFailedSnapshot = (options) => {
+  const {
+    outputDir,
+    imageWidth,
+    imageHeight,
+    baselineImage,
+    diffImage,
+    receivedImage,
+    diffOutputPath,
+    diffRatio,
+    diffPixelCount,
+  } = options;
+
+  mkdirp.sync(outputDir);
+  const compositeResultImage = new PNG({
+    width: imageWidth * 3,
+    height: imageHeight,
+  });
+  // copy baseline, diff, and received images into composite result image
+  PNG.bitblt(
+    baselineImage, compositeResultImage, 0, 0, imageWidth, imageHeight, 0, 0
+  );
+  PNG.bitblt(
+    diffImage, compositeResultImage, 0, 0, imageWidth, imageHeight, imageWidth, 0
+  );
+  PNG.bitblt(
+    receivedImage, compositeResultImage, 0, 0, imageWidth, imageHeight, imageWidth * 2, 0
+  );
+
+  const input = { imagePath: diffOutputPath, image: compositeResultImage };
+  // image._packer property contains a circular reference since node9, causing JSON.stringify to
+  // fail. Might as well discard all the hidden properties.
+  const serializedInput = JSON.stringify(input, (name, val) => (name[0] === '_' ? undefined : val));
+
+  // writing diff in separate process to avoid perf issues associated with Math in Jest VM (https://github.com/facebook/jest/issues/5163)
+  const writeDiffProcess = childProcess.spawnSync('node', [`${__dirname}/write-result-diff-image.js`], { input: Buffer.from(serializedInput) });
+  // in case of error print to console
+  if (writeDiffProcess.stderr.toString()) { console.log(writeDiffProcess.stderr.toString()); } // eslint-disable-line no-console, max-len
+
+  return {
+    pass: false,
+    diffOutputPath,
+    diffRatio,
+    diffPixelCount,
+  };
+};
+
+const isFailure = ({ pass, updateSnapshot }) => !pass && !updateSnapshot;
+
+const shouldUpdate = ({ pass, updateSnapshot, updatePassedSnapshot }) => (
+  (!pass && updateSnapshot) || (pass && updatePassedSnapshot)
+);
+
 function diffImageToSnapshot(options) {
   const {
     receivedImageBuffer,
     snapshotIdentifier,
     snapshotsDir,
     updateSnapshot = false,
+    updatePassedSnapshot = false,
     customDiffConfig = {},
     failureThreshold,
     failureThresholdType,
@@ -88,10 +142,13 @@ function diffImageToSnapshot(options) {
 
   let result = {};
   const baselineSnapshotPath = path.join(snapshotsDir, `${snapshotIdentifier}-snap.png`);
-  if (fs.existsSync(baselineSnapshotPath) && !updateSnapshot) {
+  if (!fs.existsSync(baselineSnapshotPath)) {
+    mkdirp.sync(snapshotsDir);
+    fs.writeFileSync(baselineSnapshotPath, receivedImageBuffer);
+    result = { added: true };
+  } else {
     const outputDir = path.join(snapshotsDir, '__diff_output__');
     const diffOutputPath = path.join(outputDir, `${snapshotIdentifier}-diff.png`);
-
     rimraf.sync(diffOutputPath);
 
     const defaultDiffConfig = {
@@ -138,45 +195,30 @@ function diffImageToSnapshot(options) {
       throw new Error(`Unknown failureThresholdType: ${failureThresholdType}. Valid options are "pixel" or "percent".`);
     }
 
-    if (!pass) {
-      mkdirp.sync(outputDir);
-      const compositeResultImage = new PNG({
-        width: imageWidth * 3,
-        height: imageHeight,
+    if (isFailure({ pass, updateSnapshot })) {
+      result = handleFailedSnapshot({
+        outputDir,
+        imageWidth,
+        imageHeight,
+        baselineImage,
+        diffImage,
+        receivedImage,
+        diffOutputPath,
+        diffRatio,
+        diffPixelCount,
       });
-      // copy baseline, diff, and received images into composite result image
-      PNG.bitblt(
-        baselineImage, compositeResultImage, 0, 0, imageWidth, imageHeight, 0, 0
-      );
-      PNG.bitblt(
-        diffImage, compositeResultImage, 0, 0, imageWidth, imageHeight, imageWidth, 0
-      );
-      PNG.bitblt(
-        receivedImage, compositeResultImage, 0, 0, imageWidth, imageHeight, imageWidth * 2, 0
-      );
-
-      const input = { imagePath: diffOutputPath, image: compositeResultImage };
-      // image._packer property contains a circular reference since node9, causing JSON.stringify to
-      // fail. Might as well discard all the hidden properties.
-      const serializedInput = JSON.stringify(input, (name, val) => (name[0] === '_' ? undefined : val));
-
-      // writing diff in separate process to avoid perf issues associated with Math in Jest VM (https://github.com/facebook/jest/issues/5163)
-      const writeDiffProcess = childProcess.spawnSync('node', [`${__dirname}/write-result-diff-image.js`], { input: Buffer.from(serializedInput) });
-      // in case of error print to console
-      if (writeDiffProcess.stderr.toString()) { console.log(writeDiffProcess.stderr.toString()); } // eslint-disable-line no-console, max-len
+    } else if (shouldUpdate({ pass, updateSnapshot, updatePassedSnapshot })) {
+      mkdirp.sync(snapshotsDir);
+      fs.writeFileSync(baselineSnapshotPath, receivedImageBuffer);
+      result = { updated: true };
+    } else {
+      result = {
+        pass,
+        diffRatio,
+        diffPixelCount,
+        diffOutputPath,
+      };
     }
-
-    result = {
-      pass,
-      diffOutputPath,
-      diffRatio,
-      diffPixelCount,
-    };
-  } else {
-    mkdirp.sync(snapshotsDir);
-    fs.writeFileSync(baselineSnapshotPath, receivedImageBuffer);
-
-    result = updateSnapshot ? { updated: true } : { added: true };
   }
   return result;
 }
