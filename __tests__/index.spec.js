@@ -357,6 +357,7 @@ describe('toMatchImageSnapshot', () => {
       snapshotIdentifier: 'test-spec-js-test-1-1',
       snapshotsDir: path.join('path', 'to', 'my-custom-snapshots-dir'),
       updateSnapshot: false,
+      updatePassedSnapshot: false,
       failureThreshold: 0,
       failureThresholdType: 'pixel',
     });
