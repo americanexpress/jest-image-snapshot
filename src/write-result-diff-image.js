@@ -12,6 +12,8 @@
  * the License.
  */
 
+const fs = require('fs')
+
 const getStdin = require('get-stdin');
 
 const { diffImageToSnapshot } = require('./diff-snapshot');
@@ -24,7 +26,9 @@ getStdin.buffer().then((buffer) => {
 
     const result = diffImageToSnapshot(options);
     /* eslint-disable no-console */
-    console.log(JSON.stringify(result));
+
+    fs.writeSync(3, Buffer.from(JSON.stringify(result)));
+
     process.exit(0);
   } catch (error) {
     console.error(error); // eslint-disable-line no-console
