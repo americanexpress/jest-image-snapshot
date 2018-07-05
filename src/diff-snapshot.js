@@ -183,14 +183,17 @@ function runDiffImageToSnapshot(options) {
   const serializedInput = JSON.stringify(options);
 
   let result = {};
-  const writeDiffProcess = childProcess.spawnSync('node', [`${__dirname}/write-result-diff-image.js`], { input: Buffer.from(serializedInput) });
-  if (writeDiffProcess.status === 0) {
-    result = JSON.parse(writeDiffProcess.stdout.toString());
-  }
 
-  if (writeDiffProcess.stderr.toString()) {
-    /* eslint-disable no-console */
-    console.log(writeDiffProcess.stderr.toString());
+  const writeDiffProcess = childProcess.spawnSync(
+    'node', [`${__dirname}/write-result-diff-image.js`],
+    { input: Buffer.from(serializedInput), stdio: ['pipe', 'inherit', 'inherit', 'pipe'] }
+  );
+
+  if (writeDiffProcess.status === 0) {
+    const output = writeDiffProcess.output[3].toString();
+    result = JSON.parse(output);
+  } else {
+    throw new Error('Error running image diff.');
   }
 
   return result;
