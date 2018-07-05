@@ -114,7 +114,7 @@ describe('toMatchImageSnapshot', () => {
       expect(fs.readFileSync(updateImageSnapshotPath)).toEqual(imageData);
     });
 
-    it('writes a result image in update mode with updatePassedSnapshots: true', () => {
+    it('writes a result image for passing test in update mode with updatePassedSnapshots: true', () => {
       const updateModeMatcher = toMatchImageSnapshot.bind({
         snapshotState: new SnapshotState(__filename, {
           updateSnapshot: 'all',
@@ -129,8 +129,38 @@ describe('toMatchImageSnapshot', () => {
       });
       expect(fs.readFileSync(updateImageSnapshotPath)).not.toEqual(updateImageData);
     });
-  });
 
+    it('writes a result image for failing test in update mode by default', () => {
+      const updateModeMatcher = toMatchImageSnapshot.bind({
+        snapshotState: new SnapshotState(__filename, {
+          updateSnapshot: 'all',
+        }),
+        testPath: __filename,
+      });
+      updateModeMatcher(updateImageData, {
+        customSnapshotIdentifier,
+        failureThreshold: 0,
+        failureThresholdType: 'pixel',
+      });
+      expect(fs.readFileSync(updateImageSnapshotPath)).toEqual(updateImageData);
+    });
+
+    it('writes a result image for failing test in update mode with updatePassedSnapshots: false', () => {
+      const updateModeMatcher = toMatchImageSnapshot.bind({
+        snapshotState: new SnapshotState(__filename, {
+          updateSnapshot: 'all',
+        }),
+        testPath: __filename,
+      });
+      updateModeMatcher(updateImageData, {
+        customSnapshotIdentifier,
+        updatePassedSnapshots: true,
+        failureThreshold: 0,
+        failureThresholdType: 'pixel',
+      });
+      expect(fs.readFileSync(updateImageSnapshotPath)).toEqual(updateImageData);
+    });
+  });
 
   describe('failures', () => {
     const failImageData = fs.readFileSync(fromStubs('TestImageFailure.png'));
