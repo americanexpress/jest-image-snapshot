@@ -12,7 +12,7 @@
  * the License.
  */
 
-const fs = require('fs')
+const fs = require('fs');
 
 const getStdin = require('get-stdin');
 
