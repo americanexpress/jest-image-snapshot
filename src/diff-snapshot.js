@@ -12,13 +12,14 @@
  * the License.
  */
 
+const childProcess = require('child_process');
 const fs = require('fs');
 const path = require('path');
-const childProcess = require('child_process');
-const rimraf = require('rimraf');
-const pixelmatch = require('pixelmatch');
+
 const mkdirp = require('mkdirp');
+const pixelmatch = require('pixelmatch');
 const { PNG } = require('pngjs');
+const rimraf = require('rimraf');
 
 /**
  * Helper function to create reusable image resizer
@@ -154,16 +155,9 @@ function diffImageToSnapshot(options) {
       PNG.bitblt(
         receivedImage, compositeResultImage, 0, 0, imageWidth, imageHeight, imageWidth * 2, 0
       );
-
-      const input = { imagePath: diffOutputPath, image: compositeResultImage };
-      // image._packer property contains a circular reference since node9, causing JSON.stringify to
-      // fail. Might as well discard all the hidden properties.
-      const serializedInput = JSON.stringify(input, (name, val) => (name[0] === '_' ? undefined : val));
-
-      // writing diff in separate process to avoid perf issues associated with Math in Jest VM (https://github.com/facebook/jest/issues/5163)
-      const writeDiffProcess = childProcess.spawnSync('node', [`${__dirname}/write-result-diff-image.js`], { input: Buffer.from(serializedInput) });
-      // in case of error print to console
-      if (writeDiffProcess.stderr.toString()) { console.log(writeDiffProcess.stderr.toString()); } // eslint-disable-line no-console, max-len
+      // Set filter type to Paeth to avoid expensive auto scanline filter detection
+      const pngBuffer = PNG.sync.write(compositeResultImage, { filterType: 4 });
+      fs.writeFileSync(diffOutputPath, pngBuffer);
     }
 
     result = {
@@ -181,6 +175,30 @@ function diffImageToSnapshot(options) {
   return result;
 }
 
+
+function runDiffImageToSnapshot(options) {
+  options.receivedImageBuffer = options.receivedImageBuffer.toString('base64');
+
+  const serializedInput = JSON.stringify(options);
+
+  let result = {};
+
+  const writeDiffProcess = childProcess.spawnSync(
+    'node', [`${__dirname}/diff-process.js`],
+    { input: Buffer.from(serializedInput), stdio: ['pipe', 'inherit', 'inherit', 'pipe'] }
+  );
+
+  if (writeDiffProcess.status === 0) {
+    const output = writeDiffProcess.output[3].toString();
+    result = JSON.parse(output);
+  } else {
+    throw new Error('Error running image diff.');
+  }
+
+  return result;
+}
+
 module.exports = {
   diffImageToSnapshot,
+  runDiffImageToSnapshot,
 };

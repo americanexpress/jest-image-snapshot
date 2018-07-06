@@ -15,12 +15,45 @@
 /* eslint-disable global-require */
 const fs = require('fs');
 const path = require('path');
-const mockSpawn = require('mock-spawn')();
 
 describe('diff-snapshot', () => {
   beforeEach(() => {
     jest.resetModules();
     jest.resetAllMocks();
+  });
+
+  describe('runDiffImageToSNapshot', () => {
+    const mockSpawnSync = jest.fn();
+    const fakeRequest = {
+      receivedImageBuffer: Buffer.from('abcdefg'),
+      snapshotIdentifier: 'foo',
+      snapshotsDir: 'bar',
+      updateSnapshot: false,
+      failureThreshold: 0,
+      failureThresholdType: 'pixel',
+    };
+
+    function setupTest(spawnReturn) {
+      mockSpawnSync.mockReturnValue(spawnReturn);
+      jest.mock('child_process', () => ({ spawnSync: mockSpawnSync }));
+      const { runDiffImageToSnapshot } = require('../src/diff-snapshot');
+      return runDiffImageToSnapshot;
+    }
+
+    it('runs external process and returns result', () => {
+      const runDiffImageToSnapshot = setupTest({
+        status: 0, output: [null, null, null, JSON.stringify({ add: true, updated: false })],
+      });
+
+      expect(runDiffImageToSnapshot(fakeRequest)).toEqual({ add: true, updated: false });
+
+      expect(mockSpawnSync).toBeCalled();
+    });
+
+    it('throws when process returns a non-zero status', () => {
+      const runDiffImageToSnapshot = setupTest({ status: 1 });
+      expect(() => runDiffImageToSnapshot(fakeRequest)).toThrow();
+    });
   });
 
   describe('diffImageToSnapshot', () => {
@@ -34,6 +67,7 @@ describe('diff-snapshot', () => {
     const mockMkdirpSync = jest.fn();
     const mockWriteFileSync = jest.fn();
     const mockPixelMatch = jest.fn();
+
 
     function setupTest({
       snapshotDirExists,
@@ -49,8 +83,6 @@ describe('diff-snapshot', () => {
         readFileSync: jest.fn(),
       });
 
-      mockSpawn.setDefault(mockSpawn.simple(0));
-      jest.mock('child_process', () => ({ spawnSync: mockSpawn }));
       jest.mock('fs', () => mockFs);
       jest.mock('mkdirp', () => ({ sync: mockMkdirpSync }));
       const { diffImageToSnapshot } = require('../src/diff-snapshot');
@@ -131,7 +163,7 @@ describe('diff-snapshot', () => {
       // Check that pixelmatch was called
       expect(mockPixelMatch).toHaveBeenCalledTimes(1);
       // Check that that it did not attempt to write a diff
-      expect(mockSpawn.calls).toEqual([]);
+      expect(mockWriteFileSync.mock.calls).toEqual([]);
     });
 
     it('should write a diff image if the test fails', () => {
@@ -161,9 +193,7 @@ describe('diff-snapshot', () => {
         { threshold: 0.01 }
       );
 
-      expect(mockSpawn.calls[0].args[0]).toBe(path.resolve('./src/write-result-diff-image.js'));
-      expect(mockSpawn.calls[0].command).toBe('node');
-      expect(mockSpawn.calls[0].opts.input).toEqual(expect.any(Buffer));
+      expect(mockWriteFileSync).toHaveBeenCalledTimes(1);
     });
 
     it('should pass <= failureThreshold pixel', () => {

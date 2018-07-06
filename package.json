@@ -23,7 +23,7 @@
     "preset": "amex-jest-preset",
     "collectCoverageFrom": [
       "src/*.js",
-      "!src/write-result-diff-image.js",
+      "!src/diff-process.js",
       "!**/node_modules/**",
       "!test-results/**"
     ],
@@ -46,8 +46,7 @@
     "eslint": "^4.15.0",
     "eslint-config-amex": "^7.0.0",
     "is-png": "^1.1.0",
-    "jest": "^23.0.0",
-    "mock-spawn": "^0.2.6"
+    "jest": "^23.0.0"
   },
   "dependencies": {
     "chalk": "^1.1.3",
