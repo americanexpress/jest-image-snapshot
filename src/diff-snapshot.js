@@ -21,7 +21,6 @@ const pixelmatch = require('pixelmatch');
 const { PNG } = require('pngjs');
 const rimraf = require('rimraf');
 
-
 /**
  * Helper function to create reusable image resizer
  */

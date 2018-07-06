@@ -25,7 +25,6 @@ getStdin.buffer().then((buffer) => {
     options.receivedImageBuffer = Buffer.from(options.receivedImageBuffer, 'base64');
 
     const result = diffImageToSnapshot(options);
-    /* eslint-disable no-console */
 
     fs.writeSync(3, Buffer.from(JSON.stringify(result)));
 
