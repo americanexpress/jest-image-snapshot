@@ -316,6 +316,7 @@ describe('diff-snapshot', () => {
         snapshotIdentifier: mockSnapshotIdentifier,
         snapshotsDir: mockSnapshotsDir,
         updateSnapshot: true,
+        updatePassedSnapshot: true,
         failureThreshold: 0,
         failureThresholdType: 'pixel',
       });
@@ -359,6 +360,7 @@ describe('diff-snapshot', () => {
         snapshotIdentifier: mockSnapshotIdentifier,
         snapshotsDir: mockSnapshotsDir,
         updateSnapshot: true,
+        updatePassedSnapshot: true,
         failureThreshold: 0,
         failureThresholdType: 'pixel',
       });
@@ -411,6 +413,57 @@ describe('diff-snapshot', () => {
           failureThresholdType: 'banana',
         });
       }).toThrowErrorMatchingSnapshot();
+    });
+
+    it('should not write a file if updatePassedSnapshot is false', () => {
+      const diffImageToSnapshot = setupTest({ snapshotExists: true });
+
+      const diffResult = diffImageToSnapshot({
+        receivedImageBuffer: mockImageBuffer,
+        snapshotIdentifier: mockSnapshotIdentifier,
+        snapshotsDir: mockSnapshotsDir,
+        updateSnapshot: true,
+        updatePassedSnapshot: false,
+        failureThreshold: 0,
+        failureThresholdType: 'pixel',
+      });
+
+      expect(mockWriteFileSync).not.toHaveBeenCalled();
+      expect(diffResult).toHaveProperty('pass', true);
+    });
+
+    it('should write a file if updatePassedSnapshot is true on passing test', () => {
+      const diffImageToSnapshot = setupTest({ snapshotExists: true });
+
+      const diffResult = diffImageToSnapshot({
+        receivedImageBuffer: mockImageBuffer,
+        snapshotIdentifier: mockSnapshotIdentifier,
+        snapshotsDir: mockSnapshotsDir,
+        updateSnapshot: true,
+        updatePassedSnapshot: true,
+        failureThreshold: 0,
+        failureThresholdType: 'pixel',
+      });
+
+      expect(mockWriteFileSync).toHaveBeenCalledTimes(1);
+      expect(diffResult).toHaveProperty('updated', true);
+    });
+
+    it('should update snapshot on failure if updatePassedSnapshot is false', () => {
+      const diffImageToSnapshot = setupTest({ snapshotExists: true, pixelmatchResult: 500 });
+
+      const diffResult = diffImageToSnapshot({
+        receivedImageBuffer: mockFailImageBuffer,
+        snapshotIdentifier: mockSnapshotIdentifier,
+        snapshotsDir: mockSnapshotsDir,
+        updateSnapshot: true,
+        updatePassedSnapshot: false,
+        failureThreshold: 0,
+        failureThresholdType: 'pixel',
+      });
+
+      expect(mockWriteFileSync).toHaveBeenCalledTimes(1);
+      expect(diffResult).toHaveProperty('updated', true);
     });
   });
 });
