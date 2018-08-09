@@ -15,7 +15,6 @@
 const childProcess = require('child_process');
 const fs = require('fs');
 const path = require('path');
-
 const mkdirp = require('mkdirp');
 const pixelmatch = require('pixelmatch');
 const { PNG } = require('pngjs');
@@ -166,6 +165,7 @@ function diffImageToSnapshot(options) {
         receivedImage, compositeResultImage, 0, 0, imageWidth, imageHeight, imageWidth * 2, 0
       );
       // Set filter type to Paeth to avoid expensive auto scanline filter detection
+      // For more information see https://www.w3.org/TR/PNG-Filters.html
       const pngBuffer = PNG.sync.write(compositeResultImage, { filterType: 4 });
       fs.writeFileSync(diffOutputPath, pngBuffer);
 
