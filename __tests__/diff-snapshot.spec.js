@@ -61,6 +61,8 @@ describe('diff-snapshot', () => {
     const mockSnapshotIdentifier = 'id1';
     const mockImagePath = './__tests__/stubs/TestImage.png';
     const mockImageBuffer = fs.readFileSync(mockImagePath);
+    const mockBigImagePath = './__tests__/stubs/TestImage150x150.png';
+    const mockBigImageBuffer = fs.readFileSync(mockBigImagePath);
     const mockFailImagePath = './__tests__/stubs/TestImageFailure.png';
     const mockFailImageBuffer = fs.readFileSync(mockFailImagePath);
     const mockMkdirSync = jest.fn();
@@ -190,6 +192,36 @@ describe('diff-snapshot', () => {
         expect.any(Buffer),
         100,
         100,
+        { threshold: 0.01 }
+      );
+
+      expect(mockWriteFileSync).toHaveBeenCalledTimes(1);
+    });
+
+    it('should fail if image passed is a different size', () => {
+      const diffImageToSnapshot = setupTest({ snapshotExists: true });
+      const result = diffImageToSnapshot({
+        receivedImageBuffer: mockBigImageBuffer,
+        snapshotIdentifier: mockSnapshotIdentifier,
+        snapshotsDir: mockSnapshotsDir,
+        updateSnapshot: false,
+        failureThreshold: 0,
+        failureThresholdType: 'pixel',
+      });
+
+      expect(result).toMatchObject({
+        diffOutputPath: path.join(mockSnapshotsDir, '__diff_output__', 'id1-diff.png'),
+        diffRatio: 0.0,
+        diffPixelCount: 0,
+        pass: false,
+      });
+      expect(mockPixelMatch).toHaveBeenCalledTimes(1);
+      expect(mockPixelMatch).toHaveBeenCalledWith(
+        expect.any(Buffer),
+        expect.any(Buffer),
+        expect.any(Buffer),
+        150,
+        150,
         { threshold: 0.01 }
       );
 
