@@ -15,7 +15,6 @@
 /* eslint-disable global-require */
 const fs = require('fs');
 const path = require('path');
-const mockSpawn = require('mock-spawn')();
 
 describe('diff-snapshot', () => {
   beforeEach(() => {
@@ -23,17 +22,54 @@ describe('diff-snapshot', () => {
     jest.resetAllMocks();
   });
 
+  describe('runDiffImageToSnapshot', () => {
+    const mockSpawnSync = jest.fn();
+    const fakeRequest = {
+      receivedImageBuffer: Buffer.from('abcdefg'),
+      snapshotIdentifier: 'foo',
+      snapshotsDir: 'bar',
+      updateSnapshot: false,
+      failureThreshold: 0,
+      failureThresholdType: 'pixel',
+    };
+
+    function setupTest(spawnReturn) {
+      mockSpawnSync.mockReturnValue(spawnReturn);
+      jest.mock('child_process', () => ({ spawnSync: mockSpawnSync }));
+      const { runDiffImageToSnapshot } = require('../src/diff-snapshot');
+      return runDiffImageToSnapshot;
+    }
+
+    it('runs external process and returns result', () => {
+      const runDiffImageToSnapshot = setupTest({
+        status: 0, output: [null, null, null, JSON.stringify({ add: true, updated: false })],
+      });
+
+      expect(runDiffImageToSnapshot(fakeRequest)).toEqual({ add: true, updated: false });
+
+      expect(mockSpawnSync).toBeCalled();
+    });
+
+    it('throws when process returns a non-zero status', () => {
+      const runDiffImageToSnapshot = setupTest({ status: 1 });
+      expect(() => runDiffImageToSnapshot(fakeRequest)).toThrow();
+    });
+  });
+
   describe('diffImageToSnapshot', () => {
     const mockSnapshotsDir = path.normalize('/path/to/snapshots');
     const mockSnapshotIdentifier = 'id1';
     const mockImagePath = './__tests__/stubs/TestImage.png';
     const mockImageBuffer = fs.readFileSync(mockImagePath);
+    const mockBigImagePath = './__tests__/stubs/TestImage150x150.png';
+    const mockBigImageBuffer = fs.readFileSync(mockBigImagePath);
     const mockFailImagePath = './__tests__/stubs/TestImageFailure.png';
     const mockFailImageBuffer = fs.readFileSync(mockFailImagePath);
     const mockMkdirSync = jest.fn();
     const mockMkdirpSync = jest.fn();
     const mockWriteFileSync = jest.fn();
     const mockPixelMatch = jest.fn();
+
 
     function setupTest({
       snapshotDirExists,
@@ -49,8 +85,6 @@ describe('diff-snapshot', () => {
         readFileSync: jest.fn(),
       });
 
-      mockSpawn.setDefault(mockSpawn.simple(0));
-      jest.mock('child_process', () => ({ spawnSync: mockSpawn }));
       jest.mock('fs', () => mockFs);
       jest.mock('mkdirp', () => ({ sync: mockMkdirpSync }));
       const { diffImageToSnapshot } = require('../src/diff-snapshot');
@@ -131,7 +165,7 @@ describe('diff-snapshot', () => {
       // Check that pixelmatch was called
       expect(mockPixelMatch).toHaveBeenCalledTimes(1);
       // Check that that it did not attempt to write a diff
-      expect(mockSpawn.calls).toEqual([]);
+      expect(mockWriteFileSync.mock.calls).toEqual([]);
     });
 
     it('should write a diff image if the test fails', () => {
@@ -161,9 +195,37 @@ describe('diff-snapshot', () => {
         { threshold: 0.01 }
       );
 
-      expect(mockSpawn.calls[0].args[0]).toBe(path.resolve('./src/write-result-diff-image.js'));
-      expect(mockSpawn.calls[0].command).toBe('node');
-      expect(mockSpawn.calls[0].opts.input).toEqual(expect.any(Buffer));
+      expect(mockWriteFileSync).toHaveBeenCalledTimes(1);
+    });
+
+    it('should fail if image passed is a different size', () => {
+      const diffImageToSnapshot = setupTest({ snapshotExists: true });
+      const result = diffImageToSnapshot({
+        receivedImageBuffer: mockBigImageBuffer,
+        snapshotIdentifier: mockSnapshotIdentifier,
+        snapshotsDir: mockSnapshotsDir,
+        updateSnapshot: false,
+        failureThreshold: 0,
+        failureThresholdType: 'pixel',
+      });
+
+      expect(result).toMatchObject({
+        diffOutputPath: path.join(mockSnapshotsDir, '__diff_output__', 'id1-diff.png'),
+        diffRatio: 0.0,
+        diffPixelCount: 0,
+        pass: false,
+      });
+      expect(mockPixelMatch).toHaveBeenCalledTimes(1);
+      expect(mockPixelMatch).toHaveBeenCalledWith(
+        expect.any(Buffer),
+        expect.any(Buffer),
+        expect.any(Buffer),
+        150,
+        150,
+        { threshold: 0.01 }
+      );
+
+      expect(mockWriteFileSync).toHaveBeenCalledTimes(1);
     });
 
     it('should pass <= failureThreshold pixel', () => {

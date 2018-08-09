@@ -16,7 +16,7 @@ const kebabCase = require('lodash/kebabCase');
 const merge = require('lodash/merge');
 const path = require('path');
 const Chalk = require('chalk').constructor;
-const { diffImageToSnapshot } = require('./diff-snapshot');
+const { runDiffImageToSnapshot } = require('./diff-snapshot');
 const fs = require('fs');
 
 const SNAPSHOTS_DIR = '__image_snapshots__';
@@ -68,7 +68,7 @@ function configureToMatchImageSnapshot({
     }
 
     const result =
-      diffImageToSnapshot({
+      runDiffImageToSnapshot({
         receivedImageBuffer: received,
         snapshotsDir,
         snapshotIdentifier,

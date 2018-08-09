@@ -23,7 +23,7 @@
     "preset": "amex-jest-preset",
     "collectCoverageFrom": [
       "src/*.js",
-      "!src/write-result-diff-image.js",
+      "!src/diff-process.js",
       "!**/node_modules/**",
       "!test-results/**"
     ],
@@ -33,7 +33,8 @@
     "coveragePathIgnorePatterns": [
       "/node_modules/",
       "<rootDir>/examples"
-    ]
+    ],
+    "testURL": "http://localhost/"
   },
   "repository": {
     "type": "git",
