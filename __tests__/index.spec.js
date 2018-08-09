@@ -342,7 +342,7 @@ describe('toMatchImageSnapshot', () => {
     const customConfig = { perceptual: true };
     const toMatchImageSnapshot = configureToMatchImageSnapshot({
       customDiffConfig: customConfig,
-      customSnapshotsDir: 'path\\to\\my-custom-snapshots-dir',
+      customSnapshotsDir: path.join('path', 'to', 'my-custom-snapshots-dir'),
       noColors: true,
     });
     expect.extend({ toMatchImageSnapshot });
