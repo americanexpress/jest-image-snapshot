@@ -8,6 +8,7 @@ Object {
   "receivedImageBuffer": "pretendthisisanimagebuffer",
   "snapshotIdentifier": "test-spec-js-test-1",
   "snapshotsDir": "path/to/__image_snapshots__",
+  "updatePassedSnapshot": false,
   "updateSnapshot": false,
 }
 `;
