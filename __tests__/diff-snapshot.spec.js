@@ -22,7 +22,7 @@ describe('diff-snapshot', () => {
     jest.resetAllMocks();
   });
 
-  describe('runDiffImageToSNapshot', () => {
+  describe('runDiffImageToSnapshot', () => {
     const mockSpawnSync = jest.fn();
     const fakeRequest = {
       receivedImageBuffer: Buffer.from('abcdefg'),
