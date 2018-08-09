@@ -17,6 +17,8 @@ const path = require('path');
 const rimraf = require('rimraf');
 const uniqueId = require('lodash/uniqueId');
 const isPng = require('is-png');
+const { SnapshotState } = require('jest-snapshot');
+const { toMatchImageSnapshot } = require('../src');
 
 describe('toMatchImageSnapshot', () => {
   const fromStubs = file => path.resolve(__dirname, './stubs', file);
@@ -31,7 +33,6 @@ describe('toMatchImageSnapshot', () => {
   beforeAll(() => {
     // In tests, skip reporting (skip snapshotState update to not mess with our test report)
     global.UNSTABLE_SKIP_REPORTING = true;
-    const { toMatchImageSnapshot } = require('../src'); // eslint-disable-line global-require
     expect.extend({ toMatchImageSnapshot });
   });
 
@@ -82,6 +83,82 @@ describe('toMatchImageSnapshot', () => {
       ).not.toThrowError();
 
       expect(diffExists(customSnapshotIdentifier)).toBe(false);
+    });
+  });
+
+  describe('updates', () => {
+    const customSnapshotIdentifier = 'integration-update';
+    const updateImageData = fs.readFileSync(fromStubs('TestImageUpdate1pxOff.png'));
+    const updateImageSnapshotPath = path.join(__dirname, '__image_snapshots__', `${customSnapshotIdentifier}-snap.png`);
+
+    beforeEach(() => {
+      fs.writeFileSync(updateImageSnapshotPath, imageData);
+    });
+
+    afterAll(() => {
+      fs.writeFileSync(updateImageSnapshotPath, imageData);
+    });
+
+    it('does not write a result image for passing tests in update mode by default', () => {
+      const updateModeMatcher = toMatchImageSnapshot.bind({
+        snapshotState: new SnapshotState(__filename, {
+          updateSnapshot: 'all',
+        }),
+        testPath: __filename,
+      });
+      updateModeMatcher(updateImageData, {
+        customSnapshotIdentifier,
+        failureThreshold: 2,
+        failureThresholdType: 'pixel',
+      });
+      expect(fs.readFileSync(updateImageSnapshotPath)).toEqual(imageData);
+    });
+
+    it('writes a result image for passing test in update mode with updatePassedSnapshots: true', () => {
+      const updateModeMatcher = toMatchImageSnapshot.bind({
+        snapshotState: new SnapshotState(__filename, {
+          updateSnapshot: 'all',
+        }),
+        testPath: __filename,
+      });
+      updateModeMatcher(updateImageData, {
+        customSnapshotIdentifier,
+        updatePassedSnapshots: true,
+        failureThreshold: 2,
+        failureThresholdType: 'pixel',
+      });
+      expect(fs.readFileSync(updateImageSnapshotPath)).not.toEqual(updateImageData);
+    });
+
+    it('writes a result image for failing test in update mode by default', () => {
+      const updateModeMatcher = toMatchImageSnapshot.bind({
+        snapshotState: new SnapshotState(__filename, {
+          updateSnapshot: 'all',
+        }),
+        testPath: __filename,
+      });
+      updateModeMatcher(updateImageData, {
+        customSnapshotIdentifier,
+        failureThreshold: 0,
+        failureThresholdType: 'pixel',
+      });
+      expect(fs.readFileSync(updateImageSnapshotPath)).toEqual(updateImageData);
+    });
+
+    it('writes a result image for failing test in update mode with updatePassedSnapshots: false', () => {
+      const updateModeMatcher = toMatchImageSnapshot.bind({
+        snapshotState: new SnapshotState(__filename, {
+          updateSnapshot: 'all',
+        }),
+        testPath: __filename,
+      });
+      updateModeMatcher(updateImageData, {
+        customSnapshotIdentifier,
+        updatePassedSnapshots: true,
+        failureThreshold: 0,
+        failureThresholdType: 'pixel',
+      });
+      expect(fs.readFileSync(updateImageSnapshotPath)).toEqual(updateImageData);
     });
   });
 
