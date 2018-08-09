@@ -76,12 +76,19 @@ const alignImagesToSameSize = (firstImage, secondImage) => {
   ];
 };
 
+const isFailure = ({ pass, updateSnapshot }) => !pass && !updateSnapshot;
+
+const shouldUpdate = ({ pass, updateSnapshot, updatePassedSnapshot }) => (
+  (!pass && updateSnapshot) || (pass && updatePassedSnapshot)
+);
+
 function diffImageToSnapshot(options) {
   const {
     receivedImageBuffer,
     snapshotIdentifier,
     snapshotsDir,
     updateSnapshot = false,
+    updatePassedSnapshot = false,
     customDiffConfig = {},
     failureThreshold,
     failureThresholdType,
@@ -89,10 +96,13 @@ function diffImageToSnapshot(options) {
 
   let result = {};
   const baselineSnapshotPath = path.join(snapshotsDir, `${snapshotIdentifier}-snap.png`);
-  if (fs.existsSync(baselineSnapshotPath) && !updateSnapshot) {
+  if (!fs.existsSync(baselineSnapshotPath)) {
+    mkdirp.sync(snapshotsDir);
+    fs.writeFileSync(baselineSnapshotPath, receivedImageBuffer);
+    result = { added: true };
+  } else {
     const outputDir = path.join(snapshotsDir, '__diff_output__');
     const diffOutputPath = path.join(outputDir, `${snapshotIdentifier}-diff.png`);
-
     rimraf.sync(diffOutputPath);
 
     const defaultDiffConfig = {
@@ -139,7 +149,7 @@ function diffImageToSnapshot(options) {
       throw new Error(`Unknown failureThresholdType: ${failureThresholdType}. Valid options are "pixel" or "percent".`);
     }
 
-    if (!pass) {
+    if (isFailure({ pass, updateSnapshot })) {
       mkdirp.sync(outputDir);
       const compositeResultImage = new PNG({
         width: imageWidth * 3,
@@ -158,19 +168,25 @@ function diffImageToSnapshot(options) {
       // Set filter type to Paeth to avoid expensive auto scanline filter detection
       const pngBuffer = PNG.sync.write(compositeResultImage, { filterType: 4 });
       fs.writeFileSync(diffOutputPath, pngBuffer);
+
+      result = {
+        pass: false,
+        diffOutputPath,
+        diffRatio,
+        diffPixelCount,
+      };
+    } else if (shouldUpdate({ pass, updateSnapshot, updatePassedSnapshot })) {
+      mkdirp.sync(snapshotsDir);
+      fs.writeFileSync(baselineSnapshotPath, receivedImageBuffer);
+      result = { updated: true };
+    } else {
+      result = {
+        pass,
+        diffRatio,
+        diffPixelCount,
+        diffOutputPath,
+      };
     }
-
-    result = {
-      pass,
-      diffOutputPath,
-      diffRatio,
-      diffPixelCount,
-    };
-  } else {
-    mkdirp.sync(snapshotsDir);
-    fs.writeFileSync(baselineSnapshotPath, receivedImageBuffer);
-
-    result = updateSnapshot ? { updated: true } : { added: true };
   }
   return result;
 }

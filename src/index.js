@@ -34,6 +34,7 @@ function configureToMatchImageSnapshot({
   noColors: commonNoColors = false,
   failureThreshold: commonFailureThreshold = 0,
   failureThresholdType: commonFailureThresholdType = 'pixel',
+  updatePassedSnapshot: commonUpdatePassedSnapshot = false,
 } = {}) {
   return function toMatchImageSnapshot(received, {
     customSnapshotIdentifier = '',
@@ -42,6 +43,7 @@ function configureToMatchImageSnapshot({
     noColors = commonNoColors,
     failureThreshold = commonFailureThreshold,
     failureThresholdType = commonFailureThresholdType,
+    updatePassedSnapshot = commonUpdatePassedSnapshot,
   } = {}) {
     const {
       testPath, currentTestName, isNot, snapshotState,
@@ -49,7 +51,6 @@ function configureToMatchImageSnapshot({
     const chalk = new Chalk({ enabled: !noColors });
 
     if (isNot) { throw new Error('Jest: `.not` cannot be used with `.toMatchImageSnapshot()`.'); }
-
 
     updateSnapshotState(snapshotState, { _counters: snapshotState._counters.set(currentTestName, (snapshotState._counters.get(currentTestName) || 0) + 1) }); // eslint-disable-line max-len
     const snapshotIdentifier = customSnapshotIdentifier || kebabCase(`${path.basename(testPath)}-${currentTestName}-${snapshotState._counters.get(currentTestName)}`);
@@ -75,6 +76,7 @@ function configureToMatchImageSnapshot({
         customDiffConfig: Object.assign({}, commonCustomDiffConfig, customDiffConfig),
         failureThreshold,
         failureThresholdType,
+        updatePassedSnapshot,
       });
 
     let pass = true;
