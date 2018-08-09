@@ -33,7 +33,8 @@
     "coveragePathIgnorePatterns": [
       "/node_modules/",
       "<rootDir>/examples"
-    ]
+    ],
+    "testURL": "http://localhost/"
   },
   "repository": {
     "type": "git",
