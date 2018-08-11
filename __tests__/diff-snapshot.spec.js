@@ -70,7 +70,6 @@ describe('diff-snapshot', () => {
     const mockWriteFileSync = jest.fn();
     const mockPixelMatch = jest.fn();
 
-
     function setupTest({
       snapshotDirExists,
       snapshotExists,

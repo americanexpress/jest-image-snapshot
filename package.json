@@ -33,8 +33,7 @@
     "coveragePathIgnorePatterns": [
       "/node_modules/",
       "<rootDir>/examples"
-    ],
-    "testURL": "http://localhost/"
+    ]
   },
   "repository": {
     "type": "git",
@@ -43,7 +42,7 @@
   "author": "Andres Escobar <andres.escobar@aexp.com> (https://github.com/anescobar1991)",
   "license": "Apache-2.0",
   "devDependencies": {
-    "amex-jest-preset": "^4.0.2",
+    "amex-jest-preset": "^5.0.0",
     "eslint": "^4.15.0",
     "eslint-config-amex": "^7.0.0",
     "is-png": "^1.1.0",
