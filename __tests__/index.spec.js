@@ -19,7 +19,7 @@ const path = require('path');
 describe('toMatchImageSnapshot', () => {
   function setupMock(diffImageToSnapshotResult) {
     jest.doMock('../src/diff-snapshot', () => ({
-      diffImageToSnapshot: jest.fn(() => diffImageToSnapshotResult),
+      runDiffImageToSnapshot: jest.fn(() => diffImageToSnapshotResult),
     }));
 
     const mockFs = Object.assign({}, fs, {
@@ -135,8 +135,8 @@ describe('toMatchImageSnapshot', () => {
 
     const customDiffConfig = { threshold: 0.3 };
     matcherAtTest('pretendthisisanimagebuffer', { customDiffConfig });
-    const { diffImageToSnapshot } = require('../src/diff-snapshot');
-    expect(diffImageToSnapshot.mock.calls[0][0].customDiffConfig).toEqual(customDiffConfig);
+    const { runDiffImageToSnapshot } = require('../src/diff-snapshot');
+    expect(runDiffImageToSnapshot.mock.calls[0][0].customDiffConfig).toEqual(customDiffConfig);
   });
 
   it('passes diffImageToSnapshot everything it needs to create a snapshot and compare if needed', () => {
@@ -164,9 +164,9 @@ describe('toMatchImageSnapshot', () => {
     const matcherAtTest = toMatchImageSnapshot.bind(mockTestContext);
 
     matcherAtTest('pretendthisisanimagebuffer');
-    const { diffImageToSnapshot } = require('../src/diff-snapshot');
+    const { runDiffImageToSnapshot } = require('../src/diff-snapshot');
 
-    const dataArg = diffImageToSnapshot.mock.calls[0][0];
+    const dataArg = runDiffImageToSnapshot.mock.calls[0][0];
     // This is to make the test work on windows
     dataArg.snapshotsDir = dataArg.snapshotsDir.replace(/\\/g, '/');
 
@@ -198,9 +198,9 @@ describe('toMatchImageSnapshot', () => {
     const matcherAtTest = toMatchImageSnapshot.bind(mockTestContext);
 
     matcherAtTest('pretendthisisanimagebuffer', { customSnapshotIdentifier: 'custom-name' });
-    const { diffImageToSnapshot } = require('../src/diff-snapshot');
+    const { runDiffImageToSnapshot } = require('../src/diff-snapshot');
 
-    expect(diffImageToSnapshot.mock.calls[0][0].snapshotIdentifier).toBe('custom-name');
+    expect(runDiffImageToSnapshot.mock.calls[0][0].snapshotIdentifier).toBe('custom-name');
   });
 
   it('attempts to update snapshots if snapshotState has updateSnapshot flag set', () => {
@@ -222,9 +222,9 @@ describe('toMatchImageSnapshot', () => {
     const matcherAtTest = toMatchImageSnapshot.bind(mockTestContext);
 
     matcherAtTest('pretendthisisanimagebuffer');
-    const { diffImageToSnapshot } = require('../src/diff-snapshot');
+    const { runDiffImageToSnapshot } = require('../src/diff-snapshot');
 
-    expect(diffImageToSnapshot.mock.calls[0][0].updateSnapshot).toBe(true);
+    expect(runDiffImageToSnapshot.mock.calls[0][0].updateSnapshot).toBe(true);
   });
 
   it('should work when a new snapshot is added', () => {
@@ -242,7 +242,7 @@ describe('toMatchImageSnapshot', () => {
     };
     const mockDiff = jest.fn();
     jest.doMock('../src/diff-snapshot', () => ({
-      diffImageToSnapshot: mockDiff,
+      runDiffImageToSnapshot: mockDiff,
     }));
 
     const mockFs = Object.assign({}, fs, {
@@ -329,9 +329,9 @@ describe('toMatchImageSnapshot', () => {
     };
     setupMock({ updated: true });
 
-    const diffImageToSnapshot = jest.fn(() => ({}));
+    const runDiffImageToSnapshot = jest.fn(() => ({}));
     jest.doMock('../src/diff-snapshot', () => ({
-      diffImageToSnapshot,
+      runDiffImageToSnapshot,
     }));
 
     const Chalk = jest.fn();
@@ -342,7 +342,7 @@ describe('toMatchImageSnapshot', () => {
     const customConfig = { perceptual: true };
     const toMatchImageSnapshot = configureToMatchImageSnapshot({
       customDiffConfig: customConfig,
-      customSnapshotsDir: 'path/to/my-custom-snapshots-dir',
+      customSnapshotsDir: path.join('path', 'to', 'my-custom-snapshots-dir'),
       noColors: true,
     });
     expect.extend({ toMatchImageSnapshot });
@@ -350,7 +350,7 @@ describe('toMatchImageSnapshot', () => {
 
     matcherAtTest();
 
-    expect(diffImageToSnapshot).toHaveBeenCalledWith({
+    expect(runDiffImageToSnapshot).toHaveBeenCalledWith({
       customDiffConfig: {
         perceptual: true,
       },
