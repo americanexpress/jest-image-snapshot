@@ -134,7 +134,7 @@ function diffImageToSnapshot(options) {
     );
 
     const totalPixels = imageWidth * imageHeight;
-    const diffRatio = diffPixelCount / totalPixels;
+    const diffPercentage = (diffPixelCount / totalPixels) * 100;
 
     let pass = false;
     if (hasSizeMismatch) {
@@ -143,7 +143,7 @@ function diffImageToSnapshot(options) {
     } else if (failureThresholdType === 'pixel') {
       pass = diffPixelCount <= failureThreshold;
     } else if (failureThresholdType === 'percent') {
-      pass = diffRatio <= failureThreshold;
+      pass = diffPercentage <= failureThreshold;
     } else {
       throw new Error(`Unknown failureThresholdType: ${failureThresholdType}. Valid options are "pixel" or "percent".`);
     }
@@ -172,7 +172,7 @@ function diffImageToSnapshot(options) {
       result = {
         pass: false,
         diffOutputPath,
-        diffRatio,
+        diffPercentage,
         diffPixelCount,
       };
     } else if (shouldUpdate({ pass, updateSnapshot, updatePassedSnapshot })) {
@@ -182,7 +182,7 @@ function diffImageToSnapshot(options) {
     } else {
       result = {
         pass,
-        diffRatio,
+        diffPercentage,
         diffPixelCount,
         diffOutputPath,
       };
