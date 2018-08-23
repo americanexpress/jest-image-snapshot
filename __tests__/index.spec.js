@@ -49,7 +49,7 @@ describe('toMatchImageSnapshot', () => {
     const mockDiffResult = {
       pass: true,
       diffOutputPath: 'path/to/result.png',
-      diffRatio: 0,
+      diffPercentage: 0,
       diffPixelCount: 0,
     };
 
@@ -65,7 +65,7 @@ describe('toMatchImageSnapshot', () => {
     const mockDiffResult = {
       pass: true,
       diffOutputPath: 'path/to/result.png',
-      diffRatio: 0,
+      diffPercentage: 0,
       diffPixelCount: 0,
     };
     setupMock(mockDiffResult);
@@ -81,7 +81,7 @@ describe('toMatchImageSnapshot', () => {
     const mockDiffResult = {
       pass: false,
       diffOutputPath: 'path/to/result.png',
-      diffRatio: 0.8,
+      diffPercentage: 80,
       diffPixelCount: 600,
     };
 
@@ -97,7 +97,7 @@ describe('toMatchImageSnapshot', () => {
     const mockDiffResult = {
       pass: false,
       diffOutputPath: 'path/to/result.png',
-      diffRatio: 0.4,
+      diffPercentage: 40,
       diffPixelCount: 600,
     };
 
@@ -125,7 +125,7 @@ describe('toMatchImageSnapshot', () => {
     const mockDiffResult = {
       pass: false,
       diffOutputPath: 'path/to/result.png',
-      diffRatio: 0.8,
+      diffPercentage: 80,
       diffPixelCount: 600,
     };
 
@@ -155,7 +155,7 @@ describe('toMatchImageSnapshot', () => {
     const mockDiffResult = {
       pass: false,
       diffOutputPath: 'path/to/result.png',
-      diffRatio: 0.8,
+      diffPercentage: 80,
       diffPixelCount: 600,
     };
 
@@ -189,7 +189,7 @@ describe('toMatchImageSnapshot', () => {
     const mockDiffResult = {
       pass: false,
       diffOutputPath: 'path/to/result.png',
-      diffRatio: 0.8,
+      diffPercentage: 80,
       diffPixelCount: 600,
     };
 

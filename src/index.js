@@ -62,8 +62,8 @@ function configureToMatchImageSnapshot({
       return {
         pass: false,
         message: () => `New snapshot was ${chalk.bold.red('not written')}. The update flag must be explicitly ` +
-        'passed to write a new snapshot.\n\n + This is likely because this test is run in a continuous ' +
-        'integration (CI) environment in which snapshots are not written by default.\n\n',
+          'passed to write a new snapshot.\n\n + This is likely because this test is run in a continuous ' +
+          'integration (CI) environment in which snapshots are not written by default.\n\n',
       };
     }
 
@@ -97,9 +97,8 @@ function configureToMatchImageSnapshot({
 
       if (!pass) {
         updateSnapshotState(snapshotState, { unmatched: snapshotState.unmatched + 1 });
-        const differencePercentage = result.diffRatio * 100;
-        message = () => `Expected image to match or be a close match to snapshot but was ${differencePercentage}% different from snapshot (${result.diffPixelCount} differing pixels).\n`
-                  + `${chalk.bold.red('See diff for details:')} ${chalk.red(result.diffOutputPath)}`;
+        message = () => `Expected image to match or be a close match to snapshot but was ${result.diffPercentage}% different from snapshot (${result.diffPixelCount} differing pixels).\n`
+          + `${chalk.bold.red('See diff for details:')} ${chalk.red(result.diffOutputPath)}`;
       }
     }
 

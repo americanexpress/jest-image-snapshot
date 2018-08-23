@@ -129,7 +129,7 @@ describe('diff-snapshot', () => {
 
       expect(result).toMatchObject({
         diffOutputPath: path.join(mockSnapshotsDir, '__diff_output__', 'id1-diff.png'),
-        diffRatio: 0,
+        diffPercentage: 0,
         diffPixelCount: 0,
         pass: true,
       });
@@ -157,7 +157,7 @@ describe('diff-snapshot', () => {
 
       expect(result).toMatchObject({
         diffOutputPath: path.join(mockSnapshotsDir, '__diff_output__', 'id1-diff.png'),
-        diffRatio: 0,
+        diffPercentage: 0,
         diffPixelCount: 0,
         pass: true,
       });
@@ -180,7 +180,7 @@ describe('diff-snapshot', () => {
 
       expect(result).toMatchObject({
         diffOutputPath: path.join(mockSnapshotsDir, '__diff_output__', 'id1-diff.png'),
-        diffRatio: 0.5,
+        diffPercentage: 50,
         diffPixelCount: 5000,
         pass: false,
       });
@@ -238,7 +238,7 @@ describe('diff-snapshot', () => {
 
       expect(result.pass).toBe(true);
       expect(result.diffPixelCount).toBe(250);
-      expect(result.diffRatio).toBe(0.025);
+      expect(result.diffPercentage).toBe(2.5);
     });
 
     it('should fail > failureThreshold pixel', () => {
@@ -254,7 +254,7 @@ describe('diff-snapshot', () => {
 
       expect(result.pass).toBe(false);
       expect(result.diffPixelCount).toBe(251);
-      expect(result.diffRatio).toBe(0.0251);
+      expect(result.diffPercentage).toBeCloseTo(2.51);
     });
 
     it('should pass <= failureThreshold percent', () => {
@@ -264,13 +264,13 @@ describe('diff-snapshot', () => {
         snapshotIdentifier: mockSnapshotIdentifier,
         snapshotsDir: mockSnapshotsDir,
         updateSnapshot: false,
-        failureThreshold: 0.025,
+        failureThreshold: 2.5,
         failureThresholdType: 'percent',
       });
 
       expect(result.pass).toBe(true);
       expect(result.diffPixelCount).toBe(250);
-      expect(result.diffRatio).toBe(0.025);
+      expect(result.diffPercentage).toBe(2.5);
     });
 
     it('should fail > failureThreshold percent', () => {
@@ -286,7 +286,7 @@ describe('diff-snapshot', () => {
 
       expect(result.pass).toBe(false);
       expect(result.diffPixelCount).toBe(251);
-      expect(result.diffRatio).toBe(0.0251);
+      expect(result.diffPercentage).toBeCloseTo(2.51);
     });
 
     it('should take the default diff config', () => {
