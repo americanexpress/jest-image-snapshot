@@ -2,6 +2,7 @@
 
 exports[`toMatchImageSnapshot passes diffImageToSnapshot everything it needs to create a snapshot and compare if needed 1`] = `
 Object {
+  "checksum": false,
   "customDiffConfig": Object {},
   "failureThreshold": 0,
   "failureThresholdType": "pixel",
