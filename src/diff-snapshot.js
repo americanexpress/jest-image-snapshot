@@ -19,6 +19,7 @@ const mkdirp = require('mkdirp');
 const pixelmatch = require('pixelmatch');
 const { PNG } = require('pngjs');
 const rimraf = require('rimraf');
+const { createHash } = require('crypto');
 
 /**
  * Helper function to create reusable image resizer
@@ -122,30 +123,42 @@ function diffImageToSnapshot(options) {
       : [rawReceivedImage, rawBaselineImage];
     const imageWidth = receivedImage.width;
     const imageHeight = receivedImage.height;
-    const diffImage = new PNG({ width: imageWidth, height: imageHeight });
-
-    const diffPixelCount = pixelmatch(
-      receivedImage.data,
-      baselineImage.data,
-      diffImage.data,
-      imageWidth,
-      imageHeight,
-      diffConfig
-    );
-
-    const totalPixels = imageWidth * imageHeight;
-    const diffRatio = diffPixelCount / totalPixels;
 
     let pass = false;
-    if (hasSizeMismatch) {
-      // Always fail test on image size mismatch
-      pass = false;
-    } else if (failureThresholdType === 'pixel') {
-      pass = diffPixelCount <= failureThreshold;
-    } else if (failureThresholdType === 'percent') {
-      pass = diffRatio <= failureThreshold;
-    } else {
-      throw new Error(`Unknown failureThresholdType: ${failureThresholdType}. Valid options are "pixel" or "percent".`);
+    let diffRatio = 1;
+    let diffPixelCount = 0;
+
+    const recievedImageHash = createHash('sha1-base64');
+    const baselineImageHash = createHash('sha1-base64');
+
+    const recievedImageDigest = recievedImageHash.update(rawReceivedImage.data).digest('hex');
+    const baselineImageDigest = baselineImageHash.update(rawBaselineImage.data).digest('hex');
+
+    pass = recievedImageDigest === baselineImageDigest;
+
+    if (!pass && !hasSizeMismatch) {
+      const diffImage = new PNG({ width: imageWidth, height: imageHeight });
+
+      diffPixelCount = pixelmatch(
+        receivedImage.data,
+        baselineImage.data,
+        diffImage.data,
+        imageWidth,
+        imageHeight,
+        diffConfig
+      );
+
+      const totalPixels = imageWidth * imageHeight;
+      diffRatio = diffPixelCount / totalPixels;
+
+      
+      if (failureThresholdType === 'pixel') {
+        pass = diffPixelCount <= failureThreshold;
+      } else if (failureThresholdType === 'percent') {
+        pass = diffRatio <= failureThreshold;
+      } else {
+        throw new Error(`Unknown failureThresholdType: ${failureThresholdType}. Valid options are "pixel" or "percent".`);
+      }
     }
 
     if (isFailure({ pass, updateSnapshot })) {
