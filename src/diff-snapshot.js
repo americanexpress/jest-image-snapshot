@@ -125,7 +125,7 @@ function diffImageToSnapshot(options) {
     const imageHeight = receivedImage.height;
 
     let pass = false;
-    let diffRatio = 1;
+    let diffRatio = 0;
     let diffPixelCount = 0;
 
     const recievedImageHash = createHash('sha256');
