@@ -92,6 +92,7 @@ function diffImageToSnapshot(options) {
     customDiffConfig = {},
     failureThreshold,
     failureThresholdType,
+    checksum
   } = options;
 
   let result = {};
@@ -128,10 +129,12 @@ function diffImageToSnapshot(options) {
     let diffRatio = 0;
     let diffPixelCount = 0;
 
-    const recievedImageDigest = createHash('sha1').update(rawReceivedImage.data).digest('base64');
-    const baselineImageDigest = createHash('sha1').update(rawBaselineImage.data).digest('base64');
+    if (checksum) {
+      const recievedImageDigest = createHash('sha1').update(rawReceivedImage.data).digest('base64');
+      const baselineImageDigest = createHash('sha1').update(rawBaselineImage.data).digest('base64');
 
-    pass = recievedImageDigest === baselineImageDigest;
+      pass = recievedImageDigest === baselineImageDigest;
+    }
 
     if (!pass && !hasSizeMismatch) {
       const diffImage = new PNG({ width: imageWidth, height: imageHeight });
