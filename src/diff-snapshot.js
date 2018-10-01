@@ -128,8 +128,8 @@ function diffImageToSnapshot(options) {
     let diffRatio = 1;
     let diffPixelCount = 0;
 
-    const recievedImageHash = createHash('sha1-base64');
-    const baselineImageHash = createHash('sha1-base64');
+    const recievedImageHash = createHash('sha256');
+    const baselineImageHash = createHash('sha256');
 
     const recievedImageDigest = recievedImageHash.update(rawReceivedImage.data).digest('hex');
     const baselineImageDigest = baselineImageHash.update(rawBaselineImage.data).digest('hex');
