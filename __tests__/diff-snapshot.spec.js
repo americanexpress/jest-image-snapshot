@@ -241,6 +241,23 @@ describe('diff-snapshot', () => {
       expect(result.diffRatio).toBe(0.025);
     });
 
+    it('should pass = image checksums', () => {
+      const diffImageToSnapshot = setupTest({ snapshotExists: true, pixelmatchResult: 0 });
+      const result = diffImageToSnapshot({
+        receivedImageBuffer: mockFailImageBuffer,
+        snapshotIdentifier: mockSnapshotIdentifier,
+        snapshotsDir: mockSnapshotsDir,
+        updateSnapshot: false,
+        failureThreshold: 0,
+        failureThresholdType: 'pixel',
+        checksum: true,
+      });
+
+      expect(result.pass).toBe(true);
+      expect(result.diffPixelCount).toBe(0);
+      expect(result.diffRatio).toBe(0);
+    });
+
     it('should fail > failureThreshold pixel', () => {
       const diffImageToSnapshot = setupTest({ snapshotExists: true, pixelmatchResult: 251 });
       const result = diffImageToSnapshot({
@@ -412,7 +429,7 @@ describe('diff-snapshot', () => {
       expect(mockWriteFileSync).toHaveBeenCalledWith(path.join(mockSnapshotsDir, `${mockSnapshotIdentifier}-snap.png`), mockImageBuffer);
     });
 
-    it('should return updated flag is snapshot was updated', () => {
+    it('should return updated flag if snapshot was updated', () => {
       const diffImageToSnapshot = setupTest({ snapshotExists: true });
       const diffResult = diffImageToSnapshot({
         receivedImageBuffer: mockImageBuffer,
@@ -427,7 +444,7 @@ describe('diff-snapshot', () => {
       expect(diffResult).toHaveProperty('updated', true);
     });
 
-    it('should return added flag is snapshot was added', () => {
+    it('should return added flag if snapshot was added', () => {
       const diffImageToSnapshot = setupTest({ snapshotExists: false });
       const diffResult = diffImageToSnapshot({
         receivedImageBuffer: mockImageBuffer,
