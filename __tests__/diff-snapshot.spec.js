@@ -206,6 +206,7 @@ describe('diff-snapshot', () => {
         updateSnapshot: false,
         failureThreshold: 0,
         failureThresholdType: 'pixel',
+        checksum: false,
       });
 
       expect(result).toMatchObject({

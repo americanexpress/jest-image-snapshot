@@ -360,6 +360,7 @@ describe('toMatchImageSnapshot', () => {
       updatePassedSnapshot: false,
       failureThreshold: 0,
       failureThresholdType: 'pixel',
+      checksum: false,
     });
     expect(Chalk).toHaveBeenCalledWith({
       enabled: false,

@@ -92,7 +92,7 @@ function diffImageToSnapshot(options) {
     customDiffConfig = {},
     failureThreshold,
     failureThresholdType,
-    checksum
+    checksum,
   } = options;
 
   let result = {};
@@ -131,13 +131,13 @@ function diffImageToSnapshot(options) {
     let diffPixelCount = 0;
 
     if (checksum) {
-      const recievedImageDigest = createHash('sha1').update(rawReceivedImage.data).digest('base64');
-      const baselineImageDigest = createHash('sha1').update(rawBaselineImage.data).digest('base64');
+      const recievedImageDigest = createHash('sha1').update(receivedImage.data).digest('base64');
+      const baselineImageDigest = createHash('sha1').update(baselineImage.data).digest('base64');
 
       pass = recievedImageDigest === baselineImageDigest;
     }
 
-    if (!pass && !hasSizeMismatch) {
+    if (!pass) {
       diffPixelCount = pixelmatch(
         receivedImage.data,
         baselineImage.data,
@@ -149,9 +149,10 @@ function diffImageToSnapshot(options) {
 
       const totalPixels = imageWidth * imageHeight;
       diffRatio = diffPixelCount / totalPixels;
-
-      
-      if (failureThresholdType === 'pixel') {
+      // Always fail test on image size mismatch
+      if (hasSizeMismatch) {
+        pass = false;
+      } else if (failureThresholdType === 'pixel') {
         pass = diffPixelCount <= failureThreshold;
       } else if (failureThresholdType === 'percent') {
         pass = diffRatio <= failureThreshold;
