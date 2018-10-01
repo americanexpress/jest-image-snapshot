@@ -122,9 +122,9 @@ function diffImageToSnapshot(options) {
     const [receivedImage, baselineImage] = hasSizeMismatch
       ? alignImagesToSameSize(rawReceivedImage, rawBaselineImage)
       : [rawReceivedImage, rawBaselineImage];
-    const diffImage = new PNG({ width: imageWidth, height: imageHeight });
     const imageWidth = receivedImage.width;
     const imageHeight = receivedImage.height;
+    const diffImage = new PNG({ width: imageWidth, height: imageHeight });
 
     let pass = false;
     let diffRatio = 0;
