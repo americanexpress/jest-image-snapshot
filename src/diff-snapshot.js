@@ -122,6 +122,7 @@ function diffImageToSnapshot(options) {
     const [receivedImage, baselineImage] = hasSizeMismatch
       ? alignImagesToSameSize(rawReceivedImage, rawBaselineImage)
       : [rawReceivedImage, rawBaselineImage];
+    const diffImage = new PNG({ width: imageWidth, height: imageHeight });
     const imageWidth = receivedImage.width;
     const imageHeight = receivedImage.height;
 
@@ -137,8 +138,6 @@ function diffImageToSnapshot(options) {
     }
 
     if (!pass && !hasSizeMismatch) {
-      const diffImage = new PNG({ width: imageWidth, height: imageHeight });
-
       diffPixelCount = pixelmatch(
         receivedImage.data,
         baselineImage.data,
