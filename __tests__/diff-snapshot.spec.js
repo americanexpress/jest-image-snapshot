@@ -245,7 +245,7 @@ describe('diff-snapshot', () => {
     it('should pass = image checksums', () => {
       const diffImageToSnapshot = setupTest({ snapshotExists: true, pixelmatchResult: 0 });
       const result = diffImageToSnapshot({
-        receivedImageBuffer: mockFailImageBuffer,
+        receivedImageBuffer: mockImageBuffer,
         snapshotIdentifier: mockSnapshotIdentifier,
         snapshotsDir: mockSnapshotsDir,
         updateSnapshot: false,
@@ -257,6 +257,24 @@ describe('diff-snapshot', () => {
       expect(result.pass).toBe(true);
       expect(result.diffPixelCount).toBe(0);
       expect(result.diffRatio).toBe(0);
+    });
+
+    it('should run pixelmatch != image checksums', () => {
+      const diffImageToSnapshot = setupTest({ snapshotExists: true, pixelmatchResult: 250 });
+      const result = diffImageToSnapshot({
+        receivedImageBuffer: mockFailImageBuffer,
+        snapshotIdentifier: mockSnapshotIdentifier,
+        snapshotsDir: mockSnapshotsDir,
+        updateSnapshot: false,
+        failureThreshold: 250,
+        failureThresholdType: 'pixel',
+        checksum: true,
+      });
+
+      expect(mockPixelMatch).toHaveBeenCalledTimes(1);
+      expect(result.pass).toBe(true);
+      expect(result.diffPixelCount).toBe(250);
+      expect(result.diffRatio).toBe(0.025);
     });
 
     it('should fail > failureThreshold pixel', () => {
