@@ -200,7 +200,7 @@ function runDiffImageToSnapshot(options) {
   let result = {};
 
   const writeDiffProcess = childProcess.spawnSync(
-    'node', [`${__dirname}/diff-process.js`],
+    process.execPath, [`${__dirname}/diff-process.js`],
     { input: Buffer.from(serializedInput), stdio: ['pipe', 'inherit', 'inherit', 'pipe'] }
   );
 
