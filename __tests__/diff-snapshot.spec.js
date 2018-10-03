@@ -133,15 +133,6 @@ describe('diff-snapshot', () => {
         diffPixelCount: 0,
         pass: true,
       });
-      expect(mockPixelMatch).toHaveBeenCalledTimes(1);
-      expect(mockPixelMatch).toHaveBeenCalledWith(
-        expect.any(Buffer),
-        expect.any(Buffer),
-        expect.any(Buffer),
-        100,
-        100,
-        { threshold: 0.01 }
-      );
     });
 
     it('it should not write a diff if a test passes', () => {
@@ -161,8 +152,6 @@ describe('diff-snapshot', () => {
         diffPixelCount: 0,
         pass: true,
       });
-      // Check that pixelmatch was called
-      expect(mockPixelMatch).toHaveBeenCalledTimes(1);
       // Check that that it did not attempt to write a diff
       expect(mockWriteFileSync.mock.calls).toEqual([]);
     });
@@ -206,7 +195,6 @@ describe('diff-snapshot', () => {
         updateSnapshot: false,
         failureThreshold: 0,
         failureThresholdType: 'pixel',
-        checksum: false,
       });
 
       expect(result).toMatchObject({
@@ -251,7 +239,6 @@ describe('diff-snapshot', () => {
         updateSnapshot: false,
         failureThreshold: 0,
         failureThresholdType: 'pixel',
-        checksum: true,
       });
 
       expect(result.pass).toBe(true);
@@ -268,7 +255,6 @@ describe('diff-snapshot', () => {
         updateSnapshot: false,
         failureThreshold: 250,
         failureThresholdType: 'pixel',
-        checksum: true,
       });
 
       expect(mockPixelMatch).toHaveBeenCalledTimes(1);
@@ -336,8 +322,6 @@ describe('diff-snapshot', () => {
         failureThreshold: 0,
         failureThresholdType: 'pixel',
       });
-      expect(mockPixelMatch).toHaveBeenCalledTimes(1);
-      expect(mockPixelMatch.mock.calls[0][5]).toMatchSnapshot();
     });
 
     it('should merge custom configuration with default configuration if custom config is passed', () => {
@@ -355,8 +339,6 @@ describe('diff-snapshot', () => {
         failureThreshold: 0,
         failureThresholdType: 'pixel',
       });
-      expect(mockPixelMatch).toHaveBeenCalledTimes(1);
-      expect(mockPixelMatch.mock.calls[0][5]).toMatchSnapshot();
     });
 
     it('should create diff output directory if there is not one already and test is failing', () => {
@@ -366,7 +348,7 @@ describe('diff-snapshot', () => {
         pixelmatchResult: 100,
       });
       diffImageToSnapshot({
-        receivedImageBuffer: mockImageBuffer,
+        receivedImageBuffer: mockFailImageBuffer,
         snapshotIdentifier: mockSnapshotIdentifier,
         snapshotsDir: mockSnapshotsDir,
         failureThreshold: 0,
@@ -500,7 +482,7 @@ describe('diff-snapshot', () => {
 
       expect(() => {
         diffImageToSnapshot({
-          receivedImageBuffer: mockImageBuffer,
+          receivedImageBuffer: mockFailImageBuffer,
           snapshotIdentifier: mockSnapshotIdentifier,
           snapshotsDir: mockSnapshotsDir,
           updateSnapshot: false,
