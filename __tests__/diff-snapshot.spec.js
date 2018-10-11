@@ -133,6 +133,8 @@ describe('diff-snapshot', () => {
         diffPixelCount: 0,
         pass: true,
       });
+      // Check that pixelmatch was not called
+      expect(mockPixelMatch).not.toHaveBeenCalled();
     });
 
     it('it should not write a diff if a test passes', () => {
@@ -152,6 +154,9 @@ describe('diff-snapshot', () => {
         diffPixelCount: 0,
         pass: true,
       });
+      // Check that pixelmatch was not called
+      expect(mockPixelMatch).not.toHaveBeenCalled();
+
       // Check that that it did not attempt to write a diff
       expect(mockWriteFileSync.mock.calls).toEqual([]);
     });
@@ -322,6 +327,9 @@ describe('diff-snapshot', () => {
         failureThreshold: 0,
         failureThresholdType: 'pixel',
       });
+
+      // Check that pixelmatch was not called
+      expect(mockPixelMatch).not.toHaveBeenCalled();
     });
 
     it('should merge custom configuration with default configuration if custom config is passed', () => {
@@ -339,6 +347,9 @@ describe('diff-snapshot', () => {
         failureThreshold: 0,
         failureThresholdType: 'pixel',
       });
+
+      // Check that pixelmatch was not called
+      expect(mockPixelMatch).not.toHaveBeenCalled();
     });
 
     it('should create diff output directory if there is not one already and test is failing', () => {
