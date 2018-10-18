@@ -129,10 +129,10 @@ function diffImageToSnapshot(options) {
     let diffRatio = 0;
     let diffPixelCount = 0;
 
-    const recievedImageDigest = createHash('sha1').update(receivedImage.data).digest('base64');
+    const receivedImageDigest = createHash('sha1').update(receivedImage.data).digest('base64');
     const baselineImageDigest = createHash('sha1').update(baselineImage.data).digest('base64');
 
-    pass = recievedImageDigest === baselineImageDigest;
+    pass = receivedImageDigest === baselineImageDigest;
 
     if (!pass) {
       diffPixelCount = pixelmatch(
