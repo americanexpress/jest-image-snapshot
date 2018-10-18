@@ -1,16 +1,3 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`diff-snapshot diffImageToSnapshot should merge custom configuration with default configuration if custom config is passed 1`] = `
-Object {
-  "foo": "bar",
-  "threshold": 0.1,
-}
-`;
-
-exports[`diff-snapshot diffImageToSnapshot should take the default diff config 1`] = `
-Object {
-  "threshold": 0.01,
-}
-`;
-
 exports[`diff-snapshot diffImageToSnapshot should throw an error if an unknown threshold type is supplied 1`] = `"Unknown failureThresholdType: banana. Valid options are \\"pixel\\" or \\"percent\\"."`;
