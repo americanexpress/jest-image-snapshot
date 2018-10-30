@@ -93,6 +93,29 @@ describe('toMatchImageSnapshot', () => {
       .toThrowErrorMatchingSnapshot();
   });
 
+  it('should fail when snapshot is a different size than the baseline', () => {
+    const mockDiffResult = {
+      pass: false,
+      diffSize: true,
+      imageDimensions: {
+        receivedHeight: 100,
+        receivedWidth: 100,
+        baselineHeight: 10,
+        baselineWidth: 10,
+      },
+      diffOutputPath: 'path/to/result.png',
+      diffRatio: 0.8,
+      diffPixelCount: 600,
+    };
+
+    setupMock(mockDiffResult);
+    const { toMatchImageSnapshot } = require('../src/index');
+    expect.extend({ toMatchImageSnapshot });
+
+    expect(() => expect('pretendthisisanimagebuffer').toMatchImageSnapshot())
+      .toThrow(/Expected image to be the same size as the snapshot/);
+  });
+
   it('should use noColors options if passed as true and not style error message', () => {
     const mockDiffResult = {
       pass: false,

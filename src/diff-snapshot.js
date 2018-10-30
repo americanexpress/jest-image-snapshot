@@ -117,6 +117,12 @@ function diffImageToSnapshot(options) {
       rawReceivedImage.height !== rawBaselineImage.height ||
       rawReceivedImage.width !== rawBaselineImage.width
     );
+    const imageDimensions = {
+      receivedHeight: rawReceivedImage.height,
+      receivedWidth: rawReceivedImage.width,
+      baselineHeight: rawBaselineImage.height,
+      baselineWidth: rawBaselineImage.width,
+    };
     // Align images in size if different
     const [receivedImage, baselineImage] = hasSizeMismatch
       ? alignImagesToSameSize(rawReceivedImage, rawBaselineImage)
@@ -126,6 +132,7 @@ function diffImageToSnapshot(options) {
     const diffImage = new PNG({ width: imageWidth, height: imageHeight });
 
     let pass = false;
+    let diffSize = false;
     let diffRatio = 0;
     let diffPixelCount = 0;
 
@@ -149,6 +156,7 @@ function diffImageToSnapshot(options) {
       // Always fail test on image size mismatch
       if (hasSizeMismatch) {
         pass = false;
+        diffSize = true;
       } else if (failureThresholdType === 'pixel') {
         pass = diffPixelCount <= failureThreshold;
       } else if (failureThresholdType === 'percent') {
@@ -181,6 +189,8 @@ function diffImageToSnapshot(options) {
 
       result = {
         pass: false,
+        diffSize,
+        imageDimensions,
         diffOutputPath,
         diffRatio,
         diffPixelCount,

@@ -182,7 +182,7 @@ describe('toMatchImageSnapshot', () => {
       ).toThrowError(expectedError);
     });
 
-    it('fails with a differently sized images and outputs diff', () => {
+    it('fails with differently sized images and outputs diff', () => {
       const customSnapshotIdentifier = getIdentifierIndicatingCleanupIsRequired();
 
       // First we need to write a new snapshot image
@@ -193,7 +193,7 @@ describe('toMatchImageSnapshot', () => {
       // Test against an image much larger than the snapshot.
       expect(
         () => expect(oversizeImageData).toMatchImageSnapshot({ customSnapshotIdentifier })
-      ).toThrowError(/Expected image to match or be a close match to snapshot but was 83\.85395537525355% different from snapshot/);
+      ).toThrowError(/Expected image to be the same size as the snapshot \(100x100\), but was different \(153x145\)/);
 
       expect(diffExists(customSnapshotIdentifier)).toBe(true);
     });
@@ -207,7 +207,7 @@ describe('toMatchImageSnapshot', () => {
 
       expect(
         () => expect(biggerImageData).toMatchImageSnapshot({ customSnapshotIdentifier })
-      ).toThrowError(/Expected image to match or be a close match to snapshot but was 54\.662222222222226% different from snapshot/);
+      ).toThrowError(/Expected image to be the same size as the snapshot \(100x100\), but was different \(150x150\)/);
 
       expect(diffExists(customSnapshotIdentifier)).toBe(true);
     });
