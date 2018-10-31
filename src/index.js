@@ -31,6 +31,7 @@ function updateSnapshotState(originalSnapshotState, partialSnapshotState) {
 function configureToMatchImageSnapshot({
   customDiffConfig: commonCustomDiffConfig = {},
   customSnapshotsDir: commonCustomSnapshotsDir,
+  customDiffDir: commonCustomDiffDir,
   noColors: commonNoColors = false,
   failureThreshold: commonFailureThreshold = 0,
   failureThresholdType: commonFailureThresholdType = 'pixel',
@@ -39,6 +40,7 @@ function configureToMatchImageSnapshot({
   return function toMatchImageSnapshot(received, {
     customSnapshotIdentifier = '',
     customSnapshotsDir = commonCustomSnapshotsDir,
+    customDiffDir = commonCustomDiffDir,
     customDiffConfig = {},
     noColors = commonNoColors,
     failureThreshold = commonFailureThreshold,
@@ -56,6 +58,7 @@ function configureToMatchImageSnapshot({
     const snapshotIdentifier = customSnapshotIdentifier || kebabCase(`${path.basename(testPath)}-${currentTestName}-${snapshotState._counters.get(currentTestName)}`);
 
     const snapshotsDir = customSnapshotsDir || path.join(path.dirname(testPath), SNAPSHOTS_DIR);
+    const diffDir = customDiffDir || path.join(snapshotsDir, '__diff_output__');
     const baselineSnapshotPath = path.join(snapshotsDir, `${snapshotIdentifier}-snap.png`);
 
     if (snapshotState._updateSnapshot === 'none' && !fs.existsSync(baselineSnapshotPath)) {
@@ -71,6 +74,7 @@ function configureToMatchImageSnapshot({
       runDiffImageToSnapshot({
         receivedImageBuffer: received,
         snapshotsDir,
+        diffDir,
         snapshotIdentifier,
         updateSnapshot: snapshotState._updateSnapshot === 'all',
         customDiffConfig: Object.assign({}, commonCustomDiffConfig, customDiffConfig),
