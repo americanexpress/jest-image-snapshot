@@ -366,6 +366,7 @@ describe('toMatchImageSnapshot', () => {
     const toMatchImageSnapshot = configureToMatchImageSnapshot({
       customDiffConfig: customConfig,
       customSnapshotsDir: path.join('path', 'to', 'my-custom-snapshots-dir'),
+      customDiffDir: path.join('path', 'to', 'my-custom-diff-dir'),
       noColors: true,
     });
     expect.extend({ toMatchImageSnapshot });
@@ -379,6 +380,7 @@ describe('toMatchImageSnapshot', () => {
       },
       snapshotIdentifier: 'test-spec-js-test-1-1',
       snapshotsDir: path.join('path', 'to', 'my-custom-snapshots-dir'),
+      diffDir: path.join('path', 'to', 'my-custom-diff-dir'),
       updateSnapshot: false,
       updatePassedSnapshot: false,
       failureThreshold: 0,
