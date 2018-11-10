@@ -31,6 +31,7 @@ function updateSnapshotState(originalSnapshotState, partialSnapshotState) {
 function configureToMatchImageSnapshot({
   customDiffConfig: commonCustomDiffConfig = {},
   customSnapshotsDir: commonCustomSnapshotsDir,
+  customSnapshotsFolderName: commonCustomSnapshotsFolderName,
   customDiffDir: commonCustomDiffDir,
   noColors: commonNoColors = false,
   failureThreshold: commonFailureThreshold = 0,
@@ -40,6 +41,7 @@ function configureToMatchImageSnapshot({
   return function toMatchImageSnapshot(received, {
     customSnapshotIdentifier = '',
     customSnapshotsDir = commonCustomSnapshotsDir,
+    customSnapshotsFolderName = commonCustomSnapshotsFolderName,
     customDiffDir = commonCustomDiffDir,
     customDiffConfig = {},
     noColors = commonNoColors,
@@ -57,7 +59,7 @@ function configureToMatchImageSnapshot({
     updateSnapshotState(snapshotState, { _counters: snapshotState._counters.set(currentTestName, (snapshotState._counters.get(currentTestName) || 0) + 1) }); // eslint-disable-line max-len
     const snapshotIdentifier = customSnapshotIdentifier || kebabCase(`${path.basename(testPath)}-${currentTestName}-${snapshotState._counters.get(currentTestName)}`);
 
-    const snapshotsDir = customSnapshotsDir || path.join(path.dirname(testPath), SNAPSHOTS_DIR);
+    const snapshotsDir = customSnapshotsDir || path.join(path.dirname(testPath), (customSnapshotsFolderName || SNAPSHOTS_DIR)); // eslint-disable-line max-len
     const diffDir = customDiffDir || path.join(snapshotsDir, '__diff_output__');
     const baselineSnapshotPath = path.join(snapshotsDir, `${snapshotIdentifier}-snap.png`);
 

@@ -39,6 +39,7 @@ See [the examples](./examples/README.md) for more detailed usage or read about a
   * By default we have set the `threshold` to 0.01, you can increase that value by passing a customDiffConfig as demonstrated below.
   * Please note the `threshold` set in the `customDiffConfig` is the per pixel sensitivity threshold. For example with a source pixel colour of `#ffffff` (white) and a comparison pixel colour of `#fcfcfc` (really light grey) if you set the threshold to 0 then it would trigger a failure *on that pixel*. However if you were to use say 0.5 then it wouldn't, the colour difference would need to be much more extreme to trigger a failure on that pixel, say `#000000` (black)
 * `customSnapshotsDir`: A custom absolute path of a directory to keep this snapshot in
+* `customSnapshotsFolderName`: A custom name of a snapshots folder
 * `customDiffDir`: A custom absolute path of a directory to keep this diff in
 * `customSnapshotIdentifier`: A custom name to give this snapshot. If not provided one is computed automatically
 * `noColors`: (default `false`) Removes colouring from console output, useful if storing the results in a file
