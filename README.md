@@ -131,6 +131,7 @@ To enable this image reporter, add it to your `jest.config.js` "reporters" defin
   Thanks `jest-image-snapshot`, that broken header would not have looked good in production!
 
   ## Contributing
+  
   We welcome Your interest in the American Express Open Source Community on Github.
   Any Contributor to any Open Source Project managed by the American Express Open
   Source Community must accept and sign an Agreement indicating agreement to the
@@ -142,9 +143,11 @@ To enable this image reporter, add it to your `jest.config.js` "reporters" defin
   Please feel free to open pull requests and see [CONTRIBUTING.md](./CONTRIBUTING.md) for commit formatting details.
 
   ## License
+  
   Any contributions made under this project will be governed by the [Apache License
   2.0](https://github.com/americanexpress/jest-image-snapshot/blob/master/LICENSE.txt).
 
   ## Code of Conduct
+  
   This project adheres to the [American Express Community Guidelines](https://github.com/americanexpress/jest-image-snapshot/wiki/Code-of-Conduct).
   By participating, you are expected to honor these guidelines.
