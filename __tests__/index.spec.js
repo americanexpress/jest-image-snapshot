@@ -192,6 +192,7 @@ describe('toMatchImageSnapshot', () => {
     const dataArg = runDiffImageToSnapshot.mock.calls[0][0];
     // This is to make the test work on windows
     dataArg.snapshotsDir = dataArg.snapshotsDir.replace(/\\/g, '/');
+    dataArg.diffDir = dataArg.diffDir.replace(/\\/g, '/');
 
     expect(dataArg).toMatchSnapshot();
   });
