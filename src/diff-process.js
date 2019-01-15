@@ -26,7 +26,7 @@ getStdin.buffer().then((buffer) => {
 
     const result = diffImageToSnapshot(options);
 
-    fs.writeSync(3, Buffer.from(JSON.stringify(result)));
+    fs.writeSync(3, JSON.stringify(result));
 
     process.exit(0);
   } catch (error) {
