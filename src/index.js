@@ -57,7 +57,7 @@ function configureToMatchImageSnapshot({
     const retryTimes = global[Symbol.for('RETRY_TIMES')];
 
     if (retryTimes && !customSnapshotIdentifier) {
-      throw new Error('customSnapshotIdentifier must be set when jest.retryTimes() is used');
+      throw new Error('A unique customSnapshotIdentifier must be set when jest.retryTimes() is used');
     }
 
     if (isNot) { throw new Error('Jest: `.not` cannot be used with `.toMatchImageSnapshot()`.'); }

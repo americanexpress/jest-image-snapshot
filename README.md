@@ -84,7 +84,7 @@ expect.extend({ toMatchImageSnapshot });
 ```
 
 ### jest.retryTimes()
-Jest supports automatic retries on test failures https://jestjs.io/docs/en/jest-object#jestretrytimes. This can be useful for browser screenshot tests which tend to have more frequent false positives. Note that when using jest.retryTimes you'll have to use customSnapshotIdentifier as that's the only way to reliably identify snapshots.
+Jest supports automatic retries on test failures https://jestjs.io/docs/en/jest-object#jestretrytimes. This can be useful for browser screenshot tests which tend to have more frequent false positives. Note that when using jest.retryTimes you'll have to use a unique customSnapshotIdentifier as that's the only way to reliably identify snapshots.
 
 ### Recipes
 
