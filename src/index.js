@@ -19,6 +19,8 @@ const Chalk = require('chalk').constructor;
 const { runDiffImageToSnapshot } = require('./diff-snapshot');
 const fs = require('fs');
 
+const timesCalled = new Map();
+
 const SNAPSHOTS_DIR = '__image_snapshots__';
 
 function updateSnapshotState(originalSnapshotState, partialSnapshotState) {
@@ -52,10 +54,23 @@ function configureToMatchImageSnapshot({
     } = this;
     const chalk = new Chalk({ enabled: !noColors });
 
+    const retryTimes = global[Symbol.for('RETRY_TIMES')];
+
+    if (retryTimes && !customSnapshotIdentifier) {
+      throw new Error('customSnapshotIdentifier must be set when jest.retryTimes() is used');
+    };
+
     if (isNot) { throw new Error('Jest: `.not` cannot be used with `.toMatchImageSnapshot()`.'); }
 
     updateSnapshotState(snapshotState, { _counters: snapshotState._counters.set(currentTestName, (snapshotState._counters.get(currentTestName) || 0) + 1) }); // eslint-disable-line max-len
-    const snapshotIdentifier = customSnapshotIdentifier || kebabCase(`${path.basename(testPath)}-${currentTestName}-${snapshotState._counters.get(currentTestName)}`);
+
+    let snapshotIdentifier;
+    if (retryTimes) {
+      snapshotIdentifier = kebabCase(`${path.basename(testPath)}-${currentTestName}-${customSnapshotIdentifier}`);
+      timesCalled.set(snapshotIdentifier, (timesCalled.get(snapshotIdentifier) || 0) + 1);
+    } else {
+      snapshotIdentifier = customSnapshotIdentifier || kebabCase(`${path.basename(testPath)}-${currentTestName}-${snapshotState._counters.get(currentTestName)}`);
+    }
 
     const snapshotsDir = customSnapshotsDir || path.join(path.dirname(testPath), SNAPSHOTS_DIR);
     const diffDir = customDiffDir || path.join(snapshotsDir, '__diff_output__');
@@ -98,6 +113,9 @@ function configureToMatchImageSnapshot({
       updateSnapshotState(snapshotState, { added: snapshotState.added + 1 });
     } else {
       ({ pass } = result);
+
+      const currentRun = timesCalled.get(currentTestName);
+      if (retryTimes && (currentRun <= retryTimes)) { pass = true }
 
       if (!pass) {
         updateSnapshotState(snapshotState, { unmatched: snapshotState.unmatched + 1 });
