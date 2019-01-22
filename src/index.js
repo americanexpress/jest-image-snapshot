@@ -114,11 +114,14 @@ function configureToMatchImageSnapshot({
     } else {
       ({ pass } = result);
 
-      const currentRun = timesCalled.get(currentTestName);
-      if (retryTimes && (currentRun <= retryTimes)) { pass = true }
-
       if (!pass) {
-        updateSnapshotState(snapshotState, { unmatched: snapshotState.unmatched + 1 });
+        const currentRun = timesCalled.get(snapshotIdentifier);
+        if (retryTimes && (currentRun <= retryTimes)) {
+          console.warn(`${currentTestName} failed, retrying ${(retryTimes + 1) - currentRun} more time(s)`);
+        } else {
+          updateSnapshotState(snapshotState, { unmatched: snapshotState.unmatched + 1 });
+        }
+
         const differencePercentage = result.diffRatio * 100;
         message = () => {
           let failure;
