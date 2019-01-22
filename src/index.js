@@ -58,7 +58,7 @@ function configureToMatchImageSnapshot({
 
     if (retryTimes && !customSnapshotIdentifier) {
       throw new Error('customSnapshotIdentifier must be set when jest.retryTimes() is used');
-    };
+    }
 
     if (isNot) { throw new Error('Jest: `.not` cannot be used with `.toMatchImageSnapshot()`.'); }
 
@@ -117,6 +117,7 @@ function configureToMatchImageSnapshot({
       if (!pass) {
         const currentRun = timesCalled.get(snapshotIdentifier);
         if (retryTimes && (currentRun <= retryTimes)) {
+          // eslint-disable-next-line no-console
           console.warn(`${currentTestName} failed, retrying ${(retryTimes + 1) - currentRun} more time(s)`);
         } else {
           updateSnapshotState(snapshotState, { unmatched: snapshotState.unmatched + 1 });

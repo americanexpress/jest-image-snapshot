@@ -25,3 +25,5 @@ exports[`toMatchImageSnapshot should use noColors options if passed as true and 
 "Expected image to match or be a close match to snapshot but was 40% different from snapshot (600 differing pixels).
 See diff for details: path/to/result.png"
 `;
+
+exports[`toMatchImageSnapshot when retryTimes is set should throw an error when called without customSnapshotIdentifier 1`] = `"customSnapshotIdentifier must be set when jest.retryTimes() is used"`;

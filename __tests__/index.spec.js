@@ -390,6 +390,91 @@ describe('toMatchImageSnapshot', () => {
       enabled: false,
     });
   });
+
+  describe('when retryTimes is set', () => {
+    beforeEach(() => { global[Symbol.for('RETRY_TIMES')] = 3; });
+    afterEach(() => { global[Symbol.for('RETRY_TIMES')] = undefined; });
+
+    it('should throw an error when called without customSnapshotIdentifier', () => {
+      const mockDiffResult = {
+        pass: true,
+        diffOutputPath: 'path/to/result.png',
+        diffRatio: 0,
+        diffPixelCount: 0,
+      };
+
+      setupMock(mockDiffResult);
+      const { toMatchImageSnapshot } = require('../src/index');
+      expect.extend({ toMatchImageSnapshot });
+
+      expect(() => expect('pretendthisisanimagebuffer').toMatchImageSnapshot())
+        .toThrowErrorMatchingSnapshot();
+    });
+
+    it('should identify the snapshot by testpath, testname, and customSnapshotIdentifier', () => {
+      const mockTestContext = {
+        testPath: 'path/to/test.spec.js',
+        currentTestName: 'test',
+        isNot: false,
+        snapshotState: {
+          _counters: new Map(),
+          _updateSnapshot: 'new',
+          updated: undefined,
+          added: true,
+        },
+      };
+
+      const mockDiffResult = {
+        pass: true,
+        diffOutputPath: 'path/to/result.png',
+        diffRatio: 0,
+        diffPixelCount: 0,
+      };
+
+      setupMock(mockDiffResult);
+      const { toMatchImageSnapshot } = require('../src/index');
+      const matcherAtTest = toMatchImageSnapshot.bind(mockTestContext);
+
+      matcherAtTest('pretendthisisanimagebuffer', { customSnapshotIdentifier: 'custom-name' });
+      const { runDiffImageToSnapshot } = require('../src/diff-snapshot');
+
+      expect(runDiffImageToSnapshot.mock.calls[0][0].snapshotIdentifier).toBe('test-spec-js-test-custom-name');
+    });
+
+    it('should warn when a test fails, but there are retries left', () => { /* eslint-disable no-console */
+      const originalWarn = console.warn;
+
+      console.warn = jest.fn();
+
+      const mockTestContext = {
+        testPath: 'path/to/test.spec.js',
+        currentTestName: 'test',
+        isNot: false,
+        snapshotState: {
+          _counters: new Map(),
+          _updateSnapshot: 'new',
+          updated: undefined,
+          added: true,
+        },
+      };
+
+      const mockDiffResult = {
+        pass: false,
+        diffOutputPath: 'path/to/result.png',
+        diffRatio: 0.8,
+        diffPixelCount: 600,
+      };
+
+      setupMock(mockDiffResult);
+      const { toMatchImageSnapshot } = require('../src/index');
+      const matcherAtTest = toMatchImageSnapshot.bind(mockTestContext);
+
+      matcherAtTest('pretendthisisanimagebuffer', { customSnapshotIdentifier: 'custom-name' });
+
+      expect(console.warn).toHaveBeenCalledWith('test failed, retrying 3 more time(s)');
+      console.warn = originalWarn;
+    }); /* eslint-enable no-console */
+  });
 });
 
 describe('updateSnapshotState', () => {
