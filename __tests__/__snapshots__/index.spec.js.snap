@@ -4,6 +4,7 @@ exports[`toMatchImageSnapshot passes diffImageToSnapshot everything it needs to 
 Object {
   "customDiffConfig": Object {},
   "diffDir": "path/to/__image_snapshots__/__diff_output__",
+  "diffDirection": "horizontal",
   "failureThreshold": 0,
   "failureThresholdType": "pixel",
   "receivedImageBuffer": "pretendthisisanimagebuffer",

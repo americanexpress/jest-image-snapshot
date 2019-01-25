@@ -381,6 +381,7 @@ describe('toMatchImageSnapshot', () => {
       snapshotIdentifier: 'test-spec-js-test-1-1',
       snapshotsDir: path.join('path', 'to', 'my-custom-snapshots-dir'),
       diffDir: path.join('path', 'to', 'my-custom-diff-dir'),
+      diffDirection: 'horizontal',
       updateSnapshot: false,
       updatePassedSnapshot: false,
       failureThreshold: 0,
