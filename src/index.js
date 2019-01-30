@@ -30,6 +30,61 @@ function updateSnapshotState(originalSnapshotState, partialSnapshotState) {
   return merge(originalSnapshotState, partialSnapshotState);
 }
 
+function checkResult({
+  result,
+  snapshotState,
+  retryTimes,
+  snapshotIdentifier,
+  currentTestName,
+  chalk,
+}) {
+  let pass = true;
+  /*
+    istanbul ignore next
+    `message` is implementation detail. Actual behavior is tested in integration.spec.js
+  */
+  let message = () => '';
+
+  if (result.updated) {
+    // once transition away from jasmine is done this will be a lot more elegant and pure
+    // https://github.com/facebook/jest/pull/3668
+    updateSnapshotState(snapshotState, { updated: snapshotState.updated + 1 });
+  } else if (result.added) {
+    updateSnapshotState(snapshotState, { added: snapshotState.added + 1 });
+  } else {
+    ({ pass } = result);
+
+    if (!pass) {
+      const currentRun = timesCalled.get(snapshotIdentifier);
+      if (retryTimes && (currentRun <= retryTimes)) {
+        // eslint-disable-next-line no-console
+        console.warn(`${currentTestName} failed, retrying ${(retryTimes + 1) - currentRun} more time(s)`);
+      } else {
+        updateSnapshotState(snapshotState, { unmatched: snapshotState.unmatched + 1 });
+      }
+
+      const differencePercentage = result.diffRatio * 100;
+      message = () => {
+        let failure;
+        if (result.diffSize) {
+          failure = `Expected image to be the same size as the snapshot (${result.imageDimensions.baselineWidth}x${result.imageDimensions.baselineHeight}), but was different (${result.imageDimensions.receivedWidth}x${result.imageDimensions.receivedHeight}).\n`
+          + `${chalk.bold.red('See diff for details:')} ${chalk.red(result.diffOutputPath)}`;
+        } else {
+          failure = `Expected image to match or be a close match to snapshot but was ${differencePercentage}% different from snapshot (${result.diffPixelCount} differing pixels).\n`
+          + `${chalk.bold.red('See diff for details:')} ${chalk.red(result.diffOutputPath)}`;
+        }
+
+        return failure;
+      };
+    }
+  }
+
+  return {
+    message,
+    pass,
+  };
+}
+
 function configureToMatchImageSnapshot({
   customDiffConfig: commonCustomDiffConfig = {},
   customSnapshotsDir: commonCustomSnapshotsDir,
@@ -98,51 +153,14 @@ function configureToMatchImageSnapshot({
         updatePassedSnapshot,
       });
 
-    let pass = true;
-    /*
-      istanbul ignore next
-      `message` is implementation detail. Actual behavior is tested in integration.spec.js
-    */
-    let message = () => '';
-
-    if (result.updated) {
-      // once transition away from jasmine is done this will be a lot more elegant and pure
-      // https://github.com/facebook/jest/pull/3668
-      updateSnapshotState(snapshotState, { updated: snapshotState.updated + 1 });
-    } else if (result.added) {
-      updateSnapshotState(snapshotState, { added: snapshotState.added + 1 });
-    } else {
-      ({ pass } = result);
-
-      if (!pass) {
-        const currentRun = timesCalled.get(snapshotIdentifier);
-        if (retryTimes && (currentRun <= retryTimes)) {
-          // eslint-disable-next-line no-console
-          console.warn(`${currentTestName} failed, retrying ${(retryTimes + 1) - currentRun} more time(s)`);
-        } else {
-          updateSnapshotState(snapshotState, { unmatched: snapshotState.unmatched + 1 });
-        }
-
-        const differencePercentage = result.diffRatio * 100;
-        message = () => {
-          let failure;
-          if (result.diffSize) {
-            failure = `Expected image to be the same size as the snapshot (${result.imageDimensions.baselineWidth}x${result.imageDimensions.baselineHeight}), but was different (${result.imageDimensions.receivedWidth}x${result.imageDimensions.receivedHeight}).\n`
-            + `${chalk.bold.red('See diff for details:')} ${chalk.red(result.diffOutputPath)}`;
-          } else {
-            failure = `Expected image to match or be a close match to snapshot but was ${differencePercentage}% different from snapshot (${result.diffPixelCount} differing pixels).\n`
-            + `${chalk.bold.red('See diff for details:')} ${chalk.red(result.diffOutputPath)}`;
-          }
-
-          return failure;
-        };
-      }
-    }
-
-    return {
-      message,
-      pass,
-    };
+    return checkResult({
+      result,
+      snapshotState,
+      retryTimes,
+      snapshotIdentifier,
+      currentTestName,
+      chalk,
+    });
   };
 }
 
