@@ -123,7 +123,7 @@ function configureToMatchImageSnapshot({
     } = this;
     const chalk = new Chalk({ enabled: !noColors });
 
-    const retryTimes = parseInt(global[Symbol.for('RETRY_TIMES')], 10);
+    const retryTimes = parseInt(global[Symbol.for('RETRY_TIMES')], 10) || 0;
 
     if (retryTimes && !customSnapshotIdentifier) {
       throw new Error('A unique customSnapshotIdentifier must be set when jest.retryTimes() is used');
