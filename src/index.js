@@ -35,7 +35,6 @@ function checkResult({
   snapshotState,
   retryTimes,
   snapshotIdentifier,
-  currentTestName,
   chalk,
 }) {
   let pass = true;
@@ -56,10 +55,7 @@ function checkResult({
 
     if (!pass) {
       const currentRun = timesCalled.get(snapshotIdentifier);
-      if (retryTimes && (currentRun <= retryTimes)) {
-        // eslint-disable-next-line no-console
-        console.warn(`${currentTestName} failed, retrying ${(retryTimes + 1) - currentRun} more time(s)`);
-      } else {
+      if (!retryTimes || (currentRun > retryTimes)) {
         updateSnapshotState(snapshotState, { unmatched: snapshotState.unmatched + 1 });
       }
 
@@ -176,7 +172,6 @@ function configureToMatchImageSnapshot({
       snapshotState,
       retryTimes,
       snapshotIdentifier,
-      currentTestName,
       chalk,
     });
   };

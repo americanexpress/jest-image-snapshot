@@ -441,10 +441,8 @@ describe('toMatchImageSnapshot', () => {
       expect(runDiffImageToSnapshot.mock.calls[0][0].snapshotIdentifier).toBe('test-spec-js-test-custom-name');
     });
 
-    it('should warn when a test fails, but there are retries left', () => { /* eslint-disable no-console */
-      const originalWarn = console.warn;
-
-      console.warn = jest.fn();
+    it('should only increment unmatched when test fails in excess of retryTimes', () => {
+      global.UNSTABLE_SKIP_REPORTING = false;
 
       const mockTestContext = {
         testPath: 'path/to/test.spec.js',
@@ -455,6 +453,7 @@ describe('toMatchImageSnapshot', () => {
           _updateSnapshot: 'new',
           updated: undefined,
           added: true,
+          unmatched: 0,
         },
       };
 
@@ -470,10 +469,11 @@ describe('toMatchImageSnapshot', () => {
       const matcherAtTest = toMatchImageSnapshot.bind(mockTestContext);
 
       matcherAtTest('pretendthisisanimagebuffer', { customSnapshotIdentifier: 'custom-name' });
-
-      expect(console.warn).toHaveBeenCalledWith('test failed, retrying 3 more time(s)');
-      console.warn = originalWarn;
-    }); /* eslint-enable no-console */
+      matcherAtTest('pretendthisisanimagebuffer', { customSnapshotIdentifier: 'custom-name' });
+      matcherAtTest('pretendthisisanimagebuffer', { customSnapshotIdentifier: 'custom-name' });
+      matcherAtTest('pretendthisisanimagebuffer', { customSnapshotIdentifier: 'custom-name' });
+      expect(mockTestContext.snapshotState.unmatched).toBe(1);
+    });
   });
 });
 
