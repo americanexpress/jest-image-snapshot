@@ -85,6 +85,24 @@ function checkResult({
   };
 }
 
+function createSnapshotIdentifier({
+  retryTimes,
+  testPath,
+  currentTestName,
+  customSnapshotIdentifier,
+  snapshotState,
+}) {
+  let snapshotIdentifier;
+  if (retryTimes) {
+    snapshotIdentifier = kebabCase(`${path.basename(testPath)}-${currentTestName}-${customSnapshotIdentifier}`);
+    timesCalled.set(snapshotIdentifier, (timesCalled.get(snapshotIdentifier) || 0) + 1);
+  } else {
+    snapshotIdentifier = customSnapshotIdentifier || kebabCase(`${path.basename(testPath)}-${currentTestName}-${snapshotState._counters.get(currentTestName)}`);
+  }
+
+  return snapshotIdentifier;
+}
+
 function configureToMatchImageSnapshot({
   customDiffConfig: commonCustomDiffConfig = {},
   customSnapshotsDir: commonCustomSnapshotsDir,
@@ -119,13 +137,13 @@ function configureToMatchImageSnapshot({
 
     updateSnapshotState(snapshotState, { _counters: snapshotState._counters.set(currentTestName, (snapshotState._counters.get(currentTestName) || 0) + 1) }); // eslint-disable-line max-len
 
-    let snapshotIdentifier;
-    if (retryTimes) {
-      snapshotIdentifier = kebabCase(`${path.basename(testPath)}-${currentTestName}-${customSnapshotIdentifier}`);
-      timesCalled.set(snapshotIdentifier, (timesCalled.get(snapshotIdentifier) || 0) + 1);
-    } else {
-      snapshotIdentifier = customSnapshotIdentifier || kebabCase(`${path.basename(testPath)}-${currentTestName}-${snapshotState._counters.get(currentTestName)}`);
-    }
+    const snapshotIdentifier = createSnapshotIdentifier({
+      retryTimes,
+      testPath,
+      currentTestName,
+      customSnapshotIdentifier,
+      snapshotState,
+    });
 
     const snapshotsDir = customSnapshotsDir || path.join(path.dirname(testPath), SNAPSHOTS_DIR);
     const diffDir = customDiffDir || path.join(snapshotsDir, '__diff_output__');
