@@ -88,14 +88,12 @@ function createSnapshotIdentifier({
   customSnapshotIdentifier,
   snapshotState,
 }) {
-  let snapshotIdentifier;
+  const snapshotIdentifier = customSnapshotIdentifier || kebabCase(`${path.basename(testPath)}-${currentTestName}-${snapshotState._counters.get(currentTestName)}`);
   if (retryTimes) {
-    snapshotIdentifier = kebabCase(`${path.basename(testPath)}-${currentTestName}-${customSnapshotIdentifier}`);
-    timesCalled.set(snapshotIdentifier, (timesCalled.get(snapshotIdentifier) || 0) + 1);
-  } else {
-    snapshotIdentifier = customSnapshotIdentifier || kebabCase(`${path.basename(testPath)}-${currentTestName}-${snapshotState._counters.get(currentTestName)}`);
-  }
+    if (!customSnapshotIdentifier) throw new Error('A unique customSnapshotIdentifier must be set when jest.retryTimes() is used');
 
+    timesCalled.set(snapshotIdentifier, (timesCalled.get(snapshotIdentifier) || 0) + 1);
+  }
   return snapshotIdentifier;
 }
 
@@ -124,10 +122,6 @@ function configureToMatchImageSnapshot({
     const chalk = new Chalk({ enabled: !noColors });
 
     const retryTimes = parseInt(global[Symbol.for('RETRY_TIMES')], 10) || 0;
-
-    if (retryTimes && !customSnapshotIdentifier) {
-      throw new Error('A unique customSnapshotIdentifier must be set when jest.retryTimes() is used');
-    }
 
     if (isNot) { throw new Error('Jest: `.not` cannot be used with `.toMatchImageSnapshot()`.'); }
 

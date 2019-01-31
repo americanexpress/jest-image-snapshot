@@ -411,36 +411,6 @@ describe('toMatchImageSnapshot', () => {
         .toThrowErrorMatchingSnapshot();
     });
 
-    it('should identify the snapshot by testpath, testname, and customSnapshotIdentifier', () => {
-      const mockTestContext = {
-        testPath: 'path/to/test.spec.js',
-        currentTestName: 'test',
-        isNot: false,
-        snapshotState: {
-          _counters: new Map(),
-          _updateSnapshot: 'new',
-          updated: undefined,
-          added: true,
-        },
-      };
-
-      const mockDiffResult = {
-        pass: true,
-        diffOutputPath: 'path/to/result.png',
-        diffRatio: 0,
-        diffPixelCount: 0,
-      };
-
-      setupMock(mockDiffResult);
-      const { toMatchImageSnapshot } = require('../src/index');
-      const matcherAtTest = toMatchImageSnapshot.bind(mockTestContext);
-
-      matcherAtTest('pretendthisisanimagebuffer', { customSnapshotIdentifier: 'custom-name' });
-      const { runDiffImageToSnapshot } = require('../src/diff-snapshot');
-
-      expect(runDiffImageToSnapshot.mock.calls[0][0].snapshotIdentifier).toBe('test-spec-js-test-custom-name');
-    });
-
     it('should only increment unmatched when test fails in excess of retryTimes', () => {
       global.UNSTABLE_SKIP_REPORTING = false;
 
