@@ -391,6 +391,61 @@ describe('toMatchImageSnapshot', () => {
       enabled: false,
     });
   });
+
+  describe('when retryTimes is set', () => {
+    beforeEach(() => { global[Symbol.for('RETRY_TIMES')] = 3; });
+    afterEach(() => { global[Symbol.for('RETRY_TIMES')] = undefined; });
+
+    it('should throw an error when called without customSnapshotIdentifier', () => {
+      const mockDiffResult = {
+        pass: true,
+        diffOutputPath: 'path/to/result.png',
+        diffRatio: 0,
+        diffPixelCount: 0,
+      };
+
+      setupMock(mockDiffResult);
+      const { toMatchImageSnapshot } = require('../src/index');
+      expect.extend({ toMatchImageSnapshot });
+
+      expect(() => expect('pretendthisisanimagebuffer').toMatchImageSnapshot())
+        .toThrowErrorMatchingSnapshot();
+    });
+
+    it('should only increment unmatched when test fails in excess of retryTimes', () => {
+      global.UNSTABLE_SKIP_REPORTING = false;
+
+      const mockTestContext = {
+        testPath: 'path/to/test.spec.js',
+        currentTestName: 'test',
+        isNot: false,
+        snapshotState: {
+          _counters: new Map(),
+          _updateSnapshot: 'new',
+          updated: undefined,
+          added: true,
+          unmatched: 0,
+        },
+      };
+
+      const mockDiffResult = {
+        pass: false,
+        diffOutputPath: 'path/to/result.png',
+        diffRatio: 0.8,
+        diffPixelCount: 600,
+      };
+
+      setupMock(mockDiffResult);
+      const { toMatchImageSnapshot } = require('../src/index');
+      const matcherAtTest = toMatchImageSnapshot.bind(mockTestContext);
+
+      matcherAtTest('pretendthisisanimagebuffer', { customSnapshotIdentifier: 'custom-name' });
+      matcherAtTest('pretendthisisanimagebuffer', { customSnapshotIdentifier: 'custom-name' });
+      matcherAtTest('pretendthisisanimagebuffer', { customSnapshotIdentifier: 'custom-name' });
+      matcherAtTest('pretendthisisanimagebuffer', { customSnapshotIdentifier: 'custom-name' });
+      expect(mockTestContext.snapshotState.unmatched).toBe(1);
+    });
+  });
 });
 
 describe('updateSnapshotState', () => {

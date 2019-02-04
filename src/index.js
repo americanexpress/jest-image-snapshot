@@ -19,6 +19,8 @@ const Chalk = require('chalk').constructor;
 const { runDiffImageToSnapshot } = require('./diff-snapshot');
 const fs = require('fs');
 
+const timesCalled = new Map();
+
 const SNAPSHOTS_DIR = '__image_snapshots__';
 
 function updateSnapshotState(originalSnapshotState, partialSnapshotState) {
@@ -26,6 +28,73 @@ function updateSnapshotState(originalSnapshotState, partialSnapshotState) {
     return originalSnapshotState;
   }
   return merge(originalSnapshotState, partialSnapshotState);
+}
+
+function checkResult({
+  result,
+  snapshotState,
+  retryTimes,
+  snapshotIdentifier,
+  chalk,
+}) {
+  let pass = true;
+  /*
+    istanbul ignore next
+    `message` is implementation detail. Actual behavior is tested in integration.spec.js
+  */
+  let message = () => '';
+
+  if (result.updated) {
+    // once transition away from jasmine is done this will be a lot more elegant and pure
+    // https://github.com/facebook/jest/pull/3668
+    updateSnapshotState(snapshotState, { updated: snapshotState.updated + 1 });
+  } else if (result.added) {
+    updateSnapshotState(snapshotState, { added: snapshotState.added + 1 });
+  } else {
+    ({ pass } = result);
+
+    if (!pass) {
+      const currentRun = timesCalled.get(snapshotIdentifier);
+      if (!retryTimes || (currentRun > retryTimes)) {
+        updateSnapshotState(snapshotState, { unmatched: snapshotState.unmatched + 1 });
+      }
+
+      const differencePercentage = result.diffRatio * 100;
+      message = () => {
+        let failure;
+        if (result.diffSize) {
+          failure = `Expected image to be the same size as the snapshot (${result.imageDimensions.baselineWidth}x${result.imageDimensions.baselineHeight}), but was different (${result.imageDimensions.receivedWidth}x${result.imageDimensions.receivedHeight}).\n`
+          + `${chalk.bold.red('See diff for details:')} ${chalk.red(result.diffOutputPath)}`;
+        } else {
+          failure = `Expected image to match or be a close match to snapshot but was ${differencePercentage}% different from snapshot (${result.diffPixelCount} differing pixels).\n`
+          + `${chalk.bold.red('See diff for details:')} ${chalk.red(result.diffOutputPath)}`;
+        }
+
+        return failure;
+      };
+    }
+  }
+
+  return {
+    message,
+    pass,
+  };
+}
+
+function createSnapshotIdentifier({
+  retryTimes,
+  testPath,
+  currentTestName,
+  customSnapshotIdentifier,
+  snapshotState,
+}) {
+  const snapshotIdentifier = customSnapshotIdentifier || kebabCase(`${path.basename(testPath)}-${currentTestName}-${snapshotState._counters.get(currentTestName)}`);
+  if (retryTimes) {
+    if (!customSnapshotIdentifier) throw new Error('A unique customSnapshotIdentifier must be set when jest.retryTimes() is used');
+
+    timesCalled.set(snapshotIdentifier, (timesCalled.get(snapshotIdentifier) || 0) + 1);
+  }
+  return snapshotIdentifier;
 }
 
 function configureToMatchImageSnapshot({
@@ -54,10 +123,19 @@ function configureToMatchImageSnapshot({
     } = this;
     const chalk = new Chalk({ enabled: !noColors });
 
+    const retryTimes = parseInt(global[Symbol.for('RETRY_TIMES')], 10) || 0;
+
     if (isNot) { throw new Error('Jest: `.not` cannot be used with `.toMatchImageSnapshot()`.'); }
 
     updateSnapshotState(snapshotState, { _counters: snapshotState._counters.set(currentTestName, (snapshotState._counters.get(currentTestName) || 0) + 1) }); // eslint-disable-line max-len
-    const snapshotIdentifier = customSnapshotIdentifier || kebabCase(`${path.basename(testPath)}-${currentTestName}-${snapshotState._counters.get(currentTestName)}`);
+
+    const snapshotIdentifier = createSnapshotIdentifier({
+      retryTimes,
+      testPath,
+      currentTestName,
+      customSnapshotIdentifier,
+      snapshotState,
+    });
 
     const snapshotsDir = customSnapshotsDir || path.join(path.dirname(testPath), SNAPSHOTS_DIR);
     const diffDir = customDiffDir || path.join(snapshotsDir, '__diff_output__');
@@ -86,44 +164,13 @@ function configureToMatchImageSnapshot({
         updatePassedSnapshot,
       });
 
-    let pass = true;
-    /*
-      istanbul ignore next
-      `message` is implementation detail. Actual behavior is tested in integration.spec.js
-    */
-    let message = () => '';
-
-    if (result.updated) {
-      // once transition away from jasmine is done this will be a lot more elegant and pure
-      // https://github.com/facebook/jest/pull/3668
-      updateSnapshotState(snapshotState, { updated: snapshotState.updated + 1 });
-    } else if (result.added) {
-      updateSnapshotState(snapshotState, { added: snapshotState.added + 1 });
-    } else {
-      ({ pass } = result);
-
-      if (!pass) {
-        updateSnapshotState(snapshotState, { unmatched: snapshotState.unmatched + 1 });
-        const differencePercentage = result.diffRatio * 100;
-        message = () => {
-          let failure;
-          if (result.diffSize) {
-            failure = `Expected image to be the same size as the snapshot (${result.imageDimensions.baselineWidth}x${result.imageDimensions.baselineHeight}), but was different (${result.imageDimensions.receivedWidth}x${result.imageDimensions.receivedHeight}).\n`
-            + `${chalk.bold.red('See diff for details:')} ${chalk.red(result.diffOutputPath)}`;
-          } else {
-            failure = `Expected image to match or be a close match to snapshot but was ${differencePercentage}% different from snapshot (${result.diffPixelCount} differing pixels).\n`
-            + `${chalk.bold.red('See diff for details:')} ${chalk.red(result.diffOutputPath)}`;
-          }
-
-          return failure;
-        };
-      }
-    }
-
-    return {
-      message,
-      pass,
-    };
+    return checkResult({
+      result,
+      snapshotState,
+      retryTimes,
+      snapshotIdentifier,
+      chalk,
+    });
   };
 }
 
