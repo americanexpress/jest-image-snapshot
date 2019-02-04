@@ -20,6 +20,7 @@ const pixelmatch = require('pixelmatch');
 const { PNG } = require('pngjs');
 const rimraf = require('rimraf');
 const { createHash } = require('crypto');
+const ImageComposer = require('./image-composer');
 
 /**
  * Helper function to create reusable image resizer
@@ -88,6 +89,7 @@ function diffImageToSnapshot(options) {
     snapshotIdentifier,
     snapshotsDir,
     diffDir,
+    diffDirection,
     updateSnapshot = false,
     updatePassedSnapshot = false,
     customDiffConfig = {},
@@ -168,20 +170,28 @@ function diffImageToSnapshot(options) {
 
     if (isFailure({ pass, updateSnapshot })) {
       mkdirp.sync(diffDir);
-      const compositeResultImage = new PNG({
-        width: imageWidth * 3,
-        height: imageHeight,
+      const composer = new ImageComposer({
+        diffDirection,
       });
+
+      composer.addImage(baselineImage, imageWidth, imageHeight);
+      composer.addImage(diffImage, imageWidth, imageHeight);
+      composer.addImage(receivedImage, imageWidth, imageHeight);
+
+      const composerParams = composer.getParams();
+
+      const compositeResultImage = new PNG({
+        width: composerParams.compositeWidth,
+        height: composerParams.compositeHeight,
+      });
+
       // copy baseline, diff, and received images into composite result image
-      PNG.bitblt(
-        baselineImage, compositeResultImage, 0, 0, imageWidth, imageHeight, 0, 0
-      );
-      PNG.bitblt(
-        diffImage, compositeResultImage, 0, 0, imageWidth, imageHeight, imageWidth, 0
-      );
-      PNG.bitblt(
-        receivedImage, compositeResultImage, 0, 0, imageWidth, imageHeight, imageWidth * 2, 0
-      );
+      composerParams.images.forEach((image, index) => {
+        PNG.bitblt(
+          image.imageData, compositeResultImage, 0, 0, image.imageWidth, image.imageHeight,
+          composerParams.offsetX * index, composerParams.offsetY * index
+        );
+      });
       // Set filter type to Paeth to avoid expensive auto scanline filter detection
       // For more information see https://www.w3.org/TR/PNG-Filters.html
       const pngBuffer = PNG.sync.write(compositeResultImage, { filterType: 4 });
