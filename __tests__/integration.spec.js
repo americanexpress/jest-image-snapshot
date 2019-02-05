@@ -16,7 +16,7 @@ const fs = require('fs');
 const path = require('path');
 const rimraf = require('rimraf');
 const uniqueId = require('lodash/uniqueId');
-const isPng = require('is-png');
+const sizeOf = require('image-size');
 const { SnapshotState } = require('jest-snapshot');
 const { toMatchImageSnapshot } = require('../src');
 
@@ -227,9 +227,64 @@ describe('toMatchImageSnapshot', () => {
 
       expect(fs.existsSync(pathToResultImage)).toBe(true);
 
-      const imageBuffer = fs.readFileSync(pathToResultImage);
       // just because file was written does not mean it is a png image
-      expect(isPng(imageBuffer)).toBe(true);
+      expect(sizeOf(pathToResultImage)).toHaveProperty('type', 'png');
+    });
+
+    it('writes a result image for failing tests with horizontal layout', () => {
+      const customSnapshotIdentifier = getIdentifierIndicatingCleanupIsRequired();
+      const pathToResultImage = path.join(__dirname, diffOutputDir(), `${customSnapshotIdentifier}-diff.png`);
+      // First we need to write a new snapshot image
+      expect(
+        () => expect(imageData).toMatchImageSnapshot({
+          customSnapshotIdentifier,
+          diffDirection: 'horizontal',
+        })
+      ).not.toThrowError();
+
+      // then test against a different image
+      expect(
+        () => expect(failImageData).toMatchImageSnapshot({
+          customSnapshotIdentifier,
+          diffDirection: 'horizontal',
+        })
+      ).toThrow();
+
+      expect(fs.existsSync(pathToResultImage)).toBe(true);
+
+      expect(sizeOf(pathToResultImage)).toMatchObject({
+        width: 300,
+        height: 100,
+        type: 'png',
+      });
+    });
+
+    it('writes a result image for failing tests with vertical layout', () => {
+      const customSnapshotIdentifier = getIdentifierIndicatingCleanupIsRequired();
+      const pathToResultImage = path.join(__dirname, diffOutputDir(), `${customSnapshotIdentifier}-diff.png`);
+      // First we need to write a new snapshot image
+      expect(
+        () => expect(imageData).toMatchImageSnapshot({
+          customSnapshotIdentifier,
+          diffDirection: 'vertical',
+        })
+      ).not.toThrowError();
+
+      // then test against a different image
+      expect(
+        () => expect(failImageData).toMatchImageSnapshot({
+          customSnapshotIdentifier,
+          diffDirection: 'vertical',
+        })
+      ).toThrow();
+
+      expect(fs.existsSync(pathToResultImage)).toBe(true);
+
+      expect(sizeOf(pathToResultImage)).toMatchObject({
+        width: 100,
+        height: 300,
+        type: 'png',
+      });
     });
 
     it('removes result image from previous test runs for the same snapshot', () => {
