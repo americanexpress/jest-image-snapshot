@@ -171,7 +171,7 @@ function diffImageToSnapshot(options) {
     if (isFailure({ pass, updateSnapshot })) {
       mkdirp.sync(diffDir);
       const composer = new ImageComposer({
-        diffDirection,
+        direction: diffDirection,
       });
 
       composer.addImage(baselineImage, imageWidth, imageHeight);
