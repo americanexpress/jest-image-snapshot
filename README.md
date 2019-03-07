@@ -102,7 +102,7 @@ To enable this image reporter, add it to your `jest.config.js` "reporters" defin
  
 #### Usage in TypeScript
 
-In TypeScript, you can declare the custom jest matcher `toMatchImageSnapshot` like this: 
+In TypeScript, you can declare `toMatchImageSnapshot` like this: 
 
 ```
 declare global {
