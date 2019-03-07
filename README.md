@@ -98,6 +98,21 @@ If you are using jest-image-snapshot in an ephemeral environment (like a Continu
 To enable this image reporter, add it to your `jest.config.js` "reporters" definition:
 
     "reporters": [ "default", "<rootDir>/image-reporter.js" ]
+    
+ 
+#### Usage in TypeScript
+
+In TypeScript, you can declare `toMatchImageSnapshot` like this: 
+
+```
+declare global {
+  namespace jest {
+    interface Matchers<R> {
+      toMatchImageSnapshot(): R
+    }
+  }
+}
+```
 
 ## How it works
   Given an image (Buffer instance with PNG image data) the `toMatchImageSnapshot()` matcher will create a `__image_snapshots__` directory in the directory the test is in and will store the baseline snapshot image there on the first run. Note that if `customSnapshotsDir` option is given then it will store baseline snapshot there instead.
