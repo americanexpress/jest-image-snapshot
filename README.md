@@ -6,6 +6,9 @@
 
 Jest matcher that performs image comparisons using [pixelmatch](https://github.com/mapbox/pixelmatch) and behaves just like [Jest snapshots](https://facebook.github.io/jest/docs/snapshot-testing.html) do! Very useful for visual regression testing.
 
+> Want to get paid for your contributions to `jest-image-snapshot`?
+> Send your resume to oneamex.careers@aexp.com
+
 ## Installation:
   ```bash
   npm i --save-dev jest-image-snapshot
@@ -150,7 +153,7 @@ declare global {
   Thanks `jest-image-snapshot`, that broken header would not have looked good in production!
 
   ## Contributing
-  
+
   We welcome Your interest in the American Express Open Source Community on Github.
   Any Contributor to any Open Source Project managed by the American Express Open
   Source Community must accept and sign an Agreement indicating agreement to the
@@ -162,11 +165,11 @@ declare global {
   Please feel free to open pull requests and see [CONTRIBUTING.md](./CONTRIBUTING.md) for commit formatting details.
 
   ## License
-  
+
   Any contributions made under this project will be governed by the [Apache License
   2.0](https://github.com/americanexpress/jest-image-snapshot/blob/master/LICENSE.txt).
 
   ## Code of Conduct
-  
+
   This project adheres to the [American Express Community Guidelines](https://github.com/americanexpress/jest-image-snapshot/wiki/Code-of-Conduct).
   By participating, you are expected to honor these guidelines.
