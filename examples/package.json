@@ -21,10 +21,6 @@
     "puppeteer": "*"
   },
   "jest": {
-    "setupTestFrameworkScriptFile": "<rootDir>/jest-setup.js"
-  },
-  "devDependencies": {
-    "babel-cli": "^6.26.0",
-    "babel-preset-env": "^1.6.1"
+    "setupFilesAfterEnv": ["<rootDir>/jest-setup.js"]
   }
 }
