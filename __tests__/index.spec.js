@@ -392,6 +392,41 @@ describe('toMatchImageSnapshot', () => {
     });
   });
 
+  it('should only increment matched when test passed', () => {
+    global.UNSTABLE_SKIP_REPORTING = false;
+
+    const mockTestContext = {
+      testPath: 'path/to/test.spec.js',
+      currentTestName: 'test',
+      isNot: false,
+      snapshotState: {
+        _counters: new Map(),
+        _updateSnapshot: 'new',
+        updated: undefined,
+        added: true,
+        unmatched: 0,
+        matched: 0,
+      },
+    };
+
+    const mockDiffResult = {
+      pass: true,
+      diffOutputPath: 'path/to/result.png',
+      diffRatio: 0,
+      diffPixelCount: 0,
+    };
+
+    setupMock(mockDiffResult);
+    const { toMatchImageSnapshot } = require('../src/index');
+    const matcherAtTest = toMatchImageSnapshot.bind(mockTestContext);
+
+    matcherAtTest('pretendthisisanimagebuffer', { customSnapshotIdentifier: 'custom-name' });
+    matcherAtTest('pretendthisisanimagebuffer', { customSnapshotIdentifier: 'custom-name' });
+    matcherAtTest('pretendthisisanimagebuffer', { customSnapshotIdentifier: 'custom-name' });
+    matcherAtTest('pretendthisisanimagebuffer', { customSnapshotIdentifier: 'custom-name' });
+    expect(mockTestContext.snapshotState.matched).toBe(4);
+  });
+
   describe('when retryTimes is set', () => {
     beforeEach(() => { global[Symbol.for('RETRY_TIMES')] = 3; });
     afterEach(() => { global[Symbol.for('RETRY_TIMES')] = undefined; });
