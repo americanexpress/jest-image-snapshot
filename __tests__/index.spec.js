@@ -224,6 +224,22 @@ describe('toMatchImageSnapshot', () => {
     const { runDiffImageToSnapshot } = require('../src/diff-snapshot');
 
     expect(runDiffImageToSnapshot.mock.calls[0][0].snapshotIdentifier).toBe('custom-name');
+
+    matcherAtTest('pretendthisisanimagebuffer', { customSnapshotIdentifier: () => 'functional-name' });
+    expect(runDiffImageToSnapshot.mock.calls[1][0].snapshotIdentifier).toBe('functional-name');
+
+    matcherAtTest('pretendthisisanimagebuffer', { customSnapshotIdentifier: () => '' });
+    expect(runDiffImageToSnapshot.mock.calls[2][0].snapshotIdentifier).toBe('test-spec-js-test-3');
+
+    const mockCustomSnap = jest.fn();
+    matcherAtTest('pretendthisisanimagebuffer', { customSnapshotIdentifier: mockCustomSnap });
+
+    expect(mockCustomSnap).toHaveBeenCalledWith({
+      testPath: mockTestContext.testPath,
+      currentTestName: mockTestContext.currentTestName,
+      counter: 4,
+      defaultIdentifier: 'test-spec-js-test-4',
+    });
   });
 
   it('attempts to update snapshots if snapshotState has updateSnapshot flag set', () => {
@@ -444,6 +460,9 @@ describe('toMatchImageSnapshot', () => {
       expect.extend({ toMatchImageSnapshot });
 
       expect(() => expect('pretendthisisanimagebuffer').toMatchImageSnapshot())
+        .toThrowErrorMatchingSnapshot();
+
+      expect(() => expect('pretendthisisanimagebuffer').toMatchImageSnapshot({ customSnapshotIdentifier: () => '' }))
         .toThrowErrorMatchingSnapshot();
     });
 

@@ -28,3 +28,5 @@ See diff for details: path/to/result.png"
 `;
 
 exports[`toMatchImageSnapshot when retryTimes is set should throw an error when called without customSnapshotIdentifier 2`] = `"A unique customSnapshotIdentifier must be set when jest.retryTimes() is used"`;
+
+exports[`toMatchImageSnapshot when retryTimes is set should throw an error when called without customSnapshotIdentifier 4`] = `"A unique customSnapshotIdentifier must be set when jest.retryTimes() is used"`;
