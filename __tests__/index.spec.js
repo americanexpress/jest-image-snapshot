@@ -380,10 +380,70 @@ describe('toMatchImageSnapshot', () => {
       },
       snapshotIdentifier: 'test-spec-js-test-1-1',
       snapshotsDir: path.join('path', 'to', 'my-custom-snapshots-dir'),
+      failedDir: path.join('path', 'to', 'my-custom-snapshots-dir'),
       diffDir: path.join('path', 'to', 'my-custom-diff-dir'),
       diffDirection: 'horizontal',
       updateSnapshot: false,
       updatePassedSnapshot: false,
+      updateFailedSnapshot: false,
+      failureThreshold: 0,
+      failureThresholdType: 'pixel',
+    });
+    expect(Chalk).toHaveBeenCalledWith({
+      enabled: false,
+    });
+  });
+
+  it('can provide custom defaults for failed tests', () => {
+    const mockTestContext = {
+      testPath: path.join('path', 'to', 'test.spec.js'),
+      currentTestName: 'test1',
+      isNot: false,
+      snapshotState: {
+        _counters: new Map(),
+        update: true,
+        updated: undefined,
+        added: undefined,
+      },
+    };
+    setupMock({ updated: true });
+
+    const runDiffImageToSnapshot = jest.fn(() => ({}));
+    jest.doMock('../src/diff-snapshot', () => ({
+      runDiffImageToSnapshot,
+    }));
+
+    const Chalk = jest.fn();
+    jest.doMock('chalk', () => ({
+      constructor: Chalk,
+    }));
+    const { configureToMatchImageSnapshot } = require('../src/index');
+    const customConfig = { perceptual: true };
+    const toMatchImageSnapshot = configureToMatchImageSnapshot({
+      customDiffConfig: customConfig,
+      customSnapshotsDir: path.join('path', 'to', 'my-custom-snapshots-dir'),
+      customDiffDir: path.join('path', 'to', 'my-custom-diff-dir'),
+      customFailedDir: path.join('path', 'to', 'my-custom-failed-dir'),
+      updateFailedSnapshot: true,
+      noColors: true,
+    });
+    expect.extend({ toMatchImageSnapshot });
+    const matcherAtTest = toMatchImageSnapshot.bind(mockTestContext);
+
+    matcherAtTest();
+
+    expect(runDiffImageToSnapshot).toHaveBeenCalledWith({
+      customDiffConfig: {
+        perceptual: true,
+      },
+      snapshotIdentifier: 'test-spec-js-test-1-1',
+      snapshotsDir: path.join('path', 'to', 'my-custom-snapshots-dir'),
+      failedDir: path.join('path', 'to', 'my-custom-failed-dir'),
+      diffDir: path.join('path', 'to', 'my-custom-diff-dir'),
+      diffDirection: 'horizontal',
+      updateSnapshot: false,
+      updatePassedSnapshot: false,
+      updateFailedSnapshot: true,
       failureThreshold: 0,
       failureThresholdType: 'pixel',
     });

@@ -83,15 +83,40 @@ const shouldUpdate = ({ pass, updateSnapshot, updatePassedSnapshot }) => (
   (!pass && updateSnapshot) || (pass && updatePassedSnapshot)
 );
 
+function writeImageOnFailure(updateFailedSnapshot, failedDir, identifier, imageBuffer) {
+  if (updateFailedSnapshot) {
+    if (failedDir) {
+      if (!fs.existsSync(failedDir)) {
+        mkdirp.sync(failedDir);
+      }
+      const filePath = path.join(failedDir, `${identifier}-snap.png`);
+      fs.writeFileSync(filePath, imageBuffer);
+    }
+  }
+}
+
+function compareImageHash(receivedImage, baselineImage) {
+  const receivedImageDigest = createHash('sha1')
+    .update(receivedImage.data)
+    .digest('base64');
+  const baselineImageDigest = createHash('sha1')
+    .update(baselineImage.data)
+    .digest('base64');
+
+  return receivedImageDigest === baselineImageDigest;
+}
+
 function diffImageToSnapshot(options) {
   const {
     receivedImageBuffer,
     snapshotIdentifier,
     snapshotsDir,
     diffDir,
+    failedDir,
     diffDirection,
     updateSnapshot = false,
     updatePassedSnapshot = false,
+    updateFailedSnapshot = false,
     customDiffConfig = {},
     failureThreshold,
     failureThresholdType,
@@ -138,10 +163,7 @@ function diffImageToSnapshot(options) {
     let diffRatio = 0;
     let diffPixelCount = 0;
 
-    const receivedImageDigest = createHash('sha1').update(receivedImage.data).digest('base64');
-    const baselineImageDigest = createHash('sha1').update(baselineImage.data).digest('base64');
-
-    pass = receivedImageDigest === baselineImageDigest;
+    pass = compareImageHash(receivedImage, baselineImage);
 
     if (!pass) {
       diffPixelCount = pixelmatch(
@@ -205,6 +227,8 @@ function diffImageToSnapshot(options) {
         diffRatio,
         diffPixelCount,
       };
+
+      writeImageOnFailure(updateFailedSnapshot, failedDir, snapshotIdentifier, receivedImageBuffer);
     } else if (shouldUpdate({ pass, updateSnapshot, updatePassedSnapshot })) {
       mkdirp.sync(snapshotsDir);
       fs.writeFileSync(baselineSnapshotPath, receivedImageBuffer);

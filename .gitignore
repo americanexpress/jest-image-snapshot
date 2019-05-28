@@ -4,6 +4,7 @@ node_modules
 
 # test
 test-results
+__failed__
 __diff_output__
 .jest-cache
 

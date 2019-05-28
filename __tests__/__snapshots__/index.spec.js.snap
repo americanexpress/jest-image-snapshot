@@ -5,11 +5,13 @@ Object {
   "customDiffConfig": Object {},
   "diffDir": "path/to/__image_snapshots__/__diff_output__",
   "diffDirection": "horizontal",
+  "failedDir": "path/to/__image_snapshots__",
   "failureThreshold": 0,
   "failureThresholdType": "pixel",
   "receivedImageBuffer": "pretendthisisanimagebuffer",
   "snapshotIdentifier": "test-spec-js-test-1",
   "snapshotsDir": "path/to/__image_snapshots__",
+  "updateFailedSnapshot": false,
   "updatePassedSnapshot": false,
   "updateSnapshot": false,
 }

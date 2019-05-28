@@ -103,22 +103,26 @@ function configureToMatchImageSnapshot({
   customDiffConfig: commonCustomDiffConfig = {},
   customSnapshotsDir: commonCustomSnapshotsDir,
   customDiffDir: commonCustomDiffDir,
+  customFailedDir: commonCustomFailedDir,
   diffDirection: commonDiffDirection = 'horizontal',
   noColors: commonNoColors = false,
   failureThreshold: commonFailureThreshold = 0,
   failureThresholdType: commonFailureThresholdType = 'pixel',
   updatePassedSnapshot: commonUpdatePassedSnapshot = false,
+  updateFailedSnapshot: commonUpdateFailedSnapshot = false,
 } = {}) {
   return function toMatchImageSnapshot(received, {
     customSnapshotIdentifier = '',
     customSnapshotsDir = commonCustomSnapshotsDir,
     customDiffDir = commonCustomDiffDir,
+    customFailedDir = commonCustomFailedDir,
     diffDirection = commonDiffDirection,
     customDiffConfig = {},
     noColors = commonNoColors,
     failureThreshold = commonFailureThreshold,
     failureThresholdType = commonFailureThresholdType,
     updatePassedSnapshot = commonUpdatePassedSnapshot,
+    updateFailedSnapshot = commonUpdateFailedSnapshot,
   } = {}) {
     const {
       testPath, currentTestName, isNot, snapshotState,
@@ -141,6 +145,7 @@ function configureToMatchImageSnapshot({
 
     const snapshotsDir = customSnapshotsDir || path.join(path.dirname(testPath), SNAPSHOTS_DIR);
     const diffDir = customDiffDir || path.join(snapshotsDir, '__diff_output__');
+    const failedDir = customFailedDir || snapshotsDir;
     const baselineSnapshotPath = path.join(snapshotsDir, `${snapshotIdentifier}-snap.png`);
 
     if (snapshotState._updateSnapshot === 'none' && !fs.existsSync(baselineSnapshotPath)) {
@@ -157,6 +162,7 @@ function configureToMatchImageSnapshot({
         receivedImageBuffer: received,
         snapshotsDir,
         diffDir,
+        failedDir,
         diffDirection,
         snapshotIdentifier,
         updateSnapshot: snapshotState._updateSnapshot === 'all',
@@ -164,6 +170,7 @@ function configureToMatchImageSnapshot({
         failureThreshold,
         failureThresholdType,
         updatePassedSnapshot,
+        updateFailedSnapshot,
       });
 
     return checkResult({

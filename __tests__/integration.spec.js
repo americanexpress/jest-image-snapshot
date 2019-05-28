@@ -29,6 +29,16 @@ describe('toMatchImageSnapshot', () => {
   const getIdentifierIndicatingCleanupIsRequired = () => uniqueId(cleanupRequiredIndicator);
   const getSnapshotFilename = identifier => `${identifier}-snap.png`;
   const diffExists = identifier => fs.existsSync(path.join(__dirname, diffOutputDir(), `${identifier}-diff.png`));
+  const failedOutputDir = (customFailedDir) => {
+    if (customFailedDir) {
+      return customFailedDir;
+    }
+    return path.join(__dirname, '__image_snapshots__');
+  };
+  const failedExists = (identifier, customFailedDir) =>
+    fs.existsSync(
+      path.join(failedOutputDir(customFailedDir), getSnapshotFilename(identifier))
+    );
 
   beforeAll(() => {
     // In tests, skip reporting (skip snapshotState update to not mess with our test report)
@@ -196,6 +206,47 @@ describe('toMatchImageSnapshot', () => {
       ).toThrowError(/Expected image to be the same size as the snapshot \(100x100\), but was different \(153x145\)/);
 
       expect(diffExists(customSnapshotIdentifier)).toBe(true);
+    });
+
+    it('fails but outputs image if updateFailedSnapshot is set to true', () => {
+      const customSnapshotIdentifier = getIdentifierIndicatingCleanupIsRequired();
+
+      // First we need to write a new snapshot image
+      expect(
+        () => expect(imageData).toMatchImageSnapshot({ customSnapshotIdentifier })
+      ).not.toThrowError();
+
+      // Test against an failing image date with updateFailedSnapshot Paramter
+      expect(
+        () => expect(oversizeImageData).toMatchImageSnapshot({
+          customSnapshotIdentifier,
+          updateFailedSnapshot: true,
+        })
+      ).toThrow();
+
+      expect(diffExists(customSnapshotIdentifier)).toBe(true);
+      expect(failedExists(customSnapshotIdentifier)).toBe(true);
+    });
+
+    it('fails but outputs image to custom path if updateFailedSnapshot is set to true', () => {
+      const customSnapshotIdentifier = getIdentifierIndicatingCleanupIsRequired();
+      const failedDir = path.join(__dirname, '__failed__');
+      // First we need to write a new snapshot image
+      expect(
+        () => expect(imageData).toMatchImageSnapshot({ customSnapshotIdentifier })
+      ).not.toThrowError();
+
+      // Test against an failing image date with updateFailedSnapshot Paramter
+      expect(
+        () => expect(oversizeImageData).toMatchImageSnapshot({
+          customSnapshotIdentifier,
+          customFailedDir: failedDir,
+          updateFailedSnapshot: true,
+        })
+      ).toThrow();
+
+      expect(diffExists(customSnapshotIdentifier)).toBe(true);
+      expect(failedExists(customSnapshotIdentifier, failedDir)).toBe(true);
     });
 
     it('fails with images without diff pixels after being resized', () => {
