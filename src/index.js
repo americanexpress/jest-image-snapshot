@@ -90,12 +90,29 @@ function createSnapshotIdentifier({
   customSnapshotIdentifier,
   snapshotState,
 }) {
-  const snapshotIdentifier = customSnapshotIdentifier || kebabCase(`${path.basename(testPath)}-${currentTestName}-${snapshotState._counters.get(currentTestName)}`);
+  const counter = snapshotState._counters.get(currentTestName);
+  const defaultIdentifier = kebabCase(`${path.basename(testPath)}-${currentTestName}-${counter}`);
+
+  let snapshotIdentifier = customSnapshotIdentifier || defaultIdentifier;
+
+  if (typeof customSnapshotIdentifier === 'function') {
+    const customRes = customSnapshotIdentifier({
+      testPath, currentTestName, counter, defaultIdentifier,
+    });
+
+    if (retryTimes && !customRes) {
+      throw new Error('A unique customSnapshotIdentifier must be set when jest.retryTimes() is used');
+    }
+
+    snapshotIdentifier = customRes || defaultIdentifier;
+  }
+
   if (retryTimes) {
     if (!customSnapshotIdentifier) throw new Error('A unique customSnapshotIdentifier must be set when jest.retryTimes() is used');
 
     timesCalled.set(snapshotIdentifier, (timesCalled.get(snapshotIdentifier) || 0) + 1);
   }
+
   return snapshotIdentifier;
 }
 
