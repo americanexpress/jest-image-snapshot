@@ -1,0 +1,14 @@
+# node & npm
+*.log
+
+# test
+test-results
+__diff_output__
+.jest-cache
+__tests__
+
+# examples
+examples
+
+# IDE
+.idea
