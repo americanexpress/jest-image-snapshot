@@ -131,14 +131,14 @@ function diffImageToSnapshot(options) {
     const [receivedImage, baselineImage] = hasSizeMismatch
       ? alignImagesToSameSize(rawReceivedImage, rawBaselineImage)
       : [rawReceivedImage, rawBaselineImage];
+    const imageWidth = receivedImage.width;
+    const imageHeight = receivedImage.height;
 
     if (typeof blur === 'number' && blur > 0) {
       glur(receivedImage.data, imageWidth, imageHeight, blur);
       glur(baselineImage.data, imageWidth, imageHeight, blur);
     }
 
-    const imageWidth = receivedImage.width;
-    const imageHeight = receivedImage.height;
     const diffImage = new PNG({ width: imageWidth, height: imageHeight });
 
     let pass = false;

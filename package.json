@@ -37,7 +37,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/americanexpress/jest-image-snapshot.git"
+    "url": "https://github.com/Alivejke/jest-image-snapshot.git"
   },
   "author": "Andres Escobar <andres.escobar@aexp.com> (https://github.com/anescobar1991)",
   "license": "Apache-2.0",
