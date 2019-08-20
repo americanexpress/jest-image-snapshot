@@ -37,7 +37,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/Alivejke/jest-image-snapshot.git"
+    "url": "https://github.com/americanexpress/jest-image-snapshot.git"
   },
   "author": "Andres Escobar <andres.escobar@aexp.com> (https://github.com/anescobar1991)",
   "license": "Apache-2.0",
@@ -47,8 +47,8 @@
     "eslint-config-amex": "^7.0.0",
     "image-size": "^0.7.1",
     "jest": "^24.0.0",
-    "jest-snapshot": "^23.0.0",
-    "mock-spawn": "^0.2.6"
+    "mock-spawn": "^0.2.6",
+    "jest-snapshot": "^23.0.0"
   },
   "dependencies": {
     "chalk": "^1.1.3",
