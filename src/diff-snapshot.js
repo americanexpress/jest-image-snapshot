@@ -20,6 +20,7 @@ const pixelmatch = require('pixelmatch');
 const { PNG } = require('pngjs');
 const rimraf = require('rimraf');
 const { createHash } = require('crypto');
+const glur = require('glur');
 const ImageComposer = require('./image-composer');
 
 /**
@@ -95,6 +96,7 @@ function diffImageToSnapshot(options) {
     customDiffConfig = {},
     failureThreshold,
     failureThresholdType,
+    blur,
   } = options;
 
   let result = {};
@@ -129,6 +131,12 @@ function diffImageToSnapshot(options) {
     const [receivedImage, baselineImage] = hasSizeMismatch
       ? alignImagesToSameSize(rawReceivedImage, rawBaselineImage)
       : [rawReceivedImage, rawBaselineImage];
+
+    if (typeof blur === 'number' && blur > 0) {
+      glur(receivedImage.data, imageWidth, imageHeight, blur);
+      glur(baselineImage.data, imageWidth, imageHeight, blur);
+    }
+
     const imageWidth = receivedImage.width;
     const imageHeight = receivedImage.height;
     const diffImage = new PNG({ width: imageWidth, height: imageHeight });
