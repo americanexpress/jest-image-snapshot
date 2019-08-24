@@ -69,7 +69,7 @@ The failure threshold can be set in percent, in this case if the difference is o
   it('should fail if there is more than a 1% difference', () => {
     ...
     expect(image).toMatchImageSnapshot({
-      failureThreshold: '0.01',
+      failureThreshold: 0.01,
       failureThresholdType: 'percent'
     });
   });
