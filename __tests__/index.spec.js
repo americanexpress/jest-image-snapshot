@@ -408,6 +408,61 @@ describe('toMatchImageSnapshot', () => {
     });
   });
 
+  it('can run in process', () => {
+    const mockTestContext = {
+      testPath: path.join('path', 'to', 'test.spec.js'),
+      currentTestName: 'test1',
+      isNot: false,
+      snapshotState: {
+        _counters: new Map(),
+        update: true,
+        updated: undefined,
+        added: undefined,
+      },
+    };
+    setupMock({ updated: true });
+
+    const diffImageToSnapshot = jest.fn(() => ({}));
+    jest.doMock('../src/diff-snapshot', () => ({
+      diffImageToSnapshot,
+    }));
+
+    const Chalk = jest.fn();
+    jest.doMock('chalk', () => ({
+      constructor: Chalk,
+    }));
+    const { configureToMatchImageSnapshot } = require('../src/index');
+    const customConfig = { perceptual: true };
+    const toMatchImageSnapshot = configureToMatchImageSnapshot({
+      customDiffConfig: customConfig,
+      customSnapshotsDir: path.join('path', 'to', 'my-custom-snapshots-dir'),
+      customDiffDir: path.join('path', 'to', 'my-custom-diff-dir'),
+      noColors: true,
+      runInProcess: true,
+    });
+    expect.extend({ toMatchImageSnapshot });
+    const matcherAtTest = toMatchImageSnapshot.bind(mockTestContext);
+
+    matcherAtTest();
+
+    expect(diffImageToSnapshot).toHaveBeenCalledWith({
+      customDiffConfig: {
+        perceptual: true,
+      },
+      snapshotIdentifier: 'test-spec-js-test-1-1',
+      snapshotsDir: path.join('path', 'to', 'my-custom-snapshots-dir'),
+      diffDir: path.join('path', 'to', 'my-custom-diff-dir'),
+      diffDirection: 'horizontal',
+      updateSnapshot: false,
+      updatePassedSnapshot: false,
+      failureThreshold: 0,
+      failureThresholdType: 'pixel',
+    });
+    expect(Chalk).toHaveBeenCalledWith({
+      enabled: false,
+    });
+  });
+
   it('should only increment matched when test passed', () => {
     global.UNSTABLE_SKIP_REPORTING = false;
 
