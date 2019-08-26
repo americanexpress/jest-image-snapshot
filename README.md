@@ -50,6 +50,9 @@ See [the examples](./examples/README.md) for more detailed usage or read about a
 * `failureThresholdType`: (default `pixel`) (options `percent` or `pixel`) Sets the type of threshold that would trigger a failure.
 * `updatePassedSnapshot`: (default `false`) Updates a snapshot even if it passed the threshold against the existing one.
 * `blur`: (default `0`) Applies Gaussian Blur on compared images, accepts radius in pixels as value. Useful when you have noise after scaling images per different resolutions on your target website, usually setting it's value to 1-2 should be enough to solve that problem.
+* `runInProcess`: (default `false`) Runs the diff in process without spawning a child process.
+
+
 
 ```javascript
   it('should demonstrate this matcher`s usage with a custom pixelmatch config', () => {
@@ -69,7 +72,7 @@ The failure threshold can be set in percent, in this case if the difference is o
   it('should fail if there is more than a 1% difference', () => {
     ...
     expect(image).toMatchImageSnapshot({
-      failureThreshold: '0.01',
+      failureThreshold: 0.01,
       failureThresholdType: 'percent'
     });
   });
