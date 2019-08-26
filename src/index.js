@@ -16,7 +16,7 @@ const kebabCase = require('lodash/kebabCase');
 const merge = require('lodash/merge');
 const path = require('path');
 const Chalk = require('chalk').constructor;
-const { runDiffImageToSnapshot } = require('./diff-snapshot');
+const { diffImageToSnapshot, runDiffImageToSnapshot } = require('./diff-snapshot');
 const fs = require('fs');
 
 const timesCalled = new Map();
@@ -125,6 +125,7 @@ function configureToMatchImageSnapshot({
   failureThreshold: commonFailureThreshold = 0,
   failureThresholdType: commonFailureThresholdType = 'pixel',
   updatePassedSnapshot: commonUpdatePassedSnapshot = false,
+  runInProcess: commonRunInProcess = false,
 } = {}) {
   return function toMatchImageSnapshot(received, {
     customSnapshotIdentifier = '',
@@ -136,6 +137,7 @@ function configureToMatchImageSnapshot({
     failureThreshold = commonFailureThreshold,
     failureThresholdType = commonFailureThresholdType,
     updatePassedSnapshot = commonUpdatePassedSnapshot,
+    runInProcess = commonRunInProcess,
   } = {}) {
     const {
       testPath, currentTestName, isNot, snapshotState,
@@ -169,8 +171,10 @@ function configureToMatchImageSnapshot({
       };
     }
 
+    const imageToSnapshot = runInProcess ? diffImageToSnapshot : runDiffImageToSnapshot;
+
     const result =
-      runDiffImageToSnapshot({
+      imageToSnapshot({
         receivedImageBuffer: received,
         snapshotsDir,
         diffDir,
