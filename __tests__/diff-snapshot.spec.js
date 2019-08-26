@@ -70,6 +70,7 @@ describe('diff-snapshot', () => {
     const mockMkdirpSync = jest.fn();
     const mockWriteFileSync = jest.fn();
     const mockPixelMatch = jest.fn();
+    const mockGlur = jest.fn();
 
     function setupTest({
       snapshotDirExists,
@@ -113,6 +114,8 @@ describe('diff-snapshot', () => {
 
       jest.mock('pixelmatch', () => mockPixelMatch);
       mockPixelMatch.mockImplementation(() => pixelmatchResult);
+
+      jest.mock('glur', () => mockGlur);
 
       return diffImageToSnapshot;
     }
@@ -579,6 +582,39 @@ describe('diff-snapshot', () => {
 
       expect(mockWriteFileSync).toHaveBeenCalledTimes(1);
       expect(diffResult).toHaveProperty('updated', true);
+    });
+
+    it('should not run glur on compared images when no value for blur param is provided', () => {
+      const diffImageToSnapshot = setupTest({ snapshotExists: true });
+      const result = diffImageToSnapshot({
+        receivedImageBuffer: mockFailImageBuffer,
+        snapshotIdentifier: mockSnapshotIdentifier,
+        snapshotsDir: mockSnapshotsDir,
+        diffDir: mockDiffDir,
+        updateSnapshot: false,
+        failureThreshold: 0,
+        failureThresholdType: 'pixel',
+      });
+
+      expect(mockGlur).not.toHaveBeenCalled();
+      expect(result.pass).toBe(true);
+    });
+
+    it('should run glur on compared images when value for blur param is provided', () => {
+      const diffImageToSnapshot = setupTest({ snapshotExists: true });
+      const result = diffImageToSnapshot({
+        receivedImageBuffer: mockFailImageBuffer,
+        snapshotIdentifier: mockSnapshotIdentifier,
+        snapshotsDir: mockSnapshotsDir,
+        diffDir: mockDiffDir,
+        updateSnapshot: false,
+        failureThreshold: 0,
+        failureThresholdType: 'pixel',
+        blur: 2,
+      });
+
+      expect(mockGlur).toHaveBeenCalledTimes(2);
+      expect(result.pass).toBe(true);
     });
   });
 });

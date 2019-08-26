@@ -2,6 +2,7 @@
 
 exports[`toMatchImageSnapshot passes diffImageToSnapshot everything it needs to create a snapshot and compare if needed 1`] = `
 Object {
+  "blur": 0,
   "customDiffConfig": Object {},
   "diffDir": "path/to/__image_snapshots__/__diff_output__",
   "diffDirection": "horizontal",
