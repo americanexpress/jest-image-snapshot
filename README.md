@@ -118,6 +118,30 @@ declare global {
 }
 ```
 
+#### Ignoring parts of the image snapshot if using [Puppeteer](https://github.com/GoogleChrome/puppeteer)
+
+If you want to to ignore parts of the snapshot (for example some banners or other dynamic blocks) you can find DOM elements with Puppeteer and remove/modify them (setting visibility: hidden on block, if removing it breaks your layout, should help):
+```javascript
+  async function removeBanners(page){
+    await page.evaluate(() => {
+      (document.querySelectorAll('.banner') || []).forEach(el => el.remove());
+    });
+  }
+
+  ...
+  it('renders correctly', async () => {
+    const page = await browser.newPage();
+    await page.goto('https://localhost:3000');
+
+    await removeBanners(page);
+
+    const image = await page.screenshot();
+
+    expect(image).toMatchImageSnapshot();
+  });
+  ...
+```
+
 ## How it works
   Given an image (Buffer instance with PNG image data) the `toMatchImageSnapshot()` matcher will create a `__image_snapshots__` directory in the directory the test is in and will store the baseline snapshot image there on the first run. Note that if `customSnapshotsDir` option is given then it will store baseline snapshot there instead.
 
