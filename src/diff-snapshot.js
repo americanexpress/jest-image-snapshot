@@ -84,7 +84,7 @@ const shouldUpdate = ({ pass, updateSnapshot, updatePassedSnapshot }) => (
   (!pass && updateSnapshot) || (pass && updatePassedSnapshot)
 );
 
-/* eslint-disable complexity */
+// eslint-disable-next-line complexity
 function diffImageToSnapshot(options) {
   const {
     receivedImageBuffer,
@@ -229,8 +229,6 @@ function diffImageToSnapshot(options) {
   }
   return result;
 }
-/* eslint-enabled */
-
 
 function runDiffImageToSnapshot(options) {
   options.receivedImageBuffer = options.receivedImageBuffer.toString('base64');

@@ -52,8 +52,6 @@ See [the examples](./examples/README.md) for more detailed usage or read about a
 * `blur`: (default `0`) Applies Gaussian Blur on compared images, accepts radius in pixels as value. Useful when you have noise after scaling images per different resolutions on your target website, usually setting it's value to 1-2 should be enough to solve that problem.
 * `runInProcess`: (default `false`) Runs the diff in process without spawning a child process.
 
-
-
 ```javascript
   it('should demonstrate this matcher`s usage with a custom pixelmatch config', () => {
     ...
