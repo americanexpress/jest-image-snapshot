@@ -117,7 +117,7 @@ declare global {
 }
 ```
 
-#### Ignoring parts of the imageSnapshot
+#### Ignoring parts of the image snapshot if using [Puppeteer](https://github.com/GoogleChrome/puppeteer)
 
 If you want to to ignore parts of the snapshot (for example some banners or other dynamic blocks) you can find DOM elements with Puppeteer and remove/modify them (setting visibility: hidden on block, if removing it breaks your layout, should help):
 ```javascript
