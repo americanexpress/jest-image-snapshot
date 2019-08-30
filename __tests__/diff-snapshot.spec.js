@@ -614,6 +614,12 @@ describe('diff-snapshot', () => {
       });
 
       expect(mockGlur).toHaveBeenCalledTimes(2);
+      expect(mockGlur).toHaveBeenCalledWith(
+        expect.any(Buffer),
+        100,
+        100,
+        2
+      );
       expect(result.pass).toBe(true);
     });
   });

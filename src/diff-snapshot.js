@@ -84,8 +84,8 @@ const shouldUpdate = ({ pass, updateSnapshot, updatePassedSnapshot }) => (
   (!pass && updateSnapshot) || (pass && updatePassedSnapshot)
 );
 
-// eslint-disable-next-line complexity
 function diffImageToSnapshot(options) {
+  /* eslint complexity: ["error", 12] */
   const {
     receivedImageBuffer,
     snapshotIdentifier,
