@@ -125,6 +125,7 @@ function configureToMatchImageSnapshot({
   failureThreshold: commonFailureThreshold = 0,
   failureThresholdType: commonFailureThresholdType = 'pixel',
   updatePassedSnapshot: commonUpdatePassedSnapshot = false,
+  blur: commonBlur = 0,
   runInProcess: commonRunInProcess = false,
 } = {}) {
   return function toMatchImageSnapshot(received, {
@@ -137,6 +138,7 @@ function configureToMatchImageSnapshot({
     failureThreshold = commonFailureThreshold,
     failureThresholdType = commonFailureThresholdType,
     updatePassedSnapshot = commonUpdatePassedSnapshot,
+    blur = commonBlur,
     runInProcess = commonRunInProcess,
   } = {}) {
     const {
@@ -185,6 +187,7 @@ function configureToMatchImageSnapshot({
         failureThreshold,
         failureThresholdType,
         updatePassedSnapshot,
+        blur,
       });
 
     return checkResult({

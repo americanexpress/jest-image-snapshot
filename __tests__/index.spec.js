@@ -391,6 +391,7 @@ describe('toMatchImageSnapshot', () => {
     matcherAtTest();
 
     expect(runDiffImageToSnapshot).toHaveBeenCalledWith({
+      blur: 0,
       customDiffConfig: {
         perceptual: true,
       },
@@ -446,6 +447,7 @@ describe('toMatchImageSnapshot', () => {
     matcherAtTest();
 
     expect(diffImageToSnapshot).toHaveBeenCalledWith({
+      blur: 0,
       customDiffConfig: {
         perceptual: true,
       },

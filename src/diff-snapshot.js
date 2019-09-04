@@ -20,6 +20,7 @@ const pixelmatch = require('pixelmatch');
 const { PNG } = require('pngjs');
 const rimraf = require('rimraf');
 const { createHash } = require('crypto');
+const glur = require('glur');
 const ImageComposer = require('./image-composer');
 
 /**
@@ -84,6 +85,7 @@ const shouldUpdate = ({ pass, updateSnapshot, updatePassedSnapshot }) => (
 );
 
 function diffImageToSnapshot(options) {
+  /* eslint complexity: ["error", 12] */
   const {
     receivedImageBuffer,
     snapshotIdentifier,
@@ -95,6 +97,7 @@ function diffImageToSnapshot(options) {
     customDiffConfig = {},
     failureThreshold,
     failureThresholdType,
+    blur,
   } = options;
 
   let result = {};
@@ -131,6 +134,12 @@ function diffImageToSnapshot(options) {
       : [rawReceivedImage, rawBaselineImage];
     const imageWidth = receivedImage.width;
     const imageHeight = receivedImage.height;
+
+    if (typeof blur === 'number' && blur > 0) {
+      glur(receivedImage.data, imageWidth, imageHeight, blur);
+      glur(baselineImage.data, imageWidth, imageHeight, blur);
+    }
+
     const diffImage = new PNG({ width: imageWidth, height: imageHeight });
 
     let pass = false;
@@ -220,7 +229,6 @@ function diffImageToSnapshot(options) {
   }
   return result;
 }
-
 
 function runDiffImageToSnapshot(options) {
   options.receivedImageBuffer = options.receivedImageBuffer.toString('base64');
