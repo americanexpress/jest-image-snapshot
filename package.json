@@ -46,11 +46,11 @@
   "devDependencies": {
     "@commitlint/cli": "^8.3.5",
     "@commitlint/config-conventional": "^8.3.4",
-    "amex-jest-preset": "^5.0.0",
+    "amex-jest-preset": "^6.0.1",
     "eslint": "^6.8.0",
     "eslint-config-amex": "^7.0.0",
     "husky": "^4.2.1",
-    "image-size": "^0.7.1",
+    "image-size": "^0.8.3",
     "jest": "^25.1.0",
     "jest-snapshot": "^25.1.0",
     "lockfile-lint": "^4.0.0",
@@ -62,8 +62,8 @@
     "glur": "^1.1.2",
     "lodash": "^4.17.4",
     "mkdirp": "^0.5.1",
-    "pixelmatch": "^4.0.2",
-    "pngjs": "^3.3.3",
+    "pixelmatch": "^5.1.0",
+    "pngjs": "^3.4.0",
     "rimraf": "^2.6.2"
   },
   "peerDependencies": {
