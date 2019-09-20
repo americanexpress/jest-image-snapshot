@@ -168,7 +168,7 @@ describe('toMatchImageSnapshot', () => {
     const biggerImageData = fs.readFileSync(fromStubs('TestImage150x150.png'));
 
     it('fails for a different snapshot', () => {
-      const expectedError = /^Expected image to match or be a close match to snapshot but was 86\.55000000000001% different from snapshot \(8655 differing pixels\)\./;
+      const expectedError = /^Expected image to match or be a close match to snapshot but was 86\.45% different from snapshot \(8645 differing pixels\)\./;
       const customSnapshotIdentifier = getIdentifierIndicatingCleanupIsRequired();
 
       // Write a new snapshot image
