@@ -118,6 +118,7 @@ function createSnapshotIdentifier({
 
 function configureToMatchImageSnapshot({
   customDiffConfig: commonCustomDiffConfig = {},
+  customSnapshotIdentifier: commonCustomSnapshotIdentifier,
   customSnapshotsDir: commonCustomSnapshotsDir,
   customDiffDir: commonCustomDiffDir,
   diffDirection: commonDiffDirection = 'horizontal',
@@ -129,7 +130,7 @@ function configureToMatchImageSnapshot({
   runInProcess: commonRunInProcess = false,
 } = {}) {
   return function toMatchImageSnapshot(received, {
-    customSnapshotIdentifier = '',
+    customSnapshotIdentifier = commonCustomSnapshotIdentifier,
     customSnapshotsDir = commonCustomSnapshotsDir,
     customDiffDir = commonCustomDiffDir,
     diffDirection = commonDiffDirection,

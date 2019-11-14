@@ -378,12 +378,20 @@ describe('toMatchImageSnapshot', () => {
       constructor: Chalk,
     }));
     const { configureToMatchImageSnapshot } = require('../src/index');
-    const customConfig = { perceptual: true };
+    const customDiffConfig = { perceptual: true };
+    const customSnapshotIdentifier = ({ defaultIdentifier }) =>
+      `custom-${defaultIdentifier}`;
     const toMatchImageSnapshot = configureToMatchImageSnapshot({
-      customDiffConfig: customConfig,
+      customDiffConfig,
+      customSnapshotIdentifier,
       customSnapshotsDir: path.join('path', 'to', 'my-custom-snapshots-dir'),
       customDiffDir: path.join('path', 'to', 'my-custom-diff-dir'),
+      diffDirection: 'vertical',
       noColors: true,
+      failureThreshold: 1,
+      failureThresholdType: 'percent',
+      updatePassedSnapshot: true,
+      blur: 1,
     });
     expect.extend({ toMatchImageSnapshot });
     const matcherAtTest = toMatchImageSnapshot.bind(mockTestContext);
@@ -391,18 +399,18 @@ describe('toMatchImageSnapshot', () => {
     matcherAtTest();
 
     expect(runDiffImageToSnapshot).toHaveBeenCalledWith({
-      blur: 0,
+      blur: 1,
       customDiffConfig: {
         perceptual: true,
       },
-      snapshotIdentifier: 'test-spec-js-test-1-1',
+      snapshotIdentifier: 'custom-test-spec-js-test-1-1',
       snapshotsDir: path.join('path', 'to', 'my-custom-snapshots-dir'),
       diffDir: path.join('path', 'to', 'my-custom-diff-dir'),
-      diffDirection: 'horizontal',
+      diffDirection: 'vertical',
       updateSnapshot: false,
-      updatePassedSnapshot: false,
-      failureThreshold: 0,
-      failureThresholdType: 'pixel',
+      updatePassedSnapshot: true,
+      failureThreshold: 1,
+      failureThresholdType: 'percent',
     });
     expect(Chalk).toHaveBeenCalledWith({
       enabled: false,
