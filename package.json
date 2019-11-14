@@ -1,6 +1,6 @@
 {
   "name": "jest-image-snapshot",
-  "version": "2.11.0",
+  "version": "2.11.1",
   "description": "Jest matcher for image comparisons. Most commonly used for visual regression testing.",
   "main": "src/index.js",
   "engines": {
