@@ -20,7 +20,7 @@ Want to get paid for your contributions to `jest-image-snapshot`?
 ## 📖 Table of Contents
 
 * [Features](#-features)
-* [Usage](#-useage)
+* [Usage](#-usage)
 * [API](#-api)
 * [Available Scripts](#-available-scripts)
 * [Contributing](#-contributing)
