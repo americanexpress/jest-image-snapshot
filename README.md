@@ -19,11 +19,11 @@ Want to get paid for your contributions to `jest-image-snapshot`?
 
 ## 📖 Table of Contents
 
-* [Features](#Features)
-* [Usage](#Usage)
-* [API](#API)
-* [Available Scripts](#Available%20Scripts)
-* [Contributing](#Contributing)
+* [Features](#-features)
+* [Usage](#-usage)
+* [API](#-api)
+* [Available Scripts](#-available-scripts)
+* [Contributing](#-contributing)
 
 ## ✨ Features
 
