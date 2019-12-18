@@ -36,6 +36,7 @@ function checkResult({
   retryTimes,
   snapshotIdentifier,
   chalk,
+  dumpDiffToConsole
 }) {
   let pass = true;
   /*
@@ -70,6 +71,14 @@ function checkResult({
         } else {
           failure = `Expected image to match or be a close match to snapshot but was ${differencePercentage}% different from snapshot (${result.diffPixelCount} differing pixels).\n`
           + `${chalk.bold.red('See diff for details:')} ${chalk.red(result.diffOutputPath)}`;
+        }
+
+        if (dumpDiffToConsole) {
+           failure = `${failure}
+           ${chalk.bold('------------------Img diff dump----------------')}
+           ${result.imgSrcString}
+           ${chalk.bold('-----------------End Img diff dump------------')}
+           `
         }
 
         return failure;
@@ -128,6 +137,7 @@ function configureToMatchImageSnapshot({
   updatePassedSnapshot: commonUpdatePassedSnapshot = false,
   blur: commonBlur = 0,
   runInProcess: commonRunInProcess = false,
+  dumpDiffToConsole: commonDumpDiffToConsole = false,
 } = {}) {
   return function toMatchImageSnapshot(received, {
     customSnapshotIdentifier = commonCustomSnapshotIdentifier,
@@ -141,6 +151,7 @@ function configureToMatchImageSnapshot({
     updatePassedSnapshot = commonUpdatePassedSnapshot,
     blur = commonBlur,
     runInProcess = commonRunInProcess,
+    dumpDiffToConsole: commonDumpDiffToConsole
   } = {}) {
     const {
       testPath, currentTestName, isNot, snapshotState,
@@ -197,6 +208,7 @@ function configureToMatchImageSnapshot({
       retryTimes,
       snapshotIdentifier,
       chalk,
+      dumpDiffToConsole
     });
   };
 }
