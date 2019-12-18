@@ -151,7 +151,7 @@ function configureToMatchImageSnapshot({
     updatePassedSnapshot = commonUpdatePassedSnapshot,
     blur = commonBlur,
     runInProcess = commonRunInProcess,
-    dumpDiffToConsole: commonDumpDiffToConsole
+    dumpDiffToConsole = commonDumpDiffToConsole
   } = {}) {
     const {
       testPath, currentTestName, isNot, snapshotState,
