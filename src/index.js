@@ -151,7 +151,6 @@ function configureToMatchImageSnapshot({
     updatePassedSnapshot = commonUpdatePassedSnapshot,
     blur = commonBlur,
     runInProcess = commonRunInProcess,
-    dumpDiffToConsole = commonDumpDiffToConsole
   } = {}) {
     const {
       testPath, currentTestName, isNot, snapshotState,
@@ -208,7 +207,7 @@ function configureToMatchImageSnapshot({
       retryTimes,
       snapshotIdentifier,
       chalk,
-      dumpDiffToConsole
+      dumpDiffToConsole: commonDumpDiffToConsole
     });
   };
 }
