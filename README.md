@@ -1,5 +1,5 @@
 <h1 align="center">
-  <img src='https://github.com/americanexpress/holocron/raw/master/jest-image-snapshot.png" alt="Jest Image Snapshot - One Amex" width='50%'/>
+  <img src='https://github.com/americanexpress/jest-image-snapshot/raw/master/jest-image-snapshot.png" alt="Jest Image Snapshot - One Amex" width='50%'/>
 </h1>
 
 [![npm](https://img.shields.io/npm/v/jest-image-snapshot)](https://www.npmjs.com/package/jest-image-snapshot)
