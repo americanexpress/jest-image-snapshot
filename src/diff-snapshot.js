@@ -213,7 +213,7 @@ function diffImageToSnapshot(options) {
         diffOutputPath,
         diffRatio,
         diffPixelCount,
-        imgSrcString: `data:image/png;base64,${pngBuffer }`
+        imgSrcString: `data:image/png;base64,${pngBuffer}`,
       };
     } else if (shouldUpdate({ pass, updateSnapshot, updatePassedSnapshot })) {
       mkdirp.sync(snapshotsDir);

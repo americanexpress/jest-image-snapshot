@@ -36,7 +36,7 @@ function checkResult({
   retryTimes,
   snapshotIdentifier,
   chalk,
-  dumpDiffToConsole
+  dumpDiffToConsole,
 }) {
   let pass = true;
   /*
@@ -66,19 +66,15 @@ function checkResult({
       message = () => {
         let failure;
         if (result.diffSize) {
-          failure = `Expected image to be the same size as the snapshot (${result.imageDimensions.baselineWidth}x${result.imageDimensions.baselineHeight}), but was different (${result.imageDimensions.receivedWidth}x${result.imageDimensions.receivedHeight}).\n`
-          + `${chalk.bold.red('See diff for details:')} ${chalk.red(result.diffOutputPath)}`;
+          failure = `Expected image to be the same size as the snapshot (${result.imageDimensions.baselineWidth}x${result.imageDimensions.baselineHeight}), but was different (${result.imageDimensions.receivedWidth}x${result.imageDimensions.receivedHeight}).\n`;
         } else {
-          failure = `Expected image to match or be a close match to snapshot but was ${differencePercentage}% different from snapshot (${result.diffPixelCount} differing pixels).\n`
-          + `${chalk.bold.red('See diff for details:')} ${chalk.red(result.diffOutputPath)}`;
+          failure = `Expected image to match or be a close match to snapshot but was ${differencePercentage}% different from snapshot (${result.diffPixelCount} differing pixels).\n`;
         }
 
+        failure += `${chalk.bold.red('See diff for details:')} ${chalk.red(result.diffOutputPath)}`;
+
         if (dumpDiffToConsole) {
-           failure = `${failure}
-           ${chalk.bold('------------------Img diff dump----------------')}
-           ${result.imgSrcString}
-           ${chalk.bold('-----------------End Img diff dump------------')}
-           `
+          failure += `\n${chalk.bold.red('Or paste below imge diff string to your browser`s URL bar.')}\n ${result.imgSrcString}`;
         }
 
         return failure;
@@ -151,6 +147,7 @@ function configureToMatchImageSnapshot({
     updatePassedSnapshot = commonUpdatePassedSnapshot,
     blur = commonBlur,
     runInProcess = commonRunInProcess,
+    dumpDiffToConsole = commonDumpDiffToConsole,
   } = {}) {
     const {
       testPath, currentTestName, isNot, snapshotState,
@@ -207,7 +204,7 @@ function configureToMatchImageSnapshot({
       retryTimes,
       snapshotIdentifier,
       chalk,
-      dumpDiffToConsole: commonDumpDiffToConsole
+      dumpDiffToConsole,
     });
   };
 }

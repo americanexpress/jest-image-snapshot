@@ -167,7 +167,7 @@ describe('diff-snapshot', () => {
       expect(mockWriteFileSync.mock.calls).toEqual([]);
     });
 
-    it('should write a diff image if the test fails', () => {
+    it('should write a diff image and imgSrcString if the test fails', () => {
       const diffImageToSnapshot = setupTest({ snapshotExists: true, pixelmatchResult: 5000 });
       const result = diffImageToSnapshot({
         receivedImageBuffer: mockFailImageBuffer,
@@ -185,6 +185,10 @@ describe('diff-snapshot', () => {
         diffPixelCount: 5000,
         pass: false,
       });
+
+      const isBase64ImgStr = result.imgSrcString.includes('data:image') && result.imgSrcString.includes('base64');
+      expect(isBase64ImgStr).toBe(true);
+
       expect(mockPixelMatch).toHaveBeenCalledTimes(1);
       expect(mockPixelMatch).toHaveBeenCalledWith(
         expect.any(Buffer),
@@ -622,5 +626,24 @@ describe('diff-snapshot', () => {
       );
       expect(result.pass).toBe(true);
     });
+
+    it('should populate imgSrcString if test failed', () => {
+      const diffImageToSnapshot = setupTest({
+        snapshotExists: true,
+        outputDirExists: false,
+        pixelmatchResult: 100,
+      });
+      diffImageToSnapshot({
+        receivedImageBuffer: mockFailImageBuffer,
+        snapshotIdentifier: mockSnapshotIdentifier,
+        snapshotsDir: mockSnapshotsDir,
+        diffDir: mockDiffDir,
+        failureThreshold: 0,
+        failureThresholdType: 'pixel',
+      });
+
+      expect(mockMkdirpSync).toHaveBeenCalledWith(path.join(mockSnapshotsDir, '__diff_output__'));
+    });
   });
 });
+
