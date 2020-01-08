@@ -424,7 +424,6 @@ describe('toMatchImageSnapshot', () => {
     });
   });
 
-
   it('can run in process', () => {
     const mockTestContext = {
       testPath: path.join('path', 'to', 'test.spec.js'),
@@ -578,8 +577,8 @@ describe('toMatchImageSnapshot', () => {
       const mockDiffResult = {
         pass: false,
         diffOutputPath: 'path/to/result.png',
-        diffRatio: 0,
-        diffPixelCount: 0,
+        diffRatio: 0.8,
+        diffPixelCount: 600,
         imgSrcString: 'pretendthisisanimagebase64string',
       };
 

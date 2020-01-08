@@ -74,7 +74,7 @@ function checkResult({
         failure += `${chalk.bold.red('See diff for details:')} ${chalk.red(result.diffOutputPath)}`;
 
         if (dumpDiffToConsole) {
-          failure += `\n${chalk.bold.red('Or paste below imge diff string to your browser`s URL bar.')}\n ${result.imgSrcString}`;
+          failure += `\n${chalk.bold.red('Or paste below image diff string to your browser`s URL bar.')}\n ${result.imgSrcString}`;
         }
 
         return failure;
