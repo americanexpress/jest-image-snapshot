@@ -36,6 +36,7 @@ function checkResult({
   retryTimes,
   snapshotIdentifier,
   chalk,
+  dumpDiffToConsole,
 }) {
   let pass = true;
   /*
@@ -65,11 +66,15 @@ function checkResult({
       message = () => {
         let failure;
         if (result.diffSize) {
-          failure = `Expected image to be the same size as the snapshot (${result.imageDimensions.baselineWidth}x${result.imageDimensions.baselineHeight}), but was different (${result.imageDimensions.receivedWidth}x${result.imageDimensions.receivedHeight}).\n`
-          + `${chalk.bold.red('See diff for details:')} ${chalk.red(result.diffOutputPath)}`;
+          failure = `Expected image to be the same size as the snapshot (${result.imageDimensions.baselineWidth}x${result.imageDimensions.baselineHeight}), but was different (${result.imageDimensions.receivedWidth}x${result.imageDimensions.receivedHeight}).\n`;
         } else {
-          failure = `Expected image to match or be a close match to snapshot but was ${differencePercentage}% different from snapshot (${result.diffPixelCount} differing pixels).\n`
-          + `${chalk.bold.red('See diff for details:')} ${chalk.red(result.diffOutputPath)}`;
+          failure = `Expected image to match or be a close match to snapshot but was ${differencePercentage}% different from snapshot (${result.diffPixelCount} differing pixels).\n`;
+        }
+
+        failure += `${chalk.bold.red('See diff for details:')} ${chalk.red(result.diffOutputPath)}`;
+
+        if (dumpDiffToConsole) {
+          failure += `\n${chalk.bold.red('Or paste below image diff string to your browser`s URL bar.')}\n ${result.imgSrcString}`;
         }
 
         return failure;
@@ -128,6 +133,7 @@ function configureToMatchImageSnapshot({
   updatePassedSnapshot: commonUpdatePassedSnapshot = false,
   blur: commonBlur = 0,
   runInProcess: commonRunInProcess = false,
+  dumpDiffToConsole: commonDumpDiffToConsole = false,
 } = {}) {
   return function toMatchImageSnapshot(received, {
     customSnapshotIdentifier = commonCustomSnapshotIdentifier,
@@ -141,6 +147,7 @@ function configureToMatchImageSnapshot({
     updatePassedSnapshot = commonUpdatePassedSnapshot,
     blur = commonBlur,
     runInProcess = commonRunInProcess,
+    dumpDiffToConsole = commonDumpDiffToConsole,
   } = {}) {
     const {
       testPath, currentTestName, isNot, snapshotState,
@@ -197,6 +204,7 @@ function configureToMatchImageSnapshot({
       retryTimes,
       snapshotIdentifier,
       chalk,
+      dumpDiffToConsole,
     });
   };
 }

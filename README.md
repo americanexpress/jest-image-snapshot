@@ -114,6 +114,7 @@ See [the examples](./examples/README.md) for more detailed usage or read about a
 * `updatePassedSnapshot`: (default `false`) Updates a snapshot even if it passed the threshold against the existing one.
 * `blur`: (default `0`) Applies Gaussian Blur on compared images, accepts radius in pixels as value. Useful when you have noise after scaling images per different resolutions on your target website, usually setting it's value to 1-2 should be enough to solve that problem.
 * `runInProcess`: (default `false`) Runs the diff in process without spawning a child process.
+* `dumpDiffToConsole`: (default `false`) Will output base64 string of a diff image to console in case of failed tests (in addition to creating a diff image). This string can be copy-pasted to a browser address string to preview the diff for a failed test.
 
 ```javascript
 it('should demonstrate this matcher`s usage with a custom pixelmatch config', () => {

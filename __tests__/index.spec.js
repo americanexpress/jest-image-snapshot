@@ -34,6 +34,12 @@ describe('toMatchImageSnapshot', () => {
     };
   }
 
+  const ChalkMock = () => ({
+    bold: {
+      red: input => input,
+    },
+  });
+
   beforeEach(() => {
     // In tests, skip reporting (skip snapshotState update to not mess with our test report)
     global.UNSTABLE_SKIP_REPORTING = true;
@@ -43,6 +49,7 @@ describe('toMatchImageSnapshot', () => {
 
   afterEach(() => {
     jest.unmock('fs');
+    jest.unmock('chalk');
   });
 
   it('should throw an error if used with .not matcher', () => {
@@ -563,6 +570,49 @@ describe('toMatchImageSnapshot', () => {
       matcherAtTest('pretendthisisanimagebuffer', { customSnapshotIdentifier: 'custom-name' });
       matcherAtTest('pretendthisisanimagebuffer', { customSnapshotIdentifier: 'custom-name' });
       expect(mockTestContext.snapshotState.unmatched).toBe(1);
+    });
+  });
+  describe('dumpDiffToConsole', () => {
+    it('imgSrcString is added to console message when dumpDiffToConsole is true', () => {
+      const mockDiffResult = {
+        pass: false,
+        diffOutputPath: 'path/to/result.png',
+        diffRatio: 0.8,
+        diffPixelCount: 600,
+        imgSrcString: 'pretendthisisanimagebase64string',
+      };
+
+      setupMock(mockDiffResult);
+      const { toMatchImageSnapshot } = require('../src/index');
+      expect.extend({ toMatchImageSnapshot });
+
+      jest.doMock('chalk', () => ({
+        constructor: ChalkMock,
+      }));
+
+      expect(() => expect('pretendthisisanimagebuffer').toMatchImageSnapshot({ dumpDiffToConsole: true }))
+        .toThrowErrorMatchingSnapshot();
+    });
+
+    it('imgSrcString is not added to console by default', () => {
+      const mockDiffResult = {
+        pass: false,
+        diffOutputPath: 'path/to/result.png',
+        diffRatio: 0,
+        diffPixelCount: 0,
+        imgSrcString: 'pretendthisisanimagebase64string',
+      };
+
+      setupMock(mockDiffResult);
+      const { toMatchImageSnapshot } = require('../src/index');
+      expect.extend({ toMatchImageSnapshot });
+
+      jest.doMock('chalk', () => ({
+        constructor: ChalkMock,
+      }));
+
+      expect(() => expect('pretendthisisanimagebuffer').toMatchImageSnapshot())
+        .toThrowErrorMatchingSnapshot();
     });
   });
 });
