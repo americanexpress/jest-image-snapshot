@@ -240,7 +240,11 @@ function runDiffImageToSnapshot(options) {
 
   const writeDiffProcess = childProcess.spawnSync(
     process.execPath, [`${__dirname}/diff-process.js`],
-    { input: Buffer.from(serializedInput), stdio: ['pipe', 'inherit', 'inherit', 'pipe'] }
+    {
+      input: Buffer.from(serializedInput),
+      stdio: ['pipe', 'inherit', 'inherit', 'pipe'],
+      maxBuffer: 10 * 1024 * 1024, // 10 MB
+    }
   );
 
   if (writeDiffProcess.status === 0) {
