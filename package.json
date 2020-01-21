@@ -9,7 +9,8 @@
   "scripts": {
     "lint": "eslint ./ --ignore-path .gitignore --ext .js",
     "test": "jest --ci=false",
-    "posttest": "npm run lint"
+    "test:lockfile": "lockfile-lint -p package-lock.json -t npm -a npm -o https: -c -i",
+    "posttest": "npm run lint && npm run test:lockfile"
   },
   "keywords": [
     "test",
@@ -47,8 +48,9 @@
     "eslint-config-amex": "^7.0.0",
     "image-size": "^0.7.1",
     "jest": "^24.0.0",
-    "mock-spawn": "^0.2.6",
-    "jest-snapshot": "^23.0.0"
+    "jest-snapshot": "^23.0.0",
+    "lockfile-lint": "^3.0.8",
+    "mock-spawn": "^0.2.6"
   },
   "dependencies": {
     "chalk": "^1.1.3",
