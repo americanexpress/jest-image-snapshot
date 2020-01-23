@@ -1,4 +1,4 @@
-# Contributing to iguazu-rpc
+# Contributing to jest-image-snapshot
 
 ✨ Thank you for taking the time to contribute to this project ✨
 
@@ -19,12 +19,12 @@ This project adheres to the American Express [Code of Conduct](./CODE_OF_CONDUCT
 
 ### Installation
 
-1. Fork the repository `iguazu-rpc` to your GitHub account.
+1. Fork the repository `jest-image-snapshot` to your GitHub account.
 2. Afterwards run the following commands in your terminal
 
     ```bash
-    $ git clone https://github.com/<your-github-username>/iguazu-rpc
-    $ cd iguazu-rpc
+    $ git clone https://github.com/<your-github-username>/jest-image-snapshot
+    $ cd jest-image-snapshot
     ```
 
    > replace `your-github-username` with your github username
