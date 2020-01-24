@@ -35,7 +35,7 @@ This project adheres to the American Express [Code of Conduct](./CODE_OF_CONDUCT
     $ cd npm install
     ```
 
-4. You can now run any of this scripts from the root folder.
+4. You can now run any of these scripts from the root folder.
 
 #### Running tests
 
