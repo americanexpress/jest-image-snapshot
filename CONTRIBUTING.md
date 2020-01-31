@@ -98,7 +98,7 @@ Provide the system information which is not limited to the below:
 
 - OS: [e.g. macOS, Windows]
 - Browser (if applies) [e.g. chrome, safari]
-- Version of faux-cdn: [e.g. 5.0.0]
+- Version of jest-image-snapshot: [e.g. 5.0.0]
 - Node version:[e.g 10.15.1]
 
 ### Security Bugs
@@ -107,7 +107,7 @@ Please review our [Security Policy](./SECURITY.md). Please follow the instructio
 
 ## Getting in contact
 
-- Join our [Slack channel](http://one-amex.slack.com) request an invite [here](https://join.slack.com/t/one-amex/shared_invite/enQtOTA0MzEzODExODEwLTlmYzI1Y2U2ZDEwNWJjOTAxYTlmZTYzMjUyNzQyZTdmMWIwZGJmZDM2MDZmYzVjMDk5OWU4OGIwNjJjZWRhMjY)
+- Join our [Slack channel](https://one-amex.slack.com) request an invite [here](https://join.slack.com/t/one-amex/shared_invite/enQtOTA0MzEzODExODEwLTlmYzI1Y2U2ZDEwNWJjOTAxYTlmZTYzMjUyNzQyZTdmMWIwZGJmZDM2MDZmYzVjMDk5OWU4OGIwNjJjZWRhMjY)
 
 ## Coding conventions
 
