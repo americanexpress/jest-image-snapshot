@@ -10,7 +10,8 @@
     "lint": "eslint ./ --ignore-path .gitignore --ext .js",
     "test": "jest --ci=false",
     "test:lockfile": "lockfile-lint -p package-lock.json -t npm -a npm -o https: -c -i",
-    "posttest": "npm run lint && npm run test:lockfile"
+    "test:git-history": "commitlint --from origin/master --to HEAD",
+    "posttest": "npm run lint && npm run test:git-history && npm run test:lockfile"
   },
   "keywords": [
     "test",
@@ -43,9 +44,12 @@
   "author": "Andres Escobar <andres.escobar@aexp.com> (https://github.com/anescobar1991)",
   "license": "Apache-2.0",
   "devDependencies": {
+    "@commitlint/cli": "^8.3.5",
+    "@commitlint/config-conventional": "^8.3.4",
     "amex-jest-preset": "^5.0.0",
     "eslint": "^4.15.0",
     "eslint-config-amex": "^7.0.0",
+    "husky": "^4.2.1",
     "image-size": "^0.7.1",
     "jest": "^25.1.0",
     "jest-snapshot": "^25.1.0",
@@ -64,5 +68,11 @@
   },
   "peerDependencies": {
     "jest": ">=20 <=25"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "npm test",
+      "commit-msg": "commitlint -E HUSKY_GIT_PARAMS"
+    }
   }
 }
