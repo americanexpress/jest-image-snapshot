@@ -32,24 +32,24 @@ This project adheres to the American Express [Code of Conduct](./CODE_OF_CONDUCT
 3. Install the dependencies by running
 
     ```bash
-    $ cd npm install
+    $ npm install
     ```
 
 4. You can now run any of these scripts from the root folder.
 
 #### Running tests
 
-**`npm run lint`**
+- **`npm run lint`**
 
 Verifies that your code matches the American Express code style defined in [`eslint-config-amex`](https://github.com/americanexpress/eslint-config-amex).
 
-**`npm test`**
+- **`npm test`**
 
 Runs unit tests **and** verifies the format of all commit messages on the current branch.
 
-**`npm posttest`**
+- **`npm posttest`**
 
-Runs linting on the current branch and checks that the commits follow [conventional commits](https://www.conventionalcommits.org/)
+Runs linting on the current branch, checks that the commits follow [conventional commits](https://www.conventionalcommits.org/) and verifies that the `package-lock.json` file includes public NPM registry URLs.
 
 ## Submitting a new feature
 
@@ -96,7 +96,6 @@ If applicable, add screenshots or animated GIFs to help explain your problem.
 
 Provide the system information which is not limited to the below:
 
-- OS: [e.g. macOS, Windows]
 - Browser (if applies) [e.g. chrome, safari]
 - Version of jest-image-snapshot: [e.g. 5.0.0]
 - Node version:[e.g 10.15.1]
