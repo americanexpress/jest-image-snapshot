@@ -306,5 +306,20 @@ describe('toMatchImageSnapshot', () => {
 
       expect(diffExists(customSnapshotIdentifier)).toBe(false);
     });
+
+    it('handles diffs for large images', () => {
+      const largeImageData = fs.readFileSync(fromStubs('LargeTestImage.png'));
+      const largeFailureImageData = fs.readFileSync(fromStubs('LargeTestImageFailure.png'));
+      const customSnapshotIdentifier = getIdentifierIndicatingCleanupIsRequired();
+      // First we need to write a new snapshot image
+      expect(
+        () => expect(largeImageData).toMatchImageSnapshot({ customSnapshotIdentifier })
+      ).not.toThrowError();
+
+      // then test against a different image
+      expect(
+        () => expect(largeFailureImageData).toMatchImageSnapshot({ customSnapshotIdentifier })
+      ).toThrow(/Expected image to match or be a close match/);
+    });
   });
 });
