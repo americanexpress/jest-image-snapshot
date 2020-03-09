@@ -53,7 +53,7 @@
     "image-size": "^0.7.1",
     "jest": "^25.1.0",
     "jest-snapshot": "^25.1.0",
-    "lockfile-lint": "^3.0.8",
+    "lockfile-lint": "^4.0.0",
     "mock-spawn": "^0.2.6"
   },
   "dependencies": {
