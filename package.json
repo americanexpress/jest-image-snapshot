@@ -49,15 +49,15 @@
     "@semantic-release/changelog": "^5.0.0",
     "@semantic-release/git": "^9.0.0",
     "amex-jest-preset": "^5.0.0",
-    "eslint": "^4.15.0",
+    "eslint": "^6.8.0",
     "eslint-config-amex": "^7.0.0",
     "husky": "^4.2.1",
     "image-size": "^0.7.1",
     "jest": "^25.1.0",
     "jest-snapshot": "^25.1.0",
-    "lockfile-lint": "^3.0.8",
-    "mock-spawn": "^0.2.6",
-    "semantic-release": "^17.0.4"
+    "semantic-release": "^17.0.4",
+    "lockfile-lint": "^4.0.0",
+    "mock-spawn": "^0.2.6"
   },
   "dependencies": {
     "chalk": "^1.1.3",
