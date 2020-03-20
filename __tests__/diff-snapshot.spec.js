@@ -186,7 +186,7 @@ describe('diff-snapshot', () => {
         pass: false,
       });
 
-      const isBase64ImgStr = result.imgSrcString.includes('data:image') && result.imgSrcString.includes('base64');
+      const isBase64ImgStr = result.imgSrcString.includes('data:image/png;base64,iV');
       expect(isBase64ImgStr).toBe(true);
 
       expect(mockPixelMatch).toHaveBeenCalledTimes(1);
