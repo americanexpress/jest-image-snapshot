@@ -11,6 +11,9 @@ jobs:
   include:
     # Define the release stage that runs semantic-release
     - stage: release
+      node_js:
+        - 10
+        - 12
       deploy:
         on:
           branch: master
