@@ -1,3 +1,10 @@
+## [3.0.1](https://github.com/americanexpress/jest-image-snapshot/compare/v3.0.0...v3.0.1) (2020-03-25)
+
+
+### Performance Improvements
+
+* **diff-snapshot:** remove logic to bypass diff for identical images ([1be1b00](https://github.com/americanexpress/jest-image-snapshot/commit/1be1b006220b4144f98ad583c8cd6ff629aec7b3))
+
 # [3.0.0](https://github.com/americanexpress/jest-image-snapshot/compare/v2.12.0...v3.0.0) (2020-03-24)
 
 
