@@ -171,7 +171,7 @@ To enable this image reporter, add it to your `jest.config.js` "reporters" defin
 
 #### Usage in TypeScript
 
-In TypeScript, you can declare `toMatchImageSnapshot` like this:
+In TypeScript, you can use the [DefinitelyTyped](https://www.npmjs.com/package/@types/jest-image-snapshot) definition or declare `toMatchImageSnapshot` like this:
 
 ```
 declare global {
@@ -182,6 +182,7 @@ declare global {
   }
 }
 ```
+
 
 #### Ignoring parts of the image snapshot if using [Puppeteer](https://github.com/GoogleChrome/puppeteer)
 
