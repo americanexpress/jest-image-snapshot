@@ -111,7 +111,7 @@ See [the examples](./examples/README.md) for more detailed usage or read about a
 * `failureThreshold`: (default `0`) Sets the threshold that would trigger a test failure based on the `failureThresholdType` selected. This is different to the `customDiffConfig.threshold` above, that is the per pixel failure threshold, this is the failure threshold for the entire comparison.
 * `failureThresholdType`: (default `pixel`) (options `percent` or `pixel`) Sets the type of threshold that would trigger a failure.
 * `updatePassedSnapshot`: (default `false`) Updates a snapshot even if it passed the threshold against the existing one.
-* `blur`: (default `0`) Applies Gaussian Blur on compared images, accepts radius in pixels as value. Useful when you have noise after scaling images per different resolutions on your target website, usually setting it's value to 1-2 should be enough to solve that problem.
+* `blur`: (default `0`) Applies Gaussian Blur on compared images, accepts radius in pixels as value. Useful when you have noise after scaling images per different resolutions on your target website, usually setting its value to 1-2 should be enough to solve that problem.
 * `runInProcess`: (default `false`) Runs the diff in process without spawning a child process.
 * `dumpDiffToConsole`: (default `false`) Will output base64 string of a diff image to console in case of failed tests (in addition to creating a diff image). This string can be copy-pasted to a browser address string to preview the diff for a failed test.
 
