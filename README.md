@@ -171,9 +171,12 @@ To enable this image reporter, add it to your `jest.config.js` "reporters" defin
 
 #### Usage in TypeScript
 
-In TypeScript, you can use the [DefinitelyTyped](https://www.npmjs.com/package/@types/jest-image-snapshot) definition or declare `toMatchImageSnapshot` like this:
+In TypeScript, you can use the [DefinitelyTyped](https://www.npmjs.com/package/@types/jest-image-snapshot) definition or declare `toMatchImageSnapshot` like the example below:
 
-```
+_Note: This package is not maintained by the `jest-image-snapshot` maintainers so it may be out of date or inaccurate. Because of this, we do not officially support it._
+
+
+```typescript
 declare global {
   namespace jest {
     interface Matchers<R> {
