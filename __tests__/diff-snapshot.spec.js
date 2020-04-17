@@ -244,6 +244,44 @@ describe('diff-snapshot', () => {
       expect(result.diffRatio).toBe(0.025);
     });
 
+    it('should pass with allowSizeMismatch: true if image passed is a different size but <= failureThreshold pixel', () => {
+      const diffImageToSnapshot = setupTest({ snapshotExists: true, pixelmatchResult: 250 });
+      const result = diffImageToSnapshot({
+        receivedImageBuffer: mockBigImageBuffer,
+        snapshotIdentifier: mockSnapshotIdentifier,
+        snapshotsDir: mockSnapshotsDir,
+        diffDir: mockDiffDir,
+        updateSnapshot: false,
+        failureThreshold: 250,
+        failureThresholdType: 'pixel',
+        allowSizeMismatch: true,
+      });
+
+      expect(result.pass).toBe(true);
+      expect(result.diffSize).toBe(true);
+      expect(result.diffPixelCount).toBe(250);
+      expect(result.diffRatio).toBe(0.1 / 9);
+    });
+
+    it('should fail with allowSizeMismatch: true if image passed is a different size but > failureThreshold pixel', () => {
+      const diffImageToSnapshot = setupTest({ snapshotExists: true, pixelmatchResult: 250 });
+      const result = diffImageToSnapshot({
+        receivedImageBuffer: mockBigImageBuffer,
+        snapshotIdentifier: mockSnapshotIdentifier,
+        snapshotsDir: mockSnapshotsDir,
+        diffDir: mockDiffDir,
+        updateSnapshot: false,
+        failureThreshold: 0,
+        failureThresholdType: 'pixel',
+        allowSizeMismatch: true,
+      });
+
+      expect(result.pass).toBe(false);
+      expect(result.diffSize).toBe(true);
+      expect(result.diffPixelCount).toBe(250);
+      expect(result.diffRatio).toBe(0.1 / 9);
+    });
+
     it('should pass = image checksums', () => {
       const diffImageToSnapshot = setupTest({ snapshotExists: true, pixelmatchResult: 0 });
       const result = diffImageToSnapshot({
