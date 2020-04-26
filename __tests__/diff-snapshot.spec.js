@@ -138,8 +138,6 @@ describe('diff-snapshot', () => {
         diffPixelCount: 0,
         pass: true,
       });
-      // Check that pixelmatch was not called
-      expect(mockPixelMatch).not.toHaveBeenCalled();
     });
 
     it('it should not write a diff if a test passes', () => {
@@ -160,8 +158,6 @@ describe('diff-snapshot', () => {
         diffPixelCount: 0,
         pass: true,
       });
-      // Check that pixelmatch was not called
-      expect(mockPixelMatch).not.toHaveBeenCalled();
 
       // Check that that it did not attempt to write a diff
       expect(mockWriteFileSync.mock.calls).toEqual([]);
@@ -348,7 +344,14 @@ describe('diff-snapshot', () => {
       });
 
       // Check that pixelmatch was not called
-      expect(mockPixelMatch).not.toHaveBeenCalled();
+      expect(mockPixelMatch).toHaveBeenCalledWith(
+        expect.any(Object), // buffer data
+        expect.any(Object), // buffer data
+        expect.any(Object), // buffer data
+        expect.any(Number), // image width
+        expect.any(Number), // image height
+        { threshold: 0.01 }
+      );
     });
 
     it('should merge custom configuration with default configuration if custom config is passed', () => {
@@ -361,7 +364,6 @@ describe('diff-snapshot', () => {
         diffDir: mockDiffDir,
         updateSnapshot: false,
         customDiffConfig: {
-          threshold: 0.1,
           foo: 'bar',
         },
         failureThreshold: 0,
@@ -369,7 +371,14 @@ describe('diff-snapshot', () => {
       });
 
       // Check that pixelmatch was not called
-      expect(mockPixelMatch).not.toHaveBeenCalled();
+      expect(mockPixelMatch).toHaveBeenCalledWith(
+        expect.any(Object), // buffer data
+        expect.any(Object), // buffer data
+        expect.any(Object), // buffer data
+        expect.any(Number), // image width
+        expect.any(Number), // image height
+        { foo: 'bar', threshold: 0.01 }
+      );
     });
 
     it('should create diff output directory if there is not one already and test is failing', () => {
