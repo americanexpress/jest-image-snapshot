@@ -83,6 +83,38 @@ const shouldUpdate = ({ pass, updateSnapshot, updatePassedSnapshot }) => (
   (!pass && updateSnapshot) || (pass && updatePassedSnapshot)
 );
 
+const shouldFail = ({
+  totalPixels,
+  diffPixelCount,
+  hasSizeMismatch,
+  allowSizeMismatch,
+  failureThresholdType,
+  failureThreshold,
+}) => {
+  let pass = false;
+  let diffSize = false;
+  const diffRatio = diffPixelCount / totalPixels;
+  if (hasSizeMismatch) {
+    // do not fail if allowSizeMismatch is set
+    pass = allowSizeMismatch;
+    diffSize = true;
+  }
+  if (!diffSize || pass === true) {
+    if (failureThresholdType === 'pixel') {
+      pass = diffPixelCount <= failureThreshold;
+    } else if (failureThresholdType === 'percent') {
+      pass = diffRatio <= failureThreshold;
+    } else {
+      throw new Error(`Unknown failureThresholdType: ${failureThresholdType}. Valid options are "pixel" or "percent".`);
+    }
+  }
+  return {
+    pass,
+    diffSize,
+    diffRatio,
+  };
+};
+
 function diffImageToSnapshot(options) {
   const {
     receivedImageBuffer,
@@ -96,6 +128,7 @@ function diffImageToSnapshot(options) {
     failureThreshold,
     failureThresholdType,
     blur,
+    allowSizeMismatch = false,
   } = options;
 
   let result = {};
@@ -140,9 +173,6 @@ function diffImageToSnapshot(options) {
 
     const diffImage = new PNG({ width: imageWidth, height: imageHeight });
 
-    let pass = false;
-    let diffSize = false;
-    let diffRatio = 0;
     let diffPixelCount = 0;
 
     diffPixelCount = pixelmatch(
@@ -155,18 +185,19 @@ function diffImageToSnapshot(options) {
     );
 
     const totalPixels = imageWidth * imageHeight;
-    diffRatio = diffPixelCount / totalPixels;
-    // Always fail test on image size mismatch
-    if (hasSizeMismatch) {
-      pass = false;
-      diffSize = true;
-    } else if (failureThresholdType === 'pixel') {
-      pass = diffPixelCount <= failureThreshold;
-    } else if (failureThresholdType === 'percent') {
-      pass = diffRatio <= failureThreshold;
-    } else {
-      throw new Error(`Unknown failureThresholdType: ${failureThresholdType}. Valid options are "pixel" or "percent".`);
-    }
+
+    const {
+      pass,
+      diffSize,
+      diffRatio,
+    } = shouldFail({
+      totalPixels,
+      diffPixelCount,
+      hasSizeMismatch,
+      allowSizeMismatch,
+      failureThresholdType,
+      failureThreshold,
+    });
 
     if (isFailure({ pass, updateSnapshot })) {
       mkdirp.sync(diffDir);
@@ -213,6 +244,7 @@ function diffImageToSnapshot(options) {
     } else {
       result = {
         pass,
+        diffSize,
         diffRatio,
         diffPixelCount,
         diffOutputPath,
