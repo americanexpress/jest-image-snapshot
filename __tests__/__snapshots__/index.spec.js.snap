@@ -14,6 +14,7 @@ exports[`toMatchImageSnapshot dumpDiffToConsole imgSrcString is not added to con
 
 exports[`toMatchImageSnapshot passes diffImageToSnapshot everything it needs to create a snapshot and compare if needed 1`] = `
 Object {
+  "allowSizeMismatch": false,
   "blur": 0,
   "customDiffConfig": Object {},
   "diffDir": "path/to/__image_snapshots__/__diff_output__",

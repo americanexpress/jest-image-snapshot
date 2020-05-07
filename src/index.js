@@ -134,6 +134,7 @@ function configureToMatchImageSnapshot({
   blur: commonBlur = 0,
   runInProcess: commonRunInProcess = false,
   dumpDiffToConsole: commonDumpDiffToConsole = false,
+  allowSizeMismatch: commonAllowSizeMismatch = false,
 } = {}) {
   return function toMatchImageSnapshot(received, {
     customSnapshotIdentifier = commonCustomSnapshotIdentifier,
@@ -148,6 +149,7 @@ function configureToMatchImageSnapshot({
     blur = commonBlur,
     runInProcess = commonRunInProcess,
     dumpDiffToConsole = commonDumpDiffToConsole,
+    allowSizeMismatch = commonAllowSizeMismatch,
   } = {}) {
     const {
       testPath, currentTestName, isNot, snapshotState,
@@ -196,6 +198,7 @@ function configureToMatchImageSnapshot({
         failureThresholdType,
         updatePassedSnapshot,
         blur,
+        allowSizeMismatch,
       });
 
     return checkResult({
