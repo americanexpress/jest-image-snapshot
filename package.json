@@ -4,7 +4,7 @@
   "description": "Jest matcher for image comparisons. Most commonly used for visual regression testing.",
   "main": "src/index.js",
   "engines": {
-    "node": ">=8.0.0"
+    "node": ">= 10.14.2"
   },
   "scripts": {
     "lint": "eslint ./ --ignore-path .gitignore --ext .js",
