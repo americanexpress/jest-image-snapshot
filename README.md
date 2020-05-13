@@ -22,7 +22,7 @@ Want to get paid for your contributions to `jest-image-snapshot`?
 
 ## ✨ Features
 
-* Take image snapshots of your React components
+* Take image snapshots of your application
 * Ability to compare snapshots from a baseline
 * Update snapshots when you're good with changes
 * Customize a difference threshold
