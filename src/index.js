@@ -37,6 +37,7 @@ function checkResult({
   snapshotIdentifier,
   chalk,
   dumpDiffToConsole,
+  allowSizeMismatch,
 }) {
   let pass = true;
   /*
@@ -65,7 +66,7 @@ function checkResult({
       const differencePercentage = result.diffRatio * 100;
       message = () => {
         let failure;
-        if (result.diffSize) {
+        if (result.diffSize && !allowSizeMismatch) {
           failure = `Expected image to be the same size as the snapshot (${result.imageDimensions.baselineWidth}x${result.imageDimensions.baselineHeight}), but was different (${result.imageDimensions.receivedWidth}x${result.imageDimensions.receivedHeight}).\n`;
         } else {
           failure = `Expected image to match or be a close match to snapshot but was ${differencePercentage}% different from snapshot (${result.diffPixelCount} differing pixels).\n`;
@@ -208,6 +209,7 @@ function configureToMatchImageSnapshot({
       snapshotIdentifier,
       chalk,
       dumpDiffToConsole,
+      allowSizeMismatch,
     });
   };
 }
