@@ -1,3 +1,10 @@
+## [4.0.2](https://github.com/americanexpress/jest-image-snapshot/compare/v4.0.1...v4.0.2) (2020-05-27)
+
+
+### Bug Fixes
+
+* **options:** auto-detect colors if noColors option is not specified ([d90298c](https://github.com/americanexpress/jest-image-snapshot/commit/d90298c3f102734107a7574ddf0516c19a349c66))
+
 ## [4.0.1](https://github.com/americanexpress/jest-image-snapshot/compare/v4.0.0...v4.0.1) (2020-05-27)
 
 
