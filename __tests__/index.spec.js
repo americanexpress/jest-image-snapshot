@@ -17,10 +17,12 @@ const fs = require('fs');
 const path = require('path');
 
 describe('toMatchImageSnapshot', () => {
-  function setupMock(diffImageToSnapshotResult) {
+  function setupMock(diffImageToSnapshotResult, mockSupportsColor = true) {
     jest.doMock('../src/diff-snapshot', () => ({
       runDiffImageToSnapshot: jest.fn(() => diffImageToSnapshotResult),
     }));
+
+    jest.mock('supports-color', () => mockSupportsColor);
 
     const mockFs = Object.assign({}, fs, {
       existsSync: jest.fn(),
@@ -136,6 +138,56 @@ describe('toMatchImageSnapshot', () => {
     expect.extend({ toMatchImageSnapshot });
 
     expect(() => expect('pretendthisisanimagebuffer').toMatchImageSnapshot({ noColors: true }))
+      .toThrowErrorMatchingSnapshot();
+  });
+
+  it('should use noColors options if passed as false and style error message', () => {
+    const mockDiffResult = {
+      pass: false,
+      diffOutputPath: 'path/to/result.png',
+      diffRatio: 0.4,
+      diffPixelCount: 600,
+    };
+    const mockSupportsColor = false;
+
+    setupMock(mockDiffResult, mockSupportsColor);
+    const { toMatchImageSnapshot } = require('../src/index');
+    expect.extend({ toMatchImageSnapshot });
+
+    expect(() => expect('pretendthisisanimagebuffer').toMatchImageSnapshot({ noColors: false }))
+      .toThrowErrorMatchingSnapshot();
+  });
+
+  it('should not style error message if colors not supported ', () => {
+    const mockDiffResult = {
+      pass: false,
+      diffOutputPath: 'path/to/result.png',
+      diffRatio: 0.4,
+      diffPixelCount: 600,
+    };
+    const mockSupportsColor = false;
+
+    setupMock(mockDiffResult, mockSupportsColor);
+    const { toMatchImageSnapshot } = require('../src/index');
+    expect.extend({ toMatchImageSnapshot });
+
+    expect(() => expect('pretendthisisanimagebuffer').toMatchImageSnapshot())
+      .toThrowErrorMatchingSnapshot();
+  });
+
+  it('should style error message if colors supported ', () => {
+    const mockDiffResult = {
+      pass: false,
+      diffOutputPath: 'path/to/result.png',
+      diffRatio: 0.4,
+      diffPixelCount: 600,
+    };
+
+    setupMock(mockDiffResult);
+    const { toMatchImageSnapshot } = require('../src/index');
+    expect.extend({ toMatchImageSnapshot });
+
+    expect(() => expect('pretendthisisanimagebuffer').toMatchImageSnapshot())
       .toThrowErrorMatchingSnapshot();
   });
 

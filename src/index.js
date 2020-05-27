@@ -128,7 +128,7 @@ function configureToMatchImageSnapshot({
   customSnapshotsDir: commonCustomSnapshotsDir,
   customDiffDir: commonCustomDiffDir,
   diffDirection: commonDiffDirection = 'horizontal',
-  noColors: commonNoColors = false,
+  noColors: commonNoColors,
   failureThreshold: commonFailureThreshold = 0,
   failureThresholdType: commonFailureThresholdType = 'pixel',
   updatePassedSnapshot: commonUpdatePassedSnapshot = false,
@@ -155,7 +155,11 @@ function configureToMatchImageSnapshot({
     const {
       testPath, currentTestName, isNot, snapshotState,
     } = this;
-    const chalk = new Chalk({ enabled: !noColors });
+    const chalkOptions = {};
+    if (typeof noColors !== 'undefined') {
+      chalkOptions.enabled = !noColors;
+    }
+    const chalk = new Chalk(chalkOptions);
 
     const retryTimes = parseInt(global[Symbol.for('RETRY_TIMES')], 10) || 0;
 
