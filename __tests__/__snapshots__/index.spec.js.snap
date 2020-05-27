@@ -35,6 +35,11 @@ exports[`toMatchImageSnapshot should fail when snapshot has a difference beyond 
 
 exports[`toMatchImageSnapshot should throw an error if used with .not matcher 1`] = `"Jest: \`.not\` cannot be used with \`.toMatchImageSnapshot()\`."`;
 
+exports[`toMatchImageSnapshot should use noColors options if passed as false and style error message 2`] = `
+"Expected image to match or be a close match to snapshot but was 40% different from snapshot (600 differing pixels).
+[1m[31mSee diff for details:[39m[22m [31mpath/to/result.png[39m"
+`;
+
 exports[`toMatchImageSnapshot should use noColors options if passed as true and not style error message 2`] = `
 "Expected image to match or be a close match to snapshot but was 40% different from snapshot (600 differing pixels).
 See diff for details: path/to/result.png"

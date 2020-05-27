@@ -139,6 +139,22 @@ describe('toMatchImageSnapshot', () => {
       .toThrowErrorMatchingSnapshot();
   });
 
+  it('should use noColors options if passed as false and style error message', () => {
+    const mockDiffResult = {
+      pass: false,
+      diffOutputPath: 'path/to/result.png',
+      diffRatio: 0.4,
+      diffPixelCount: 600,
+    };
+
+    setupMock(mockDiffResult);
+    const { toMatchImageSnapshot } = require('../src/index');
+    expect.extend({ toMatchImageSnapshot });
+
+    expect(() => expect('pretendthisisanimagebuffer').toMatchImageSnapshot({ noColors: false }))
+      .toThrowErrorMatchingSnapshot();
+  });
+
   it('should use custom pixelmatch configuration if passed in', () => {
     const mockTestContext = {
       testPath: 'path/to/test.spec.js',
