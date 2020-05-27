@@ -1,3 +1,15 @@
+# [4.0.0](https://github.com/americanexpress/jest-image-snapshot/compare/v3.1.0...v4.0.0) (2020-05-14)
+
+
+### chore
+
+* upgrade to jest 26 + drop node 8 support ([#205](https://github.com/americanexpress/jest-image-snapshot/issues/205)) ([4834533](https://github.com/americanexpress/jest-image-snapshot/commit/4834533369dae1533c93ad883e3f66617d7d9c3f))
+
+
+### BREAKING CHANGES
+
+* drop node 8 support
+
 # [3.1.0](https://github.com/americanexpress/jest-image-snapshot/compare/v3.0.1...v3.1.0) (2020-04-17)
 
 
