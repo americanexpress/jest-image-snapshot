@@ -1,3 +1,10 @@
+## [4.0.1](https://github.com/americanexpress/jest-image-snapshot/compare/v4.0.0...v4.0.1) (2020-05-27)
+
+
+### Bug Fixes
+
+* **options:** add allowSizeMismatch arg ([6529ff4](https://github.com/americanexpress/jest-image-snapshot/commit/6529ff4b2bd9a20abe33d4b68d9d793198931f18))
+
 # [4.0.0](https://github.com/americanexpress/jest-image-snapshot/compare/v3.1.0...v4.0.0) (2020-05-14)
 
 
