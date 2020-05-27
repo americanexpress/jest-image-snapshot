@@ -2,6 +2,7 @@ language: node_js
 node_js:
   - 10
   - 12
+  - 14
 before_install:
   # Create a master branch for commitlint
   # https://github.com/conventional-changelog/commitlint/issues/6
@@ -13,6 +14,7 @@ jobs:
       node_js:
         - 10
         - 12
+        - 14
       deploy:
         on:
           branch: master
