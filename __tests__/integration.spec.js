@@ -84,6 +84,20 @@ describe('toMatchImageSnapshot', () => {
 
       expect(diffExists(customSnapshotIdentifier)).toBe(false);
     });
+
+    it('does not write a result image for passing tests (ssim)', () => {
+      const customSnapshotIdentifier = 'integration-6';
+
+      // First we need to write a new snapshot image
+      expect(
+        () => expect(imageData).toMatchImageSnapshot({
+          customSnapshotIdentifier,
+          comparisonMethod: 'ssim',
+        })
+      ).not.toThrowError();
+
+      expect(diffExists(customSnapshotIdentifier)).toBe(false);
+    });
   });
 
   describe('updates', () => {
@@ -130,6 +144,23 @@ describe('toMatchImageSnapshot', () => {
       expect(fs.readFileSync(updateImageSnapshotPath)).not.toEqual(updateImageData);
     });
 
+    it('writes a result image for passing test in update mode with updatePassedSnapshots: true (ssim)', () => {
+      const updateModeMatcher = toMatchImageSnapshot.bind({
+        snapshotState: new SnapshotState(__filename, {
+          updateSnapshot: 'all',
+        }),
+        testPath: __filename,
+      });
+      updateModeMatcher(updateImageData, {
+        customSnapshotIdentifier,
+        updatePassedSnapshots: true,
+        failureThreshold: 2,
+        failureThresholdType: 'pixel',
+        comparisonMode: 'ssim',
+      });
+      expect(fs.readFileSync(updateImageSnapshotPath)).not.toEqual(updateImageData);
+    });
+
     it('writes a result image for failing test in update mode by default', () => {
       const updateModeMatcher = toMatchImageSnapshot.bind({
         snapshotState: new SnapshotState(__filename, {
@@ -157,6 +188,23 @@ describe('toMatchImageSnapshot', () => {
         updatePassedSnapshots: true,
         failureThreshold: 0,
         failureThresholdType: 'pixel',
+      });
+      expect(fs.readFileSync(updateImageSnapshotPath)).toEqual(updateImageData);
+    });
+
+    it('writes a result image for failing test in update mode with updatePassedSnapshots: false (ssim)', () => {
+      const updateModeMatcher = toMatchImageSnapshot.bind({
+        snapshotState: new SnapshotState(__filename, {
+          updateSnapshot: 'all',
+        }),
+        testPath: __filename,
+      });
+      updateModeMatcher(updateImageData, {
+        customSnapshotIdentifier,
+        updatePassedSnapshots: false,
+        failureThreshold: 0,
+        failureThresholdType: 'pixel',
+        comparisonMode: 'ssim',
       });
       expect(fs.readFileSync(updateImageSnapshotPath)).toEqual(updateImageData);
     });
@@ -195,7 +243,8 @@ describe('toMatchImageSnapshot', () => {
         () => expect(oversizeImageData).toMatchImageSnapshot({ customSnapshotIdentifier })
       ).toThrowError(/Expected image to be the same size as the snapshot \(100x100\), but was different \(153x145\)/);
 
-      expect(diffExists(customSnapshotIdentifier)).toBe(true);
+      expect(diffExists(customSnapshotIdentifier))
+        .toBe(true);
     });
 
     it('fails with images without diff pixels after being resized', () => {
@@ -217,18 +266,56 @@ describe('toMatchImageSnapshot', () => {
       const pathToResultImage = path.join(__dirname, diffOutputDir(), `${customSnapshotIdentifier}-diff.png`);
       // First we need to write a new snapshot image
       expect(
-        () => expect(imageData).toMatchImageSnapshot({ customSnapshotIdentifier })
+        () => expect(imageData)
+          .toMatchImageSnapshot({ customSnapshotIdentifier })
       ).not.toThrowError();
 
       // then test against a different image
       expect(
-        () => expect(failImageData).toMatchImageSnapshot({ customSnapshotIdentifier })
+        () => expect(failImageData)
+          .toMatchImageSnapshot({ customSnapshotIdentifier })
       ).toThrow();
 
-      expect(fs.existsSync(pathToResultImage)).toBe(true);
+      expect(fs.existsSync(pathToResultImage))
+        .toBe(true);
 
       // just because file was written does not mean it is a png image
       expect(sizeOf(pathToResultImage)).toHaveProperty('type', 'png');
+    });
+
+    it('writes a result image for failing tests (ssim)', () => {
+      const largeImageData = fs.readFileSync(fromStubs('LargeTestImage.png'));
+      const largeFailureImageData = fs.readFileSync(fromStubs('LargeTestImageFailure.png'));
+      const largeImageFailureDiffData =
+        fs.readFileSync(fromStubs('LargeTestImage-LargeTestImageFailure-ssim-diff.png'));
+      const customSnapshotIdentifier = getIdentifierIndicatingCleanupIsRequired();
+      const pathToResultImage = path.join(__dirname, diffOutputDir(), `${customSnapshotIdentifier}-diff.png`);
+      // First we need to write a new snapshot image
+      expect(
+        () => expect(largeImageData)
+          .toMatchImageSnapshot({
+            customSnapshotIdentifier, comparisonMethod: 'ssim',
+          })
+      )
+        .not
+        .toThrowError();
+
+      // then test against a different image
+      expect(
+        () => expect(largeFailureImageData)
+          .toMatchImageSnapshot({
+            customSnapshotIdentifier, comparisonMethod: 'ssim',
+          })
+      )
+        .toThrow();
+
+      expect(fs.existsSync(pathToResultImage))
+        .toBe(true);
+
+      expect(fs.readFileSync(pathToResultImage)).toEqual(largeImageFailureDiffData);
+      // just because file was written does not mean it is a png image
+      expect(sizeOf(pathToResultImage))
+        .toHaveProperty('type', 'png');
     });
 
     it('writes a result image for failing tests with horizontal layout', () => {
@@ -236,27 +323,34 @@ describe('toMatchImageSnapshot', () => {
       const pathToResultImage = path.join(__dirname, diffOutputDir(), `${customSnapshotIdentifier}-diff.png`);
       // First we need to write a new snapshot image
       expect(
-        () => expect(imageData).toMatchImageSnapshot({
-          customSnapshotIdentifier,
-          diffDirection: 'horizontal',
-        })
-      ).not.toThrowError();
+        () => expect(imageData)
+          .toMatchImageSnapshot({
+            customSnapshotIdentifier,
+            diffDirection: 'horizontal',
+          })
+      )
+        .not
+        .toThrowError();
 
       // then test against a different image
       expect(
-        () => expect(failImageData).toMatchImageSnapshot({
-          customSnapshotIdentifier,
-          diffDirection: 'horizontal',
-        })
-      ).toThrow();
+        () => expect(failImageData)
+          .toMatchImageSnapshot({
+            customSnapshotIdentifier,
+            diffDirection: 'horizontal',
+          })
+      )
+        .toThrow();
 
-      expect(fs.existsSync(pathToResultImage)).toBe(true);
+      expect(fs.existsSync(pathToResultImage))
+        .toBe(true);
 
-      expect(sizeOf(pathToResultImage)).toMatchObject({
-        width: 300,
-        height: 100,
-        type: 'png',
-      });
+      expect(sizeOf(pathToResultImage))
+        .toMatchObject({
+          width: 300,
+          height: 100,
+          type: 'png',
+        });
     });
 
     it('writes a result image for failing tests with vertical layout', () => {
@@ -264,34 +358,42 @@ describe('toMatchImageSnapshot', () => {
       const pathToResultImage = path.join(__dirname, diffOutputDir(), `${customSnapshotIdentifier}-diff.png`);
       // First we need to write a new snapshot image
       expect(
-        () => expect(imageData).toMatchImageSnapshot({
-          customSnapshotIdentifier,
-          diffDirection: 'vertical',
-        })
-      ).not.toThrowError();
+        () => expect(imageData)
+          .toMatchImageSnapshot({
+            customSnapshotIdentifier,
+            diffDirection: 'vertical',
+          })
+      )
+        .not
+        .toThrowError();
 
       // then test against a different image
       expect(
-        () => expect(failImageData).toMatchImageSnapshot({
-          customSnapshotIdentifier,
-          diffDirection: 'vertical',
-        })
-      ).toThrow();
+        () => expect(failImageData)
+          .toMatchImageSnapshot({
+            customSnapshotIdentifier,
+            diffDirection: 'vertical',
+          })
+      )
+        .toThrow();
 
-      expect(fs.existsSync(pathToResultImage)).toBe(true);
+      expect(fs.existsSync(pathToResultImage))
+        .toBe(true);
 
-      expect(sizeOf(pathToResultImage)).toMatchObject({
-        width: 100,
-        height: 300,
-        type: 'png',
-      });
+      expect(sizeOf(pathToResultImage))
+        .toMatchObject({
+          width: 100,
+          height: 300,
+          type: 'png',
+        });
     });
 
     it('removes result image from previous test runs for the same snapshot', () => {
       const customSnapshotIdentifier = getIdentifierIndicatingCleanupIsRequired();
       // First we need to write a new snapshot image
       expect(
-        () => expect(imageData).toMatchImageSnapshot({ customSnapshotIdentifier })
+        () => expect(imageData)
+          .toMatchImageSnapshot({ customSnapshotIdentifier })
       ).not.toThrowError();
 
       // then test against a different image (to generate a results image)
@@ -304,7 +406,8 @@ describe('toMatchImageSnapshot', () => {
         () => expect(imageData).toMatchImageSnapshot({ customSnapshotIdentifier })
       ).not.toThrowError();
 
-      expect(diffExists(customSnapshotIdentifier)).toBe(false);
+      expect(diffExists(customSnapshotIdentifier))
+        .toBe(false);
     });
 
     it('handles diffs for large images', () => {
@@ -320,6 +423,68 @@ describe('toMatchImageSnapshot', () => {
       expect(
         () => expect(largeFailureImageData).toMatchImageSnapshot({ customSnapshotIdentifier })
       ).toThrow(/Expected image to match or be a close match/);
+    });
+
+    describe('Desktop Images Test', () => {
+      it('not to throw at 6pct with pixelmatch with', () => {
+        const largeImageData = fs.readFileSync(fromStubs('Desktop 1_082.png'));
+        const largeFailureImageData = fs.readFileSync(fromStubs('Desktop 1_083.png'));
+        const customSnapshotIdentifier = getIdentifierIndicatingCleanupIsRequired();
+        // First we need to write a new snapshot image
+        expect(
+          () => expect(largeImageData)
+            .toMatchImageSnapshot({
+              failureThreshold: 0.06,
+              failureThresholdType: 'percent',
+              customSnapshotIdentifier,
+            })
+        )
+          .not
+          .toThrowError();
+
+        // then test against a different image
+        expect(
+          () => expect(largeFailureImageData)
+            .toMatchImageSnapshot({
+              failureThreshold: 0.06,
+              failureThresholdType: 'percent',
+              customSnapshotIdentifier,
+            })
+        )
+          .not
+          .toThrowError();
+      });
+      it('to throw at 1pct with SSIM', () => {
+        const largeImageData = fs.readFileSync(fromStubs('Desktop 1_082.png'));
+        const largeFailureImageData = fs.readFileSync(fromStubs('Desktop 1_083.png'));
+        const customSnapshotIdentifier = getIdentifierIndicatingCleanupIsRequired();
+        // First we need to write a new snapshot image
+        expect(
+          () => expect(largeImageData)
+            .toMatchImageSnapshot({
+              comparisonMethod: 'ssim',
+              failureThreshold: 0.01,
+              failureThresholdType: 'percent',
+              customSnapshotIdentifier,
+            })
+        )
+          .not
+          .toThrowError();
+
+        // then test against a different image
+        expect(
+          () => expect(largeFailureImageData)
+            .toMatchImageSnapshot({
+              comparisonMethod: 'ssim',
+              failureThreshold: 0.01,
+              failureThresholdType: 'percent',
+              customSnapshotIdentifier,
+              // required for coverage
+              runInProcess: true,
+            })
+        )
+          .toThrow(/Expected image to match or be a close match/);
+      });
     });
   });
 });

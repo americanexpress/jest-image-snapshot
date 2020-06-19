@@ -442,6 +442,7 @@ describe('toMatchImageSnapshot', () => {
     const customDiffConfig = { perceptual: true };
     const customSnapshotIdentifier = ({ defaultIdentifier }) =>
       `custom-${defaultIdentifier}`;
+    const comparisonMethod = 'ssim';
     const toMatchImageSnapshot = configureToMatchImageSnapshot({
       customDiffConfig,
       customSnapshotIdentifier,
@@ -453,6 +454,7 @@ describe('toMatchImageSnapshot', () => {
       failureThresholdType: 'percent',
       updatePassedSnapshot: true,
       blur: 1,
+      comparisonMethod,
     });
     expect.extend({ toMatchImageSnapshot });
     const matcherAtTest = toMatchImageSnapshot.bind(mockTestContext);
@@ -473,6 +475,7 @@ describe('toMatchImageSnapshot', () => {
       updatePassedSnapshot: true,
       failureThreshold: 1,
       failureThresholdType: 'percent',
+      comparisonMethod,
     });
     expect(Chalk).toHaveBeenCalledWith({
       enabled: false,
@@ -530,6 +533,7 @@ describe('toMatchImageSnapshot', () => {
       updatePassedSnapshot: false,
       failureThreshold: 0,
       failureThresholdType: 'pixel',
+      comparisonMethod: 'pixelmatch',
     });
     expect(Chalk).toHaveBeenCalledWith({
       enabled: false,
