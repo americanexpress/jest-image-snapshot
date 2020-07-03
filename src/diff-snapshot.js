@@ -52,10 +52,34 @@ const fillSizeDifference = (width, height) => (image) => {
   return image;
 };
 /* eslint-enabled */
+/**
+ * This was originally embedded in diffImageToSnapshot
+ * when it only worked with pixelmatch.  It has a default
+ * threshold of 0.01 defined in terms of what it means to pixelmatch.
+ * It has been moved here as part of the SSIM implementation to make it
+ * a little easier to read and find.
+ * More information about this can be found under the options section listed
+ * in https://github.com/mapbox/pixelmatch/README.md and in the original pixelmatch
+ * code.  There is also some documentation on this in our README.md under the
+ * customDiffConfig option.
+ * @type {{threshold: number}}
+ */
 const defaultPixelmatchDiffConfig = {
   threshold: 0.01,
 };
-
+/**
+ * This is the default SSIM diff configuration
+ * for the jest-image-snapshot's use of the ssim.js
+ * library.  Bezkrovny is a specific SSIM algorithm optimized
+ * for speed by downsampling the origin image into a smaller image.
+ * For the small loss in precision, it is roughly 9x faster than the
+ * SSIM preset 'fast' -- which is modeled after the original SSIM whitepaper.
+ * Wang, et al. 2004 on "Image Quality Assessment: From Error Visibility to Structural Similarity"
+ * (https://github.com/obartra/ssim/blob/master/assets/ssim.pdf)
+ * Most users will never need or want to change this -- unless --
+ * they want to get a better quality generated diff.
+ * @type {{ssim: string}}
+ */
 const defaultSSIMDiffConfig = { ssim: 'bezkrovny' };
 
 /**

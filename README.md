@@ -100,9 +100,13 @@ See [the examples](./examples/README.md) for more detailed usage or read about a
 
 `toMatchImageSnapshot()` takes an optional options object with the following properties:
 
-* `customDiffConfig`: Custom config passed to [pixelmatch](https://github.com/mapbox/pixelmatch#pixelmatchimg1-img2-output-width-height-options) (See options section)
-  * By default we have set the `threshold` to 0.01, you can increase that value by passing a customDiffConfig as demonstrated below.
-  * Please note the `threshold` set in the `customDiffConfig` is the per pixel sensitivity threshold. For example with a source pixel colour of `#ffffff` (white) and a comparison pixel colour of `#fcfcfc` (really light grey) if you set the threshold to 0 then it would trigger a failure *on that pixel*. However if you were to use say 0.5 then it wouldn't, the colour difference would need to be much more extreme to trigger a failure on that pixel, say `#000000` (black)
+* `customDiffConfig`: Custom config passed to [pixelmatch](https://github.com/mapbox/pixelmatch#pixelmatchimg1-img2-output-width-height-options) (See options section) or [ssim.js](https://github.com/obartra/ssim/wiki/Usage#options)
+  * Pixelmatch specific options
+    * By default we have set the `threshold` to 0.01, you can increase that value by passing a customDiffConfig as demonstrated below.
+    * Please note the `threshold` set in the `customDiffConfig` is the per pixel sensitivity threshold. For example with a source pixel colour of `#ffffff` (white) and a comparison pixel colour of `#fcfcfc` (really light grey) if you set the threshold to 0 then it would trigger a failure *on that pixel*. However if you were to use say 0.5 then it wouldn't, the colour difference would need to be much more extreme to trigger a failure on that pixel, say `#000000` (black)
+  * SSIM specific options
+    * By default we set `ssim` to 'bezkrovny'.  It is the fastest option and best option most of the time.  In cases where, higher precision is needed,  this can be set to 'fast'.  See [SSIM Performance Consideration](#ssim-performance-considerations) for a better understanding of how to use this feature.
+* `comparisonMethod`: (default: `pixelmatch`) (options `pixelmatch` or `ssim`) The method by which images are compared.  `pixelmatch` does a pixel by pixel comparison, whereas `ssim` does a structural similarity comparison.  `ssim` is a new experimental feature for jest-image-snapshot, but may become the default comparison method in the future.  For a better understanding of how to use SSIM, see [Recommendations when using SSIM Comparison](#recommendations-when-using-ssim-comparison).
 * `customSnapshotsDir`: A custom absolute path of a directory to keep this snapshot in
 * `customDiffDir`: A custom absolute path of a directory to keep this diff in
 * `customSnapshotIdentifier`: A custom name to give this snapshot. If not provided one is computed automatically. When a function is provided it is called with an object containing `testPath`, `currentTestName`, `counter` and `defaultIdentifier` as its first argument. The function must return an identifier to use for the snapshot.
@@ -155,6 +159,42 @@ expect.extend({ toMatchImageSnapshot });
 
 ### jest.retryTimes()
 Jest supports [automatic retries on test failures](https://jestjs.io/docs/en/jest-object#jestretrytimes). This can be useful for browser screenshot tests which tend to have more frequent false positives. Note that when using jest.retryTimes you'll have to use a unique customSnapshotIdentifier as that's the only way to reliably identify snapshots.
+
+### Recommendations when using SSIM comparison
+Since SSIM calculates differences in structural similarity by building a moving 'window' over an images pixels, it does not particularly benefit from pixel count comparisons, especially when you factor in that it has a lot of floating point arithmetic in javascript.  However, SSIM gains two key benefits over pixel by pixel comparison:
+- Reduced false positives (failing tests when the images look the same)
+- Higher sensitivity to actual changes in the image itself.
+
+As such, most users can benefit from setting a 1% or 0.01 threshold for any SSIM comparison. The below code shows a one line modification of the 1% threshold example.
+
+```javascript
+it('should fail if there is more than a 1% difference (ssim)', () => {
+  ...
+  expect(image).toMatchImageSnapshot({
+    comparisonMethod: 'ssim',
+    failureThreshold: 0.01,
+    failureThresholdType: 'percent'
+  });
+});
+```
+### SSIM Performance Considerations
+The default SSIM comparison method used in the jest-image-snapshot implementation is 'bezkrovny' (as a `customDiffConfig` `{ssim: 'bezkrovny'}`).
+Bezkrovny is a special implementation of SSIM that is optimized for speed at a small, almost inconsequential change in accuracy.  It gains this benefit by downsampling (or shrinking the original image) before performing the comparisons.
+This will provide the best combination of results and performance most of the time.  When the need arises where higher accuracy is desired at the expense of time or a higher quality diff image is needed for debugging,
+this option can be changed to `{ssim: 'fast'}`. This uses the original SSIM algorithm described in Wang, et al. 2004 on "Image Quality Assessment: From Error Visibility to Structural Similarity" (https://github.com/obartra/ssim/blob/master/assets/ssim.pdf) optimized for javascript.
+
+The following is an example configuration for using `{ssim: 'fast'}` with toMatchImageSnapshot().
+```javascript.
+{
+  comparisonMethod: 'ssim',
+  customDiffConfig: {
+    ssim: 'fast',
+  },
+  failureThreshold: 0.01,
+  failureThresholdType: 'percent'
+}
+```
+
 
 ### Recipes
 
