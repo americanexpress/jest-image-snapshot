@@ -17,6 +17,7 @@ const fs = require('fs');
 const path = require('path');
 const mkdirp = require('mkdirp');
 const pixelmatch = require('pixelmatch');
+const ssim = require('ssim.js');
 const { PNG } = require('pngjs');
 const rimraf = require('rimraf');
 const glur = require('glur');
@@ -51,6 +52,74 @@ const fillSizeDifference = (width, height) => (image) => {
   return image;
 };
 /* eslint-enabled */
+/**
+ * This was originally embedded in diffImageToSnapshot
+ * when it only worked with pixelmatch.  It has a default
+ * threshold of 0.01 defined in terms of what it means to pixelmatch.
+ * It has been moved here as part of the SSIM implementation to make it
+ * a little easier to read and find.
+ * More information about this can be found under the options section listed
+ * in https://github.com/mapbox/pixelmatch/README.md and in the original pixelmatch
+ * code.  There is also some documentation on this in our README.md under the
+ * customDiffConfig option.
+ * @type {{threshold: number}}
+ */
+const defaultPixelmatchDiffConfig = {
+  threshold: 0.01,
+};
+/**
+ * This is the default SSIM diff configuration
+ * for the jest-image-snapshot's use of the ssim.js
+ * library.  Bezkrovny is a specific SSIM algorithm optimized
+ * for speed by downsampling the origin image into a smaller image.
+ * For the small loss in precision, it is roughly 9x faster than the
+ * SSIM preset 'fast' -- which is modeled after the original SSIM whitepaper.
+ * Wang, et al. 2004 on "Image Quality Assessment: From Error Visibility to Structural Similarity"
+ * (https://github.com/obartra/ssim/blob/master/assets/ssim.pdf)
+ * Most users will never need or want to change this -- unless --
+ * they want to get a better quality generated diff.
+ * @type {{ssim: string}}
+ */
+const defaultSSIMDiffConfig = { ssim: 'bezkrovny' };
+
+/**
+ * Helper function for SSIM comparison that allows us to use the existing diff
+ * config that works with jest-image-snapshot to pass parameters
+ * that will work with SSIM.  It also transforms the parameters to match the spec
+ * required by the SSIM library.
+ */
+const ssimMatch = (
+  newImageData,
+  baselineImageData,
+  diffImageData,
+  imageWidth,
+  imageHeight,
+  diffConfig
+) => {
+  const newImage = { data: newImageData, width: imageWidth, height: imageHeight };
+  const baselineImage = { data: baselineImageData, width: imageWidth, height: imageHeight };
+  // eslint-disable-next-line camelcase
+  const { ssim_map, mssim } = ssim.ssim(newImage, baselineImage, diffConfig);
+  // Converts the SSIM value to different pixels based on image width and height
+  // conforms to how pixelmatch works.
+  const diffPixels = (1 - mssim) * imageWidth * imageHeight;
+  const diffRgbaPixels = new DataView(diffImageData.buffer, diffImageData.byteOffset);
+  for (let ln = 0; ln !== imageHeight; ++ln) {
+    for (let pos = 0; pos !== imageWidth; ++pos) {
+      const rpos = (ln * imageWidth) + pos;
+      // initial value is transparent.  We'll add in the SSIM offset.
+      // red (ff) green (00) blue (00) alpha (00)
+      const diffValue = 0xff000000 + Math.floor(0xff *
+        (1 - ssim_map.data[
+          // eslint-disable-next-line no-mixed-operators
+          (ssim_map.width * Math.round(ssim_map.height * ln / imageHeight)) +
+          // eslint-disable-next-line no-mixed-operators
+          Math.round(ssim_map.width * pos / imageWidth)]));
+      diffRgbaPixels.setUint32(rpos * 4, diffValue);
+    }
+  }
+  return diffPixels;
+};
 
 /**
  * Aligns images sizes to biggest common value
@@ -129,8 +198,10 @@ function diffImageToSnapshot(options) {
     failureThresholdType,
     blur,
     allowSizeMismatch = false,
+    comparisonMethod = 'pixelmatch',
   } = options;
 
+  const comparisonFn = comparisonMethod === 'ssim' ? ssimMatch : pixelmatch;
   let result = {};
   const baselineSnapshotPath = path.join(snapshotsDir, `${snapshotIdentifier}-snap.png`);
   if (!fs.existsSync(baselineSnapshotPath)) {
@@ -141,9 +212,7 @@ function diffImageToSnapshot(options) {
     const diffOutputPath = path.join(diffDir, `${snapshotIdentifier}-diff.png`);
     rimraf.sync(diffOutputPath);
 
-    const defaultDiffConfig = {
-      threshold: 0.01,
-    };
+    const defaultDiffConfig = comparisonMethod !== 'ssim' ? defaultPixelmatchDiffConfig : defaultSSIMDiffConfig;
 
     const diffConfig = Object.assign({}, defaultDiffConfig, customDiffConfig);
 
@@ -175,7 +244,7 @@ function diffImageToSnapshot(options) {
 
     let diffPixelCount = 0;
 
-    diffPixelCount = pixelmatch(
+    diffPixelCount = comparisonFn(
       receivedImage.data,
       baselineImage.data,
       diffImage.data,
