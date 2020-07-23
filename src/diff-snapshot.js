@@ -1,5 +1,6 @@
 /*
  * Copyright (c) 2017 American Express Travel Related Services Company, Inc.
+ * Copyright (c) 2020 Dan Weber <dweber@gmail.com>
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
  * in compliance with the License. You may obtain a copy of the License at
@@ -335,7 +336,22 @@ function runDiffImageToSnapshot(options) {
     {
       input: Buffer.from(serializedInput),
       stdio: ['pipe', 'inherit', 'inherit', 'pipe'],
-      maxBuffer: 10 * 1024 * 1024, // 10 MB
+      // Dan (@omnisip): Before setting this, I checked the implementation
+      // of Node.JS's child_process all the way back to v0.10.48.
+      // This value does not cause Node.js to allocate memory.  On the contrary,
+      // it exists only to serve as a validation for the maximum data to be returned.
+      // If the output amount is exceeded, node will automatically terminate the process.
+      // As such, we have a couple options:
+      // 1) We can guess as to how much data it will actually need and throttle it
+      //    (e.g. 4*height*width*3 + expected JSON size); or
+      // 2) We can allow it be as much memory as required (in this case, Number.MAX_SAFE_INTEGER)
+      // Technically neither is ideal, but since we store entire and process images in memory,
+      // the amount of memory used will always be the same.  As such, it seems most apt
+      // to allow the user to deal with out of memory issues as they arise using the standard
+      // operating system delivery methods than for us to establish an arbitrary limit on
+      // what they can and can't do.  If this becomes a legitimate issue in the future,
+      // we can always look at supporting images as streams from disk.
+      maxBuffer: Number.MAX_SAFE_INTEGER,
     }
   );
 
