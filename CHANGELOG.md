@@ -1,3 +1,10 @@
+# [4.1.0](https://github.com/americanexpress/jest-image-snapshot/compare/v4.0.2...v4.1.0) (2020-07-23)
+
+
+### Features
+
+* **ssim:** add integration ([#220](https://github.com/americanexpress/jest-image-snapshot/issues/220)) ([e2b304a](https://github.com/americanexpress/jest-image-snapshot/commit/e2b304a6c6aaf7e1d12c2e088105181ee108b960))
+
 ## [4.0.2](https://github.com/americanexpress/jest-image-snapshot/compare/v4.0.1...v4.0.2) (2020-05-27)
 
 
