@@ -67,6 +67,7 @@
     "mkdirp": "^0.5.1",
     "pixelmatch": "^5.1.0",
     "pngjs": "^3.4.0",
+    "puppeteer": "^5.2.1",
     "rimraf": "^2.6.2"
   },
   "peerDependencies": {
