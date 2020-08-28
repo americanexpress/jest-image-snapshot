@@ -160,6 +160,28 @@ expect.extend({ toMatchImageSnapshot });
 ### jest.retryTimes()
 Jest supports [automatic retries on test failures](https://jestjs.io/docs/en/jest-object#jestretrytimes). This can be useful for browser screenshot tests which tend to have more frequent false positives. Note that when using jest.retryTimes you'll have to use a unique customSnapshotIdentifier as that's the only way to reliably identify snapshots.
 
+### Removing Outdated Snapshots
+
+Unlike jest-managed snapshots, the images created by `jest-image-snapshot` will not be automatically removed by the `-u` flag if they are no longer needed. You can force `jest-image-snapshot` to remove the files by including the `outdated-snapshot-reporter` in your config and running with the environment variable `JEST_IMAGE_SNAPSHOT_TRACK_OBSOLETE`.
+
+```json
+{
+  "jest": {
+    "reporters": [
+      "default",
+      "jest-image-snapshot/src/outdated-snapshot-reporter.js"
+    ]
+  }
+}
+```
+
+**WARNING: Do not run a *partial* test suite with this flag as it may consider snapshots of tests that weren't run to be obsolete.**
+
+```bash
+export JEST_IMAGE_SNAPSHOT_TRACK_OBSOLETE=1
+jest
+```
+
 ### Recommendations when using SSIM comparison
 Since SSIM calculates differences in structural similarity by building a moving 'window' over an images pixels, it does not particularly benefit from pixel count comparisons, especially when you factor in that it has a lot of floating point arithmetic in javascript.  However, SSIM gains two key benefits over pixel by pixel comparison:
 - Reduced false positives (failing tests when the images look the same)
