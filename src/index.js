@@ -136,6 +136,7 @@ function configureToMatchImageSnapshot({
   runInProcess: commonRunInProcess = false,
   dumpDiffToConsole: commonDumpDiffToConsole = false,
   allowSizeMismatch: commonAllowSizeMismatch = false,
+  comparisonMethod: commonComparisonMethod = 'pixelmatch',
 } = {}) {
   return function toMatchImageSnapshot(received, {
     customSnapshotIdentifier = commonCustomSnapshotIdentifier,
@@ -151,6 +152,7 @@ function configureToMatchImageSnapshot({
     runInProcess = commonRunInProcess,
     dumpDiffToConsole = commonDumpDiffToConsole,
     allowSizeMismatch = commonAllowSizeMismatch,
+    comparisonMethod = commonComparisonMethod,
   } = {}) {
     const {
       testPath, currentTestName, isNot, snapshotState,
@@ -204,6 +206,7 @@ function configureToMatchImageSnapshot({
         updatePassedSnapshot,
         blur,
         allowSizeMismatch,
+        comparisonMethod,
       });
 
     return checkResult({
