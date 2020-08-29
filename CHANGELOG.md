@@ -1,3 +1,10 @@
+# [4.2.0](https://github.com/americanexpress/jest-image-snapshot/compare/v4.1.0...v4.2.0) (2020-08-29)
+
+
+### Features
+
+* add obsolete snapshot reporting ([#222](https://github.com/americanexpress/jest-image-snapshot/issues/222)) ([47da7c2](https://github.com/americanexpress/jest-image-snapshot/commit/47da7c23495037e869ee68154218e5d73e1e8cd5))
+
 # [4.1.0](https://github.com/americanexpress/jest-image-snapshot/compare/v4.0.2...v4.1.0) (2020-07-23)
 
 
