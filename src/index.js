@@ -18,6 +18,7 @@ const path = require('path');
 const Chalk = require('chalk').constructor;
 const { diffImageToSnapshot, runDiffImageToSnapshot } = require('./diff-snapshot');
 const fs = require('fs');
+const OutdatedSnapshotReporter = require('./outdated-snapshot-reporter');
 
 const timesCalled = new Map();
 
@@ -180,6 +181,7 @@ function configureToMatchImageSnapshot({
     const snapshotsDir = customSnapshotsDir || path.join(path.dirname(testPath), SNAPSHOTS_DIR);
     const diffDir = customDiffDir || path.join(snapshotsDir, '__diff_output__');
     const baselineSnapshotPath = path.join(snapshotsDir, `${snapshotIdentifier}-snap.png`);
+    OutdatedSnapshotReporter.markTouchedFile(baselineSnapshotPath);
 
     if (snapshotState._updateSnapshot === 'none' && !fs.existsSync(baselineSnapshotPath)) {
       return {
