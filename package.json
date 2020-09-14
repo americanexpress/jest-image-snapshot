@@ -71,7 +71,7 @@
     "ssim.js": "^3.1.1"
   },
   "peerDependencies": {
-    "jest": ">=20 <=27"
+    "jest": ">=20 <=26.4.2"
   },
   "husky": {
     "hooks": {
