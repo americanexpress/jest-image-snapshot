@@ -12,6 +12,31 @@ exports[`toMatchImageSnapshot dumpDiffToConsole imgSrcString is not added to con
 [1m[31mSee diff for details:[39m[22m [31mpath/to/result.png[39m"
 `;
 
+exports[`toMatchImageSnapshot dumpInlineDiffToConsole falls back to dumpDiffToConsole if the terminal is unsupported 2`] = `
+"Expected image to match or be a close match to snapshot but was 80% different from snapshot (600 differing pixels).
+[1m[31mSee diff for details:[39m[22m [31mpath/to/result.png[39m
+[1m[31mOr paste below image diff string to your browser\`s URL bar.[39m[22m
+ pretendthisisanimagebase64string"
+`;
+
+exports[`toMatchImageSnapshot dumpInlineDiffToConsole uses Inline Image Protocol in iTerm 2`] = `
+"Expected image to match or be a close match to snapshot but was 80% different from snapshot (600 differing pixels).
+[1m[31mSee diff for details:[39m[22m [31mpath/to/result.png[39m
+
+	]1337;File=name=cGF0aC90by9yZXN1bHQucG5n;inline=1;width=40:pretendthisisanimagebase64string
+
+"
+`;
+
+exports[`toMatchImageSnapshot dumpInlineDiffToConsole uses Inline Image Protocol when ENABLE_INLINE_DIFF is set 2`] = `
+"Expected image to match or be a close match to snapshot but was 80% different from snapshot (600 differing pixels).
+[1m[31mSee diff for details:[39m[22m [31mpath/to/result.png[39m
+
+	]1337;File=name=cGF0aC90by9yZXN1bHQucG5n;inline=1;width=40:pretendthisisanimagebase64string
+
+"
+`;
+
 exports[`toMatchImageSnapshot passes diffImageToSnapshot everything it needs to create a snapshot and compare if needed 1`] = `
 Object {
   "allowSizeMismatch": false,
