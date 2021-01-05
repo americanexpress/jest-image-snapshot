@@ -38,6 +38,7 @@ function checkResult({
   snapshotIdentifier,
   chalk,
   dumpDiffToConsole,
+  dumpInlineDiffToConsole,
   allowSizeMismatch,
 }) {
   let pass = true;
@@ -75,7 +76,14 @@ function checkResult({
 
         failure += `${chalk.bold.red('See diff for details:')} ${chalk.red(result.diffOutputPath)}`;
 
-        if (dumpDiffToConsole) {
+        const supportedInlineTerms = [
+          'iTerm.app',
+          'WezTerm',
+        ];
+
+        if (dumpInlineDiffToConsole && (supportedInlineTerms.includes(process.env.TERM_PROGRAM) || 'ENABLE_INLINE_DIFF' in process.env)) {
+          failure += `\n\n\t\x1b]1337;File=name=${Buffer.from(result.diffOutputPath).toString('base64')};inline=1;width=40:${result.imgSrcString.replace('data:image/png;base64,', '')}\x07\x1b\n\n`;
+        } else if (dumpDiffToConsole || dumpInlineDiffToConsole) {
           failure += `\n${chalk.bold.red('Or paste below image diff string to your browser`s URL bar.')}\n ${result.imgSrcString}`;
         }
 
@@ -136,6 +144,7 @@ function configureToMatchImageSnapshot({
   blur: commonBlur = 0,
   runInProcess: commonRunInProcess = false,
   dumpDiffToConsole: commonDumpDiffToConsole = false,
+  dumpInlineDiffToConsole: commonDumpInlineDiffToConsole = false,
   allowSizeMismatch: commonAllowSizeMismatch = false,
   comparisonMethod: commonComparisonMethod = 'pixelmatch',
 } = {}) {
@@ -152,6 +161,7 @@ function configureToMatchImageSnapshot({
     blur = commonBlur,
     runInProcess = commonRunInProcess,
     dumpDiffToConsole = commonDumpDiffToConsole,
+    dumpInlineDiffToConsole = commonDumpInlineDiffToConsole,
     allowSizeMismatch = commonAllowSizeMismatch,
     comparisonMethod = commonComparisonMethod,
   } = {}) {
@@ -218,6 +228,7 @@ function configureToMatchImageSnapshot({
       snapshotIdentifier,
       chalk,
       dumpDiffToConsole,
+      dumpInlineDiffToConsole,
       allowSizeMismatch,
     });
   };

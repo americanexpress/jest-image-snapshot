@@ -675,6 +675,86 @@ describe('toMatchImageSnapshot', () => {
         .toThrowErrorMatchingSnapshot();
     });
   });
+
+  describe('dumpInlineDiffToConsole', () => {
+    const { TERM_PROGRAM } = process.env;
+
+    afterEach(() => { process.env.TERM_PROGRAM = TERM_PROGRAM; });
+
+    it('falls back to dumpDiffToConsole if the terminal is unsupported', () => {
+      const mockDiffResult = {
+        pass: false,
+        diffOutputPath: 'path/to/result.png',
+        diffRatio: 0.8,
+        diffPixelCount: 600,
+        imgSrcString: 'pretendthisisanimagebase64string',
+      };
+      setupMock(mockDiffResult);
+      const { toMatchImageSnapshot } = require('../src/index');
+      expect.extend({ toMatchImageSnapshot });
+
+      jest.doMock('chalk', () => ({
+        constructor: ChalkMock,
+      }));
+
+      process.env.TERM_PROGRAM = 'xterm';
+
+      expect(() => expect('pretendthisisanimagebuffer').toMatchImageSnapshot({ dumpInlineDiffToConsole: true }))
+        .toThrowErrorMatchingSnapshot();
+    });
+
+    it('uses Inline Image Protocol in iTerm', () => {
+      const mockDiffResult = {
+        pass: false,
+        diffOutputPath: 'path/to/result.png',
+        diffRatio: 0.8,
+        diffPixelCount: 600,
+        imgSrcString: 'pretendthisisanimagebase64string',
+        imageDimensions: {
+          receivedHeight: 100,
+          receivedWidth: 200,
+        },
+      };
+      setupMock(mockDiffResult);
+      const { toMatchImageSnapshot } = require('../src/index');
+      expect.extend({ toMatchImageSnapshot });
+
+      jest.doMock('chalk', () => ({
+        constructor: ChalkMock,
+      }));
+
+      process.env.TERM_PROGRAM = 'iTerm.app';
+
+      expect(() => expect('pretendthisisanimagebuffer').toMatchImageSnapshot({ dumpInlineDiffToConsole: true }))
+        .toThrowErrorMatchingSnapshot();
+    });
+
+    it('uses Inline Image Protocol when ENABLE_INLINE_DIFF is set', () => {
+      const mockDiffResult = {
+        pass: false,
+        diffOutputPath: 'path/to/result.png',
+        diffRatio: 0.8,
+        diffPixelCount: 600,
+        imgSrcString: 'pretendthisisanimagebase64string',
+        imageDimensions: {
+          receivedHeight: 100,
+          receivedWidth: 200,
+        },
+      };
+      setupMock(mockDiffResult);
+      const { toMatchImageSnapshot } = require('../src/index');
+      expect.extend({ toMatchImageSnapshot });
+
+      jest.doMock('chalk', () => ({
+        constructor: ChalkMock,
+      }));
+
+      process.env.ENABLE_INLINE_DIFF = true;
+
+      expect(() => expect('pretendthisisanimagebuffer').toMatchImageSnapshot({ dumpInlineDiffToConsole: true }))
+        .toThrowErrorMatchingSnapshot();
+    });
+  });
 });
 
 describe('updateSnapshotState', () => {

@@ -1,3 +1,10 @@
+# [4.3.0](https://github.com/americanexpress/jest-image-snapshot/compare/v4.2.0...v4.3.0) (2020-12-16)
+
+
+### Features
+
+* inline images support ([#244](https://github.com/americanexpress/jest-image-snapshot/issues/244)) ([b82b068](https://github.com/americanexpress/jest-image-snapshot/commit/b82b068c6e001a2e098ac2fbde3abc55ffeb493b))
+
 # [4.2.0](https://github.com/americanexpress/jest-image-snapshot/compare/v4.1.0...v4.2.0) (2020-08-29)
 
 
