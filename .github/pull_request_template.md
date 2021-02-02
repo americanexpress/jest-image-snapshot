@@ -27,9 +27,6 @@
 - [ ] My changes are in sync with the code style of this project.
 - [ ] There aren't any other open Pull Requests for the same issue/update.
 - [ ] These changes should be applied to a maintenance branch.
-- [ ] This change requires cross browser checks.
-- [ ] This change impacts caching for client browsers.
-- [ ] This change adds additional environment variable requirements for Jest-Image-Snapshot users.
 - [ ] I have added the Apache 2.0 license header to any new files created.
 
 ## What is the Impact to Developers Using Jest-Image-Snapshot?
