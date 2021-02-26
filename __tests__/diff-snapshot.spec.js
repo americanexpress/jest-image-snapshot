@@ -50,9 +50,30 @@ describe('diff-snapshot', () => {
       expect(mockSpawnSync).toBeCalled();
     });
 
-    it('throws when process returns a non-zero status', () => {
-      const runDiffImageToSnapshot = setupTest({ status: 1 });
-      expect(() => runDiffImageToSnapshot(fakeRequest)).toThrow();
+    it.each`
+      spawnReturn
+      ${{ status: 1 }}
+      ${{ status: 1, error: {} }}
+      ${{ status: 1, error: new Error() }}
+    `(
+  'throws an Unknown Error when process returns a non-zero status $#',
+  ({ spawnReturn }) => {
+    const runDiffImageToSnapshot = setupTest(spawnReturn);
+
+    expect(() => runDiffImageToSnapshot(fakeRequest)).toThrowError(
+      new Error('Error running image diff: Unknown Error')
+    );
+  }
+);
+
+    it('throws a helpful error if available', () => {
+      const runDiffImageToSnapshot = setupTest({
+        status: 1,
+        error: new Error('🦖'),
+      });
+      expect(() => runDiffImageToSnapshot(fakeRequest)).toThrowError(
+        new Error('Error running image diff: 🦖')
+      );
     });
   });
 
