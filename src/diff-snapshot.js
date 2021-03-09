@@ -343,7 +343,7 @@ function runDiffImageToSnapshot(options) {
     const output = writeDiffProcess.output[3].toString();
     result = JSON.parse(output);
   } else {
-    throw new Error('Error running image diff.');
+    throw new Error(`Error running image diff: ${(writeDiffProcess.error && writeDiffProcess.error.message) || 'Unknown Error'}`);
   }
 
   return result;

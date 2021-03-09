@@ -1,3 +1,10 @@
+# [4.4.0](https://github.com/americanexpress/jest-image-snapshot/compare/v4.3.0...v4.4.0) (2021-02-26)
+
+
+### Features
+
+* better error message ([#254](https://github.com/americanexpress/jest-image-snapshot/issues/254)) ([af44dd4](https://github.com/americanexpress/jest-image-snapshot/commit/af44dd49bf82caefb289b7780c97a1ba6bcc9e8d))
+
 # [4.3.0](https://github.com/americanexpress/jest-image-snapshot/compare/v4.2.0...v4.3.0) (2020-12-16)
 
 
