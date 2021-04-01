@@ -21,7 +21,8 @@ const rimraf = require('rimraf');
 describe('OutdatedSnapshotReporter', () => {
   const jestImageSnapshotDir = path.join(__dirname, '..');
   const imagePath = path.join(__dirname, 'stubs/TestImage.png');
-  const jestBinPath = path.join(jestImageSnapshotDir, 'node_modules/.bin/jest');
+  const jestExe = process.platform === 'win32' ? 'jest.cmd' : 'jest';
+  const jestBinPath = path.join(jestImageSnapshotDir, `node_modules/.bin/${jestExe}`);
   let tmpDir = os.tmpdir();
 
   function setupTestProject(dir) {
@@ -35,7 +36,7 @@ describe('OutdatedSnapshotReporter', () => {
 
     const commonTest = `
     const fs = require('fs');
-    const {toMatchImageSnapshot} = require('${jestImageSnapshotDir}');
+    const {toMatchImageSnapshot} = require('${jestImageSnapshotDir.replace(/\\/g, '/')}');
     expect.extend({toMatchImageSnapshot});
     `;
     const imageTest = `${commonTest}
@@ -56,11 +57,14 @@ describe('OutdatedSnapshotReporter', () => {
   }
 
   function runJest(cliArgs, environment = {}) {
-    return childProcess.spawnSync(jestBinPath, cliArgs, {
+    const child = childProcess.spawnSync(jestBinPath, cliArgs, {
       cwd: tmpDir,
       encoding: 'utf-8',
       env: { ...process.env, ...environment },
     });
+    if (child.error) throw child.error;
+
+    return child;
   }
 
   function getSnapshotFiles() {
