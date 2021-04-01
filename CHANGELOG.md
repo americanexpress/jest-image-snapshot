@@ -1,3 +1,10 @@
+## [4.4.1](https://github.com/americanexpress/jest-image-snapshot/compare/v4.4.0...v4.4.1) (2021-04-01)
+
+
+### Bug Fixes
+
+* incorrect stats reported to jest ([#257](https://github.com/americanexpress/jest-image-snapshot/issues/257)) ([e8f949a](https://github.com/americanexpress/jest-image-snapshot/commit/e8f949a845facf4e0fc47f6f63ab59f791d4148a))
+
 # [4.4.0](https://github.com/americanexpress/jest-image-snapshot/compare/v4.3.0...v4.4.0) (2021-02-26)
 
 
