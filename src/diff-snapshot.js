@@ -205,7 +205,7 @@ function diffImageToSnapshot(options) {
   let result = {};
   const baselineSnapshotPath = path.join(snapshotsDir, `${snapshotIdentifier}-snap.png`);
   if (!fs.existsSync(baselineSnapshotPath)) {
-    mkdirp.sync(snapshotsDir);
+    mkdirp.sync(path.dirname(baselineSnapshotPath));
     fs.writeFileSync(baselineSnapshotPath, receivedImageBuffer);
     result = { added: true };
   } else {
@@ -269,7 +269,7 @@ function diffImageToSnapshot(options) {
     });
 
     if (isFailure({ pass, updateSnapshot })) {
-      mkdirp.sync(diffDir);
+      mkdirp.sync(path.dirname(diffOutputPath));
       const composer = new ImageComposer({
         direction: diffDirection,
       });
@@ -307,7 +307,7 @@ function diffImageToSnapshot(options) {
         imgSrcString: `data:image/png;base64,${pngBuffer.toString('base64')}`,
       };
     } else if (shouldUpdate({ pass, updateSnapshot, updatePassedSnapshot })) {
-      mkdirp.sync(snapshotsDir);
+      mkdirp.sync(path.dirname(baselineSnapshotPath));
       fs.writeFileSync(baselineSnapshotPath, receivedImageBuffer);
       result = { updated: true };
     } else {
