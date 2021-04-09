@@ -75,7 +75,7 @@ Thanks `jest-image-snapshot`, that broken header would not have looked good in p
 npm i --save-dev jest-image-snapshot
 ```
 
-Please note that `Jest` `>=20 <=25` is a peerDependency. `jest-image-snapshot` will **not** work with anything below Jest 20.x.x
+Please note that `Jest` `>=20 <=26` is a peerDependency. `jest-image-snapshot` will **not** work with anything below Jest 20.x.x
 
 ### Invocation
 
