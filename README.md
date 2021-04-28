@@ -39,7 +39,7 @@ To update the stored image snapshot run Jest with `--updateSnapshot` or `-u` arg
 
 ### See it in action
 
-Typically this matcher is used to for visual tests that run on a browser. For example let's say I finish working on a feature and want to write a test to prevent visual regressions:
+Typically this matcher is used for visual tests that run on a browser. For example let's say I finish working on a feature and want to write a test to prevent visual regressions:
 
 ```javascript
 ...
