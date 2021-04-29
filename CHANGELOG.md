@@ -1,3 +1,10 @@
+# [4.5.0](https://github.com/americanexpress/jest-image-snapshot/compare/v4.4.1...v4.5.0) (2021-04-29)
+
+
+### Features
+
+* allow folders on snapshot identifier ([#267](https://github.com/americanexpress/jest-image-snapshot/issues/267)) ([ad49a97](https://github.com/americanexpress/jest-image-snapshot/commit/ad49a975a425826245a3f72e4df262db09ce25ea))
+
 ## [4.4.1](https://github.com/americanexpress/jest-image-snapshot/compare/v4.4.0...v4.4.1) (2021-04-01)
 
 
