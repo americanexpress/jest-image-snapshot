@@ -57,9 +57,9 @@ function checkResult({
   } else {
     ({ pass } = result);
 
-    updateSnapshotState(snapshotState, { matched: snapshotState.matched + 1 });
-
-    if (!pass) {
+    if (pass) {
+      updateSnapshotState(snapshotState, { matched: snapshotState.matched + 1 });
+    } else {
       const currentRun = timesCalled.get(snapshotIdentifier);
       if (!retryTimes || (currentRun > retryTimes)) {
         updateSnapshotState(snapshotState, { unmatched: snapshotState.unmatched + 1 });

@@ -1,3 +1,24 @@
+# [4.5.0](https://github.com/americanexpress/jest-image-snapshot/compare/v4.4.1...v4.5.0) (2021-04-29)
+
+
+### Features
+
+* allow folders on snapshot identifier ([#267](https://github.com/americanexpress/jest-image-snapshot/issues/267)) ([ad49a97](https://github.com/americanexpress/jest-image-snapshot/commit/ad49a975a425826245a3f72e4df262db09ce25ea))
+
+## [4.4.1](https://github.com/americanexpress/jest-image-snapshot/compare/v4.4.0...v4.4.1) (2021-04-01)
+
+
+### Bug Fixes
+
+* incorrect stats reported to jest ([#257](https://github.com/americanexpress/jest-image-snapshot/issues/257)) ([e8f949a](https://github.com/americanexpress/jest-image-snapshot/commit/e8f949a845facf4e0fc47f6f63ab59f791d4148a))
+
+# [4.4.0](https://github.com/americanexpress/jest-image-snapshot/compare/v4.3.0...v4.4.0) (2021-02-26)
+
+
+### Features
+
+* better error message ([#254](https://github.com/americanexpress/jest-image-snapshot/issues/254)) ([af44dd4](https://github.com/americanexpress/jest-image-snapshot/commit/af44dd49bf82caefb289b7780c97a1ba6bcc9e8d))
+
 # [4.3.0](https://github.com/americanexpress/jest-image-snapshot/compare/v4.2.0...v4.3.0) (2020-12-16)
 
 

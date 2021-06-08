@@ -50,9 +50,30 @@ describe('diff-snapshot', () => {
       expect(mockSpawnSync).toBeCalled();
     });
 
-    it('throws when process returns a non-zero status', () => {
-      const runDiffImageToSnapshot = setupTest({ status: 1 });
-      expect(() => runDiffImageToSnapshot(fakeRequest)).toThrow();
+    it.each`
+      spawnReturn
+      ${{ status: 1 }}
+      ${{ status: 1, error: {} }}
+      ${{ status: 1, error: new Error() }}
+    `(
+  'throws an Unknown Error when process returns a non-zero status $#',
+  ({ spawnReturn }) => {
+    const runDiffImageToSnapshot = setupTest(spawnReturn);
+
+    expect(() => runDiffImageToSnapshot(fakeRequest)).toThrowError(
+      new Error('Error running image diff: Unknown Error')
+    );
+  }
+);
+
+    it('throws a helpful error if available', () => {
+      const runDiffImageToSnapshot = setupTest({
+        status: 1,
+        error: new Error('🦖'),
+      });
+      expect(() => runDiffImageToSnapshot(fakeRequest)).toThrowError(
+        new Error('Error running image diff: 🦖')
+      );
     });
   });
 
@@ -437,6 +458,25 @@ describe('diff-snapshot', () => {
       expect(mockMkdirpSync).toHaveBeenCalledWith(path.join(mockSnapshotsDir, '__diff_output__'));
     });
 
+    it('should create diff output sub-directory if there is not one already and test is failing', () => {
+      const diffImageToSnapshot = setupTest({
+        snapshotExists: true,
+        outputDirExists: false,
+        pixelmatchResult: 100,
+      });
+
+      diffImageToSnapshot({
+        receivedImageBuffer: mockFailImageBuffer,
+        snapshotIdentifier: path.join('parent', mockSnapshotIdentifier),
+        snapshotsDir: mockSnapshotsDir,
+        diffDir: mockDiffDir,
+        failureThreshold: 0,
+        failureThresholdType: 'pixel',
+      });
+
+      expect(mockMkdirpSync).toHaveBeenCalledWith(path.join(mockSnapshotsDir, '__diff_output__', 'parent'));
+    });
+
     it('should not create diff output directory if test passed', () => {
       const diffImageToSnapshot = setupTest({ snapshotExists: true, outputDirExists: false });
       diffImageToSnapshot({
@@ -481,6 +521,22 @@ describe('diff-snapshot', () => {
       });
 
       expect(mockMkdirpSync).toHaveBeenCalledWith(mockSnapshotsDir);
+    });
+
+    it('should create snapshots sub-directory if there is not one already', () => {
+      const diffImageToSnapshot = setupTest({ snapshotExists: true, snapshotDirExists: false });
+      diffImageToSnapshot({
+        receivedImageBuffer: mockImageBuffer,
+        snapshotIdentifier: path.join('parent', mockSnapshotIdentifier),
+        snapshotsDir: mockSnapshotsDir,
+        diffDir: mockDiffDir,
+        updateSnapshot: true,
+        updatePassedSnapshot: true,
+        failureThreshold: 0,
+        failureThresholdType: 'pixel',
+      });
+
+      expect(mockMkdirpSync).toHaveBeenCalledWith(path.join(mockSnapshotsDir, 'parent'));
     });
 
     it('should not create snapshots directory if there already is one', () => {
