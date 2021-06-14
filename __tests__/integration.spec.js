@@ -1,5 +1,6 @@
 /*
  * Copyright (c) 2017 American Express Travel Related Services Company, Inc.
+ * Copyright (c) 2020 Dan Weber <dweber@gmail.com>
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
  * in compliance with the License. You may obtain a copy of the License at
@@ -423,6 +424,34 @@ describe('toMatchImageSnapshot', () => {
       expect(
         () => expect(largeFailureImageData).toMatchImageSnapshot({ customSnapshotIdentifier })
       ).toThrow(/Expected image to match or be a close match/);
+    });
+
+    it('diff-process should succeed even if the tests fail with large image sizes (issue #210)', () => {
+      const superLargeImageData = fs.readFileSync(fromStubs('Dan_Weber-6-2200.png'));
+      const superLargeImageFailureData = fs.readFileSync(fromStubs('Dan_Weber-7-2200.png'));
+      const customSnapshotIdentifier = getIdentifierIndicatingCleanupIsRequired();
+      // First we need to write a new snapshot image
+      expect(
+        () => expect(superLargeImageData)
+          .toMatchImageSnapshot({
+            failureThreshold: 0.00,
+            failureThresholdType: 'pixel',
+            customSnapshotIdentifier,
+          })
+      )
+        .not
+        .toThrowError();
+
+      // then test against a different image
+      expect(
+        () => expect(superLargeImageFailureData)
+          .toMatchImageSnapshot({
+            failureThreshold: 0,
+            failureThresholdType: 'pixel',
+            customSnapshotIdentifier,
+          })
+      )
+        .toThrowError(/Expected image to match or be a close match/);
     });
 
     describe('Desktop Images Test', () => {
