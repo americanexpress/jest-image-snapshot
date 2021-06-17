@@ -1,9 +1,9 @@
 <h1 align="center">
-  <img src='https://github.com/americanexpress/jest-image-snapshot/raw/master/jest-image-snapshot.png' alt="Jest Image Snapshot - One Amex" width='50%'/>
+  <img src='https://github.com/americanexpress/jest-image-snapshot/raw/main/jest-image-snapshot.png' alt="Jest Image Snapshot - One Amex" width='50%'/>
 </h1>
 
 [![npm](https://img.shields.io/npm/v/jest-image-snapshot)](https://www.npmjs.com/package/jest-image-snapshot)
-[![Travis (.org) branch](https://img.shields.io/travis/americanexpress/jest-image-snapshot/master)](https://travis-ci.org/americanexpress/jest-image-snapshot)
+![Health Check](https://github.com/americanexpress/jest-image-snapshot/workflows/Health%20Check/badge.svg)
 [![Mentioned in Awesome Jest](https://awesome.re/mentioned-badge.svg)](https://github.com/jest-community/awesome-jest)
 
 > Jest matcher that performs image comparisons using [pixelmatch](https://github.com/mapbox/pixelmatch) and behaves just like [Jest snapshots](https://facebook.github.io/jest/docs/snapshot-testing.html) do! Very useful for visual regression testing.
@@ -292,7 +292,7 @@ Please feel free to open pull requests and see [CONTRIBUTING.md](./CONTRIBUTING.
 ## 🗝️ License
 
 Any contributions made under this project will be governed by the [Apache License
-2.0](https://github.com/americanexpress/jest-image-snapshot/blob/master/LICENSE.txt).
+2.0](https://github.com/americanexpress/jest-image-snapshot/blob/main/LICENSE.txt).
 
 ## 🗣️ Code of Conduct
 
