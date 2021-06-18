@@ -1,0 +1,43 @@
+name: Tests
+
+on:
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node: [ '10.x','12.x', '14.x', '16.x' ]
+    name: Node ${{ matrix.node }}
+    steps:
+    - uses: actions/checkout@v2
+    - run: |
+        git remote set-branches --add origin main
+        git fetch
+    - name: Setup Node
+      uses: actions/setup-node@v2
+      with:
+        node-version: ${{ matrix.node }}
+    - name: Install Dependencies
+      run: npm ci
+      env:
+        NODE_ENV: development
+    - name: Unit Tests
+      run: npm run test
+      env:
+        NODE_ENV: production
+    - name: Lockfile Lint Test
+      run: npm run test:lockfile
+      env:
+        NODE_ENV: production
+    - name: Git History Test
+      run: npm run test:git-history
+      env:
+        NODE_ENV: production
+    - name: Lint
+      run: npm run lint
+      env:
+        NODE_ENV: production
