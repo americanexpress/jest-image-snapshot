@@ -1,3 +1,10 @@
+## [4.5.1](https://github.com/americanexpress/jest-image-snapshot/compare/v4.5.0...v4.5.1) (2021-06-25)
+
+
+### Bug Fixes
+
+* **deps:** bump glob-parent from 5.1.1 to 5.1.2 ([#276](https://github.com/americanexpress/jest-image-snapshot/issues/276)) ([0c5879e](https://github.com/americanexpress/jest-image-snapshot/commit/0c5879ea2552682208e822d5d696c94121ed7125))
+
 # [4.5.0](https://github.com/americanexpress/jest-image-snapshot/compare/v4.4.1...v4.5.0) (2021-04-29)
 
 
