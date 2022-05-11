@@ -189,6 +189,8 @@ function diffImageToSnapshot(options) {
     receivedImageBuffer,
     snapshotIdentifier,
     snapshotsDir,
+    storeReceivedOnFailure,
+    receivedDir,
     diffDir,
     diffDirection,
     updateSnapshot = false,
@@ -209,6 +211,9 @@ function diffImageToSnapshot(options) {
     fs.writeFileSync(baselineSnapshotPath, receivedImageBuffer);
     result = { added: true };
   } else {
+    const receivedSnapshotPath = path.join(receivedDir, `${snapshotIdentifier}-received.png`);
+    rimraf.sync(receivedSnapshotPath);
+
     const diffOutputPath = path.join(diffDir, `${snapshotIdentifier}-diff.png`);
     rimraf.sync(diffOutputPath);
 
@@ -269,6 +274,11 @@ function diffImageToSnapshot(options) {
     });
 
     if (isFailure({ pass, updateSnapshot })) {
+      if (storeReceivedOnFailure) {
+        mkdirp.sync(path.dirname(receivedSnapshotPath));
+        fs.writeFileSync(receivedSnapshotPath, receivedImageBuffer);
+      }
+
       mkdirp.sync(path.dirname(diffOutputPath));
       const composer = new ImageComposer({
         direction: diffDirection,
@@ -301,6 +311,7 @@ function diffImageToSnapshot(options) {
         pass: false,
         diffSize,
         imageDimensions,
+        receivedSnapshotPath,
         diffOutputPath,
         diffRatio,
         diffPixelCount,
