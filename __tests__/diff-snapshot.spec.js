@@ -248,6 +248,30 @@ describe('diff-snapshot', () => {
       expect(mockWriteFileSync).toHaveBeenCalledTimes(2);
     });
 
+    it('should not write a received image if the test fails and storeReceivedOnFailure = false', () => {
+      const diffImageToSnapshot = setupTest({ snapshotExists: true, pixelmatchResult: 5000 });
+      const result = diffImageToSnapshot({
+        receivedImageBuffer: mockFailImageBuffer,
+        snapshotIdentifier: mockSnapshotIdentifier,
+        snapshotsDir: mockSnapshotsDir,
+        storeReceivedOnFailure: false,
+        receivedDir: mockReceivedDir,
+        diffDir: mockDiffDir,
+        updateSnapshot: false,
+        failureThreshold: 0,
+        failureThresholdType: 'pixel',
+      });
+
+      expect(result).toMatchObject({
+        diffOutputPath: path.join(mockSnapshotsDir, '__diff_output__', 'id1-diff.png'),
+        diffRatio: 0.5,
+        diffPixelCount: 5000,
+        pass: false,
+      });
+
+      expect(mockWriteFileSync).toHaveBeenCalledTimes(1);
+    });
+
     it('should fail if image passed is a different size', () => {
       const diffImageToSnapshot = setupTest({ snapshotExists: true, pixelmatchResult: 5000 });
       const result = diffImageToSnapshot({

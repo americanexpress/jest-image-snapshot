@@ -277,6 +277,7 @@ function diffImageToSnapshot(options) {
       if (storeReceivedOnFailure) {
         mkdirp.sync(path.dirname(receivedSnapshotPath));
         fs.writeFileSync(receivedSnapshotPath, receivedImageBuffer);
+        result = { receivedSnapshotPath };
       }
 
       mkdirp.sync(path.dirname(diffOutputPath));
@@ -308,10 +309,10 @@ function diffImageToSnapshot(options) {
       fs.writeFileSync(diffOutputPath, pngBuffer);
 
       result = {
+        ...result,
         pass: false,
         diffSize,
         imageDimensions,
-        receivedSnapshotPath,
         diffOutputPath,
         diffRatio,
         diffPixelCount,
