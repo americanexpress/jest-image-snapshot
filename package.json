@@ -4,7 +4,7 @@
   "description": "Jest matcher for image comparisons. Most commonly used for visual regression testing.",
   "main": "src/index.js",
   "engines": {
-    "node": ">= 10.14.2"
+    "node": "^12.13.0 || ^14.15.0 || ^16.10.0 || >=17.0.0"
   },
   "scripts": {
     "lint": "eslint ./ --ignore-path .gitignore --ext .js",
@@ -53,8 +53,8 @@
     "eslint-config-amex": "^7.0.0",
     "husky": "^4.2.1",
     "image-size": "^0.8.3",
-    "jest": "^27.0.4",
-    "jest-snapshot": "^27.0.4",
+    "jest": "^28.0.3",
+    "jest-snapshot": "^28.0.3",
     "lockfile-lint": "^4.0.0",
     "mock-spawn": "^0.2.6",
     "semantic-release": "^17.0.4"
@@ -71,7 +71,7 @@
     "ssim.js": "^3.1.1"
   },
   "peerDependencies": {
-    "jest": ">=20 <=27"
+    "jest": ">=20 <=28"
   },
   "husky": {
     "hooks": {
