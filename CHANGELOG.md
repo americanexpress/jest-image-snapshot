@@ -1,3 +1,16 @@
+# [5.0.0](https://github.com/americanexpress/jest-image-snapshot/compare/v4.5.1...v5.0.0) (2022-05-30)
+
+
+### chore
+
+* **jest:** upgrade v28 ([a902a5b](https://github.com/americanexpress/jest-image-snapshot/commit/a902a5baa87d0925b3ff241d7f592f6e1fc0c8fd)), closes [#296](https://github.com/americanexpress/jest-image-snapshot/issues/296)
+
+
+### BREAKING CHANGES
+
+* **jest:** drop support for Node 10 due
+to jest use of globalThis in Node 12
+
 ## [4.5.1](https://github.com/americanexpress/jest-image-snapshot/compare/v4.5.0...v4.5.1) (2021-06-25)
 
 
