@@ -79,6 +79,7 @@ describe('diff-snapshot', () => {
 
   describe('diffImageToSnapshot', () => {
     const mockSnapshotsDir = path.normalize('/path/to/snapshots');
+    const mockReceivedDir = path.normalize('/path/to/snapshots/__received_output__');
     const mockDiffDir = path.normalize('/path/to/snapshots/__diff_output__');
     const mockSnapshotIdentifier = 'id1';
     const mockImagePath = './__tests__/stubs/TestImage.png';
@@ -147,6 +148,7 @@ describe('diff-snapshot', () => {
         receivedImageBuffer: mockImageBuffer,
         snapshotIdentifier: mockSnapshotIdentifier,
         snapshotsDir: mockSnapshotsDir,
+        receivedDir: mockReceivedDir,
         diffDir: mockDiffDir,
         updateSnapshot: false,
         failureThreshold: 0,
@@ -167,6 +169,7 @@ describe('diff-snapshot', () => {
         receivedImageBuffer: mockImageBuffer,
         snapshotIdentifier: mockSnapshotIdentifier,
         snapshotsDir: mockSnapshotsDir,
+        receivedDir: mockReceivedDir,
         diffDir: mockDiffDir,
         updateSnapshot: false,
         failureThreshold: 0,
@@ -190,6 +193,7 @@ describe('diff-snapshot', () => {
         receivedImageBuffer: mockFailImageBuffer,
         snapshotIdentifier: mockSnapshotIdentifier,
         snapshotsDir: mockSnapshotsDir,
+        receivedDir: mockReceivedDir,
         diffDir: mockDiffDir,
         updateSnapshot: false,
         failureThreshold: 0,
@@ -219,12 +223,62 @@ describe('diff-snapshot', () => {
       expect(mockWriteFileSync).toHaveBeenCalledTimes(1);
     });
 
+    it('should write a received image if the test fails and storeReceivedOnFailure = true', () => {
+      const diffImageToSnapshot = setupTest({ snapshotExists: true, pixelmatchResult: 5000 });
+      const result = diffImageToSnapshot({
+        receivedImageBuffer: mockFailImageBuffer,
+        snapshotIdentifier: mockSnapshotIdentifier,
+        snapshotsDir: mockSnapshotsDir,
+        storeReceivedOnFailure: true,
+        receivedDir: mockReceivedDir,
+        diffDir: mockDiffDir,
+        updateSnapshot: false,
+        failureThreshold: 0,
+        failureThresholdType: 'pixel',
+      });
+
+      expect(result).toMatchObject({
+        diffOutputPath: path.join(mockSnapshotsDir, '__diff_output__', 'id1-diff.png'),
+        receivedSnapshotPath: path.join(mockSnapshotsDir, '__received_output__', 'id1-received.png'),
+        diffRatio: 0.5,
+        diffPixelCount: 5000,
+        pass: false,
+      });
+
+      expect(mockWriteFileSync).toHaveBeenCalledTimes(2);
+    });
+
+    it('should not write a received image if the test fails and storeReceivedOnFailure = false', () => {
+      const diffImageToSnapshot = setupTest({ snapshotExists: true, pixelmatchResult: 5000 });
+      const result = diffImageToSnapshot({
+        receivedImageBuffer: mockFailImageBuffer,
+        snapshotIdentifier: mockSnapshotIdentifier,
+        snapshotsDir: mockSnapshotsDir,
+        storeReceivedOnFailure: false,
+        receivedDir: mockReceivedDir,
+        diffDir: mockDiffDir,
+        updateSnapshot: false,
+        failureThreshold: 0,
+        failureThresholdType: 'pixel',
+      });
+
+      expect(result).toMatchObject({
+        diffOutputPath: path.join(mockSnapshotsDir, '__diff_output__', 'id1-diff.png'),
+        diffRatio: 0.5,
+        diffPixelCount: 5000,
+        pass: false,
+      });
+
+      expect(mockWriteFileSync).toHaveBeenCalledTimes(1);
+    });
+
     it('should fail if image passed is a different size', () => {
       const diffImageToSnapshot = setupTest({ snapshotExists: true, pixelmatchResult: 5000 });
       const result = diffImageToSnapshot({
         receivedImageBuffer: mockBigImageBuffer,
         snapshotIdentifier: mockSnapshotIdentifier,
         snapshotsDir: mockSnapshotsDir,
+        receivedDir: mockReceivedDir,
         diffDir: mockDiffDir,
         updateSnapshot: false,
         failureThreshold: 0,
@@ -254,6 +308,7 @@ describe('diff-snapshot', () => {
         receivedImageBuffer: mockFailImageBuffer,
         snapshotIdentifier: mockSnapshotIdentifier,
         snapshotsDir: mockSnapshotsDir,
+        receivedDir: mockReceivedDir,
         diffDir: mockDiffDir,
         updateSnapshot: false,
         failureThreshold: 250,
@@ -271,6 +326,7 @@ describe('diff-snapshot', () => {
         receivedImageBuffer: mockBigImageBuffer,
         snapshotIdentifier: mockSnapshotIdentifier,
         snapshotsDir: mockSnapshotsDir,
+        receivedDir: mockReceivedDir,
         diffDir: mockDiffDir,
         updateSnapshot: false,
         failureThreshold: 250,
@@ -290,6 +346,7 @@ describe('diff-snapshot', () => {
         receivedImageBuffer: mockBigImageBuffer,
         snapshotIdentifier: mockSnapshotIdentifier,
         snapshotsDir: mockSnapshotsDir,
+        receivedDir: mockReceivedDir,
         diffDir: mockDiffDir,
         updateSnapshot: false,
         failureThreshold: 0,
@@ -309,6 +366,7 @@ describe('diff-snapshot', () => {
         receivedImageBuffer: mockImageBuffer,
         snapshotIdentifier: mockSnapshotIdentifier,
         snapshotsDir: mockSnapshotsDir,
+        receivedDir: mockReceivedDir,
         diffDir: mockDiffDir,
         updateSnapshot: false,
         failureThreshold: 0,
@@ -326,6 +384,7 @@ describe('diff-snapshot', () => {
         receivedImageBuffer: mockFailImageBuffer,
         snapshotIdentifier: mockSnapshotIdentifier,
         snapshotsDir: mockSnapshotsDir,
+        receivedDir: mockReceivedDir,
         diffDir: mockDiffDir,
         updateSnapshot: false,
         failureThreshold: 250,
@@ -344,6 +403,7 @@ describe('diff-snapshot', () => {
         receivedImageBuffer: mockFailImageBuffer,
         snapshotIdentifier: mockSnapshotIdentifier,
         snapshotsDir: mockSnapshotsDir,
+        receivedDir: mockReceivedDir,
         diffDir: mockDiffDir,
         updateSnapshot: false,
         failureThreshold: 250,
@@ -361,6 +421,7 @@ describe('diff-snapshot', () => {
         receivedImageBuffer: mockFailImageBuffer,
         snapshotIdentifier: mockSnapshotIdentifier,
         snapshotsDir: mockSnapshotsDir,
+        receivedDir: mockReceivedDir,
         diffDir: mockDiffDir,
         updateSnapshot: false,
         failureThreshold: 0.025,
@@ -378,6 +439,7 @@ describe('diff-snapshot', () => {
         receivedImageBuffer: mockFailImageBuffer,
         snapshotIdentifier: mockSnapshotIdentifier,
         snapshotsDir: mockSnapshotsDir,
+        receivedDir: mockReceivedDir,
         diffDir: mockDiffDir,
         updateSnapshot: false,
         failureThreshold: 0.025,
@@ -396,6 +458,7 @@ describe('diff-snapshot', () => {
         receivedImageBuffer: mockImageBuffer,
         snapshotIdentifier: mockSnapshotIdentifier,
         snapshotsDir: mockSnapshotsDir,
+        receivedDir: mockReceivedDir,
         diffDir: mockDiffDir,
         updateSnapshot: false,
         failureThreshold: 0,
@@ -420,6 +483,7 @@ describe('diff-snapshot', () => {
         receivedImageBuffer: mockImageBuffer,
         snapshotIdentifier: mockSnapshotIdentifier,
         snapshotsDir: mockSnapshotsDir,
+        receivedDir: mockReceivedDir,
         diffDir: mockDiffDir,
         updateSnapshot: false,
         customDiffConfig: {
@@ -450,6 +514,7 @@ describe('diff-snapshot', () => {
         receivedImageBuffer: mockFailImageBuffer,
         snapshotIdentifier: mockSnapshotIdentifier,
         snapshotsDir: mockSnapshotsDir,
+        receivedDir: mockReceivedDir,
         diffDir: mockDiffDir,
         failureThreshold: 0,
         failureThresholdType: 'pixel',
@@ -469,6 +534,7 @@ describe('diff-snapshot', () => {
         receivedImageBuffer: mockFailImageBuffer,
         snapshotIdentifier: path.join('parent', mockSnapshotIdentifier),
         snapshotsDir: mockSnapshotsDir,
+        receivedDir: mockReceivedDir,
         diffDir: mockDiffDir,
         failureThreshold: 0,
         failureThresholdType: 'pixel',
@@ -483,6 +549,7 @@ describe('diff-snapshot', () => {
         receivedImageBuffer: mockImageBuffer,
         snapshotIdentifier: mockSnapshotIdentifier,
         snapshotsDir: mockSnapshotsDir,
+        receivedDir: mockReceivedDir,
         diffDir: mockDiffDir,
         updateSnapshot: false,
         failureThreshold: 0,
@@ -498,6 +565,7 @@ describe('diff-snapshot', () => {
         receivedImageBuffer: mockImageBuffer,
         snapshotIdentifier: mockSnapshotIdentifier,
         snapshotsDir: mockSnapshotsDir,
+        receivedDir: mockReceivedDir,
         diffDir: mockDiffDir,
         updateSnapshot: false,
         failureThreshold: 0,
@@ -513,6 +581,7 @@ describe('diff-snapshot', () => {
         receivedImageBuffer: mockImageBuffer,
         snapshotIdentifier: mockSnapshotIdentifier,
         snapshotsDir: mockSnapshotsDir,
+        receivedDir: mockReceivedDir,
         diffDir: mockDiffDir,
         updateSnapshot: true,
         updatePassedSnapshot: true,
@@ -529,6 +598,7 @@ describe('diff-snapshot', () => {
         receivedImageBuffer: mockImageBuffer,
         snapshotIdentifier: path.join('parent', mockSnapshotIdentifier),
         snapshotsDir: mockSnapshotsDir,
+        receivedDir: mockReceivedDir,
         diffDir: mockDiffDir,
         updateSnapshot: true,
         updatePassedSnapshot: true,
@@ -545,6 +615,7 @@ describe('diff-snapshot', () => {
         receivedImageBuffer: mockImageBuffer,
         snapshotIdentifier: mockSnapshotIdentifier,
         snapshotsDir: mockSnapshotsDir,
+        receivedDir: mockReceivedDir,
         diffDir: mockDiffDir,
         updateSnapshot: true,
         failureThreshold: 0,
@@ -560,6 +631,7 @@ describe('diff-snapshot', () => {
         receivedImageBuffer: mockImageBuffer,
         snapshotIdentifier: mockSnapshotIdentifier,
         snapshotsDir: mockSnapshotsDir,
+        receivedDir: mockReceivedDir,
         diffDir: mockDiffDir,
         updateSnapshot: false,
         failureThreshold: 0,
@@ -576,6 +648,7 @@ describe('diff-snapshot', () => {
         receivedImageBuffer: mockImageBuffer,
         snapshotIdentifier: mockSnapshotIdentifier,
         snapshotsDir: mockSnapshotsDir,
+        receivedDir: mockReceivedDir,
         diffDir: mockDiffDir,
         updateSnapshot: true,
         updatePassedSnapshot: true,
@@ -592,6 +665,7 @@ describe('diff-snapshot', () => {
         receivedImageBuffer: mockImageBuffer,
         snapshotIdentifier: mockSnapshotIdentifier,
         snapshotsDir: mockSnapshotsDir,
+        receivedDir: mockReceivedDir,
         diffDir: mockDiffDir,
         diffDirection: 'vertical',
         updateSnapshot: false,
@@ -612,6 +686,7 @@ describe('diff-snapshot', () => {
         receivedImageBuffer: mockImageBuffer,
         snapshotIdentifier: mockSnapshotIdentifier,
         snapshotsDir: mockSnapshotsDir,
+        receivedDir: mockReceivedDir,
         diffDir: mockDiffDir,
         updateSnapshot: false,
         failureThreshold: 0,
@@ -629,6 +704,7 @@ describe('diff-snapshot', () => {
           receivedImageBuffer: mockFailImageBuffer,
           snapshotIdentifier: mockSnapshotIdentifier,
           snapshotsDir: mockSnapshotsDir,
+          receivedDir: mockReceivedDir,
           diffDir: mockDiffDir,
           updateSnapshot: false,
           failureThreshold: 0,
@@ -644,6 +720,7 @@ describe('diff-snapshot', () => {
         receivedImageBuffer: mockImageBuffer,
         snapshotIdentifier: mockSnapshotIdentifier,
         snapshotsDir: mockSnapshotsDir,
+        receivedDir: mockReceivedDir,
         diffDir: mockDiffDir,
         updateSnapshot: true,
         updatePassedSnapshot: false,
@@ -662,6 +739,7 @@ describe('diff-snapshot', () => {
         receivedImageBuffer: mockImageBuffer,
         snapshotIdentifier: mockSnapshotIdentifier,
         snapshotsDir: mockSnapshotsDir,
+        receivedDir: mockReceivedDir,
         diffDir: mockDiffDir,
         updateSnapshot: true,
         updatePassedSnapshot: true,
@@ -680,6 +758,7 @@ describe('diff-snapshot', () => {
         receivedImageBuffer: mockFailImageBuffer,
         snapshotIdentifier: mockSnapshotIdentifier,
         snapshotsDir: mockSnapshotsDir,
+        receivedDir: mockReceivedDir,
         diffDir: mockDiffDir,
         updateSnapshot: true,
         updatePassedSnapshot: false,
@@ -697,6 +776,7 @@ describe('diff-snapshot', () => {
         receivedImageBuffer: mockFailImageBuffer,
         snapshotIdentifier: mockSnapshotIdentifier,
         snapshotsDir: mockSnapshotsDir,
+        receivedDir: mockReceivedDir,
         diffDir: mockDiffDir,
         updateSnapshot: false,
         failureThreshold: 0,
@@ -713,6 +793,7 @@ describe('diff-snapshot', () => {
         receivedImageBuffer: mockFailImageBuffer,
         snapshotIdentifier: mockSnapshotIdentifier,
         snapshotsDir: mockSnapshotsDir,
+        receivedDir: mockReceivedDir,
         diffDir: mockDiffDir,
         updateSnapshot: false,
         failureThreshold: 0,
@@ -740,6 +821,7 @@ describe('diff-snapshot', () => {
         receivedImageBuffer: mockFailImageBuffer,
         snapshotIdentifier: mockSnapshotIdentifier,
         snapshotsDir: mockSnapshotsDir,
+        receivedDir: mockReceivedDir,
         diffDir: mockDiffDir,
         failureThreshold: 0,
         failureThresholdType: 'pixel',

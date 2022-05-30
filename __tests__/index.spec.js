@@ -415,6 +415,54 @@ describe('toMatchImageSnapshot', () => {
     expect(() => matcherAtTest('pretendthisisanimagebuffer')).not.toThrow();
   });
 
+  it('should pass with defaults', () => {
+    const mockTestContext = {
+      testPath: path.join('path', 'to', 'test.spec.js'),
+      currentTestName: 'test1',
+      isNot: false,
+      snapshotState: {
+        _counters: new Map(),
+        update: true,
+        updated: undefined,
+        added: undefined,
+      },
+    };
+    setupMock({ updated: true });
+
+    const runDiffImageToSnapshot = jest.fn(() => ({}));
+    jest.doMock('../src/diff-snapshot', () => ({
+      runDiffImageToSnapshot,
+    }));
+
+    const Chalk = jest.fn();
+    jest.doMock('chalk', () => ({
+      constructor: Chalk,
+    }));
+    const { toMatchImageSnapshot } = require('../src/index');
+    const matcherAtTest = toMatchImageSnapshot.bind(mockTestContext);
+
+    matcherAtTest();
+
+    expect(runDiffImageToSnapshot).toHaveBeenCalledWith({
+      allowSizeMismatch: false,
+      blur: 0,
+      comparisonMethod: 'pixelmatch',
+      customDiffConfig: {},
+      diffDir: 'path/to/__image_snapshots__/__diff_output__',
+      diffDirection: 'horizontal',
+      failureThreshold: 0,
+      failureThresholdType: 'pixel',
+      receivedDir: 'path/to/__image_snapshots__/__received_output__',
+      receivedImageBuffer: undefined,
+      snapshotIdentifier: 'test-spec-js-test-1-1',
+      snapshotsDir: 'path/to/__image_snapshots__',
+      storeReceivedOnFailure: false,
+      updatePassedSnapshot: false,
+      updateSnapshot: false,
+    });
+    expect(Chalk).toHaveBeenCalledWith({});
+  });
+
   it('can provide custom defaults', () => {
     const mockTestContext = {
       testPath: path.join('path', 'to', 'test.spec.js'),
@@ -447,6 +495,8 @@ describe('toMatchImageSnapshot', () => {
       customDiffConfig,
       customSnapshotIdentifier,
       customSnapshotsDir: path.join('path', 'to', 'my-custom-snapshots-dir'),
+      customReceivedDir: path.join('path', 'to', 'my-custom-received-dir'),
+      storeReceivedOnFailure: true,
       customDiffDir: path.join('path', 'to', 'my-custom-diff-dir'),
       diffDirection: 'vertical',
       noColors: true,
@@ -469,6 +519,8 @@ describe('toMatchImageSnapshot', () => {
       },
       snapshotIdentifier: 'custom-test-spec-js-test-1-1',
       snapshotsDir: path.join('path', 'to', 'my-custom-snapshots-dir'),
+      receivedDir: path.join('path', 'to', 'my-custom-received-dir'),
+      storeReceivedOnFailure: true,
       diffDir: path.join('path', 'to', 'my-custom-diff-dir'),
       diffDirection: 'vertical',
       updateSnapshot: false,
@@ -510,7 +562,9 @@ describe('toMatchImageSnapshot', () => {
     const toMatchImageSnapshot = configureToMatchImageSnapshot({
       customDiffConfig: customConfig,
       customSnapshotsDir: path.join('path', 'to', 'my-custom-snapshots-dir'),
+      customReceivedDir: path.join('path', 'to', 'my-custom-received-dir'),
       customDiffDir: path.join('path', 'to', 'my-custom-diff-dir'),
+      storeReceivedOnFailure: true,
       noColors: true,
       runInProcess: true,
     });
@@ -527,8 +581,10 @@ describe('toMatchImageSnapshot', () => {
       },
       snapshotIdentifier: 'test-spec-js-test-1-1',
       snapshotsDir: path.join('path', 'to', 'my-custom-snapshots-dir'),
+      receivedDir: path.join('path', 'to', 'my-custom-received-dir'),
       diffDir: path.join('path', 'to', 'my-custom-diff-dir'),
       diffDirection: 'horizontal',
+      storeReceivedOnFailure: true,
       updateSnapshot: false,
       updatePassedSnapshot: false,
       failureThreshold: 0,

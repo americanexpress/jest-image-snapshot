@@ -47,9 +47,11 @@ Object {
   "diffDirection": "horizontal",
   "failureThreshold": 0,
   "failureThresholdType": "pixel",
+  "receivedDir": "path/to/__image_snapshots__/__received_output__",
   "receivedImageBuffer": "pretendthisisanimagebuffer",
   "snapshotIdentifier": "test-spec-js-test-1",
   "snapshotsDir": "path/to/__image_snapshots__",
+  "storeReceivedOnFailure": false,
   "updatePassedSnapshot": false,
   "updateSnapshot": false,
 }
