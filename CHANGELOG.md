@@ -1,3 +1,10 @@
+# [5.1.0](https://github.com/americanexpress/jest-image-snapshot/compare/v5.0.0...v5.1.0) (2022-05-30)
+
+
+### Features
+
+* allow storing received screenshot on failure ([#298](https://github.com/americanexpress/jest-image-snapshot/issues/298)) ([cfb81c9](https://github.com/americanexpress/jest-image-snapshot/commit/cfb81c99e1465420f007e180a59559c5d62d1c67))
+
 # [5.0.0](https://github.com/americanexpress/jest-image-snapshot/compare/v4.5.1...v5.0.0) (2022-05-30)
 
 
