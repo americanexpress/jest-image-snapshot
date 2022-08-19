@@ -108,9 +108,9 @@ describe('diff-snapshot', () => {
         readFileSync: jest.fn(),
       });
 
-      jest.mock('fs', () => mockFs);
       jest.mock('mkdirp', () => ({ sync: mockMkdirpSync }));
-      const { diffImageToSnapshot } = require('../src/diff-snapshot');
+      jest.mock('fs', () => mockFs);
+
 
       mockFs.existsSync.mockImplementation((p) => {
         switch (p) {
@@ -133,6 +133,7 @@ describe('diff-snapshot', () => {
 
         return null;
       });
+      const { diffImageToSnapshot } = require('../src/diff-snapshot');
 
       jest.mock('pixelmatch', () => mockPixelMatch);
       mockPixelMatch.mockImplementation(() => pixelmatchResult);
@@ -207,14 +208,14 @@ describe('diff-snapshot', () => {
         pass: false,
       });
 
-      const isBase64ImgStr = result.imgSrcString.includes('data:image/png;base64,iV');
+      const isBase64ImgStr = result.imgSrcString.includes('data:image/png;base64');
       expect(isBase64ImgStr).toBe(true);
 
       expect(mockPixelMatch).toHaveBeenCalledTimes(1);
       expect(mockPixelMatch).toHaveBeenCalledWith(
         expect.any(Buffer),
         expect.any(Buffer),
-        expect.any(Buffer),
+        expect.any(Uint8Array),
         100,
         100,
         { threshold: 0.01 }
@@ -293,7 +294,7 @@ describe('diff-snapshot', () => {
       expect(mockPixelMatch).toHaveBeenCalledWith(
         expect.any(Buffer),
         expect.any(Buffer),
-        expect.any(Buffer),
+        expect.any(Uint8Array),
         150,
         150,
         { threshold: 0.01 }

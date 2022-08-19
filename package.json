@@ -65,8 +65,8 @@
     "glur": "^1.1.2",
     "lodash": "^4.17.4",
     "mkdirp": "^0.5.1",
+    "node-libpng": "^0.2.20",
     "pixelmatch": "^5.1.0",
-    "pngjs": "^3.4.0",
     "rimraf": "^2.6.2",
     "ssim.js": "^3.1.1"
   },

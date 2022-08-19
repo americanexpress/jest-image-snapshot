@@ -18,18 +18,21 @@ const path = require('path');
 const mkdirp = require('mkdirp');
 const pixelmatch = require('pixelmatch');
 const ssim = require('ssim.js');
-const { PNG } = require('pngjs');
 const rimraf = require('rimraf');
 const glur = require('glur');
+const {
+  xy, writePngFileSync, encode, decode, rect, PngImage,
+} = require('node-libpng');
 const ImageComposer = require('./image-composer');
 
 /**
  * Helper function to create reusable image resizer
  */
 const createImageResizer = (width, height) => (source) => {
-  const resized = new PNG({ width, height, fill: true });
-  PNG.bitblt(source, resized, 0, 0, source.width, source.height, 0, 0);
-  return resized;
+  source.resizeCanvas({
+    dimensions: xy(width, height),
+  });
+  return source;
 };
 
 /**
@@ -103,19 +106,21 @@ const ssimMatch = (
   // Converts the SSIM value to different pixels based on image width and height
   // conforms to how pixelmatch works.
   const diffPixels = (1 - mssim) * imageWidth * imageHeight;
-  const diffRgbaPixels = new DataView(diffImageData.buffer, diffImageData.byteOffset);
-  for (let ln = 0; ln !== imageHeight; ++ln) {
-    for (let pos = 0; pos !== imageWidth; ++pos) {
-      const rpos = (ln * imageWidth) + pos;
-      // initial value is transparent.  We'll add in the SSIM offset.
-      // red (ff) green (00) blue (00) alpha (00)
-      const diffValue = 0xff000000 + Math.floor(0xff *
-        (1 - ssim_map.data[
-          // eslint-disable-next-line no-mixed-operators
-          (ssim_map.width * Math.round(ssim_map.height * ln / imageHeight)) +
-          // eslint-disable-next-line no-mixed-operators
-          Math.round(ssim_map.width * pos / imageWidth)]));
-      diffRgbaPixels.setUint32(rpos * 4, diffValue);
+  if (diffPixels > 0) {
+    const diffRgbaPixels = new DataView(diffImageData.buffer, diffImageData.byteOffset);
+    for (let ln = 0; ln !== imageHeight; ++ln) {
+      for (let pos = 0; pos !== imageWidth; ++pos) {
+        const rpos = (ln * imageWidth) + pos;
+        // initial value is transparent.  We'll add in the SSIM offset.
+        // red (ff) green (00) blue (00) alpha (00)
+        const diffValue = 0xff000000 + Math.floor(0xff *
+          (1 - ssim_map.data[
+            // eslint-disable-next-line no-mixed-operators
+            (ssim_map.width * Math.round(ssim_map.height * ln / imageHeight)) +
+            // eslint-disable-next-line no-mixed-operators
+            Math.round(ssim_map.width * pos / imageWidth)]));
+        diffRgbaPixels.setUint32(rpos * 4, diffValue);
+      }
     }
   }
   return diffPixels;
@@ -184,6 +189,21 @@ const shouldFail = ({
   };
 };
 
+const rgbToRgba = (image, imageWidth, imageHeight) => {
+  if (image.colorType === 'rgb') {
+    const a = new Uint8Array(imageWidth * imageHeight * 4);
+    for (let i = 0; i < imageWidth * imageHeight * 3; i += 3) {
+      a[i + 3] = 255;
+      a[i] = image.data[i];
+      a[i + 1] = image.data[i + 1];
+      a[i + 2] = image.data[i + 2];
+    }
+    return a;
+  }
+  return image.data;
+};
+
+
 function diffImageToSnapshot(options) {
   const {
     receivedImageBuffer,
@@ -221,8 +241,8 @@ function diffImageToSnapshot(options) {
 
     const diffConfig = Object.assign({}, defaultDiffConfig, customDiffConfig);
 
-    const rawReceivedImage = PNG.sync.read(receivedImageBuffer);
-    const rawBaselineImage = PNG.sync.read(fs.readFileSync(baselineSnapshotPath));
+    const rawReceivedImage = decode(receivedImageBuffer);
+    const rawBaselineImage = decode(fs.readFileSync(baselineSnapshotPath));
     const hasSizeMismatch = (
       rawReceivedImage.height !== rawBaselineImage.height ||
       rawReceivedImage.width !== rawBaselineImage.width
@@ -245,14 +265,16 @@ function diffImageToSnapshot(options) {
       glur(baselineImage.data, imageWidth, imageHeight, blur);
     }
 
-    const diffImage = new PNG({ width: imageWidth, height: imageHeight });
-
+    const buffer = Buffer.alloc(imageWidth * imageHeight * 4);
+    const diffImage = new Uint8Array(buffer);
     let diffPixelCount = 0;
+    const receivedImageRGBA = rgbToRgba(receivedImage, imageWidth, imageHeight);
+    const baselineImageRGBA = rgbToRgba(baselineImage, imageWidth, imageHeight);
 
     diffPixelCount = comparisonFn(
-      receivedImage.data,
-      baselineImage.data,
-      diffImage.data,
+      receivedImageRGBA,
+      baselineImageRGBA,
+      diffImage,
       imageWidth,
       imageHeight,
       diffConfig
@@ -285,28 +307,41 @@ function diffImageToSnapshot(options) {
         direction: diffDirection,
       });
 
-      composer.addImage(baselineImage, imageWidth, imageHeight);
+      composer.addImage(baselineImageRGBA, imageWidth, imageHeight);
       composer.addImage(diffImage, imageWidth, imageHeight);
-      composer.addImage(receivedImage, imageWidth, imageHeight);
+      composer.addImage(receivedImageRGBA, imageWidth, imageHeight);
 
       const composerParams = composer.getParams();
 
-      const compositeResultImage = new PNG({
-        width: composerParams.compositeWidth,
-        height: composerParams.compositeHeight,
-      });
+      const compositeResultImage = new PngImage(encode(Buffer.alloc(4),
+        {
+          width: 1,
+          height: 1,
+          compressionLevel: 0,
+        }
+      ));
 
-      // copy baseline, diff, and received images into composite result image
+      compositeResultImage.data = Buffer.alloc(
+        composerParams.compositeWidth * composerParams.compositeHeight * 4
+      );
+      compositeResultImage.width = composerParams.compositeWidth;
+      compositeResultImage.height = composerParams.compositeHeight;
+
+
       composerParams.images.forEach((image, index) => {
-        PNG.bitblt(
-          image.imageData, compositeResultImage, 0, 0, image.imageWidth, image.imageHeight,
+        compositeResultImage.copyFrom({
+          data: image.imageData, width: imageWidth, height: imageHeight, colorType: 'rgba',
+        }, xy(
           composerParams.offsetX * index, composerParams.offsetY * index
-        );
+        ), rect(0, 0, image.imageWidth, image.imageHeight));
       });
-      // Set filter type to Paeth to avoid expensive auto scanline filter detection
-      // For more information see https://www.w3.org/TR/PNG-Filters.html
-      const pngBuffer = PNG.sync.write(compositeResultImage, { filterType: 4 });
-      fs.writeFileSync(diffOutputPath, pngBuffer);
+      writePngFileSync(diffOutputPath, compositeResultImage.data,
+        {
+          width: composerParams.compositeWidth,
+          height: composerParams.compositeHeight,
+          compressionLevel: 5,
+        });
+
 
       result = {
         ...result,
@@ -316,7 +351,7 @@ function diffImageToSnapshot(options) {
         diffOutputPath,
         diffRatio,
         diffPixelCount,
-        imgSrcString: `data:image/png;base64,${pngBuffer.toString('base64')}`,
+        imgSrcString: `data:image/png;base64,${compositeResultImage.data.toString('base64')}`,
       };
     } else if (shouldUpdate({ pass, updateSnapshot, updatePassedSnapshot })) {
       mkdirp.sync(path.dirname(baselineSnapshotPath));
@@ -347,7 +382,7 @@ function runDiffImageToSnapshot(options) {
     {
       input: Buffer.from(serializedInput),
       stdio: ['pipe', 'inherit', 'inherit', 'pipe'],
-      maxBuffer: 10 * 1024 * 1024, // 10 MB
+      maxBuffer: 100 * 1024 * 1024, // 10 MB
     }
   );
 
