@@ -114,7 +114,7 @@ describe('diff-snapshot', () => {
 
       mockFs.existsSync.mockImplementation((p) => {
         switch (p) {
-          case path.join(mockSnapshotsDir, `${mockSnapshotIdentifier}-snap.png`):
+          case path.join(mockSnapshotsDir, `${mockSnapshotIdentifier}.png`):
             return snapshotExists;
           case mockDiffDir:
             return !!outputDirExists;
@@ -127,7 +127,7 @@ describe('diff-snapshot', () => {
       mockFs.readFileSync.mockImplementation((p) => {
         const bn = path.basename(p);
 
-        if (bn === 'id1-snap.png' && snapshotExists) {
+        if (bn === 'id1.png' && snapshotExists) {
           return mockImageBuffer;
         }
 
@@ -638,7 +638,7 @@ describe('diff-snapshot', () => {
       });
 
       expect(mockWriteFileSync).toHaveBeenCalledTimes(1);
-      expect(mockWriteFileSync).toHaveBeenCalledWith(path.join(mockSnapshotsDir, `${mockSnapshotIdentifier}-snap.png`), mockImageBuffer);
+      expect(mockWriteFileSync).toHaveBeenCalledWith(path.join(mockSnapshotsDir, `${mockSnapshotIdentifier}.png`), mockImageBuffer);
     });
 
     it('should return updated flag if snapshot was updated', () => {
@@ -674,7 +674,7 @@ describe('diff-snapshot', () => {
 
       expect(diffResult).toHaveProperty('added', true);
       expect(mockWriteFileSync).toHaveBeenCalledWith(
-        path.join(mockSnapshotsDir, 'id1-snap.png'),
+        path.join(mockSnapshotsDir, 'id1.png'),
         expect.any(Buffer)
       );
     });

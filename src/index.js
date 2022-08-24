@@ -108,7 +108,7 @@ function createSnapshotIdentifier({
   const counter = snapshotState._counters.get(currentTestName);
   const defaultIdentifier = kebabCase(`${path.basename(testPath)}-${currentTestName}-${counter}`);
 
-  let snapshotIdentifier = customSnapshotIdentifier || defaultIdentifier;
+  let snapshotIdentifier = customSnapshotIdentifier || `${defaultIdentifier}-snap`;
 
   if (typeof customSnapshotIdentifier === 'function') {
     const customRes = customSnapshotIdentifier({
@@ -195,7 +195,7 @@ function configureToMatchImageSnapshot({
     const snapshotsDir = customSnapshotsDir || path.join(path.dirname(testPath), SNAPSHOTS_DIR);
     const receivedDir = customReceivedDir;
     const diffDir = customDiffDir;
-    const baselineSnapshotPath = path.join(snapshotsDir, `${snapshotIdentifier}-snap.png`);
+    const baselineSnapshotPath = path.join(snapshotsDir, `${snapshotIdentifier}.png`);
     OutdatedSnapshotReporter.markTouchedFile(baselineSnapshotPath);
 
     if (snapshotState._updateSnapshot === 'none' && !fs.existsSync(baselineSnapshotPath)) {

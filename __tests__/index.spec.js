@@ -450,7 +450,7 @@ describe('toMatchImageSnapshot', () => {
       failureThreshold: 0,
       failureThresholdType: 'pixel',
       receivedImageBuffer: undefined,
-      snapshotIdentifier: 'test-spec-js-test-1-1',
+      snapshotIdentifier: 'test-spec-js-test-1-1-snap',
       snapshotsDir: 'path/to/__image_snapshots__',
       storeReceivedOnFailure: false,
       updatePassedSnapshot: false,
@@ -575,7 +575,7 @@ describe('toMatchImageSnapshot', () => {
       customDiffConfig: {
         perceptual: true,
       },
-      snapshotIdentifier: 'test-spec-js-test-1-1',
+      snapshotIdentifier: 'test-spec-js-test-1-1-snap',
       snapshotsDir: path.join('path', 'to', 'my-custom-snapshots-dir'),
       receivedDir: path.join('path', 'to', 'my-custom-received-dir'),
       diffDir: path.join('path', 'to', 'my-custom-diff-dir'),

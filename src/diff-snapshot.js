@@ -205,7 +205,7 @@ function diffImageToSnapshot(options) {
 
   const comparisonFn = comparisonMethod === 'ssim' ? ssimMatch : pixelmatch;
   let result = {};
-  const baselineSnapshotPath = path.join(snapshotsDir, `${snapshotIdentifier}-snap.png`);
+  const baselineSnapshotPath = path.join(snapshotsDir, `${snapshotIdentifier}.png`);
   if (!fs.existsSync(baselineSnapshotPath)) {
     mkdirp.sync(path.dirname(baselineSnapshotPath));
     fs.writeFileSync(baselineSnapshotPath, receivedImageBuffer);

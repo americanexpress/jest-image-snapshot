@@ -27,7 +27,7 @@ describe('toMatchImageSnapshot', () => {
   const customSnapshotsDir = path.resolve(__dirname, '__custom_snapshots_dir__');
   const cleanupRequiredIndicator = 'cleanup-required-';
   const getIdentifierIndicatingCleanupIsRequired = () => uniqueId(cleanupRequiredIndicator);
-  const getSnapshotFilename = identifier => `${identifier}-snap.png`;
+  const getSnapshotFilename = identifier => `${identifier}.png`;
   const diffExists = identifier => fs.existsSync(path.join(__dirname, diffOutputDir(), `${identifier}-diff.png`));
 
   beforeAll(() => {
@@ -103,7 +103,7 @@ describe('toMatchImageSnapshot', () => {
   describe('updates', () => {
     const customSnapshotIdentifier = 'integration-update';
     const updateImageData = fs.readFileSync(fromStubs('TestImageUpdate1pxOff.png'));
-    const updateImageSnapshotPath = path.join(__dirname, '__image_snapshots__', `${customSnapshotIdentifier}-snap.png`);
+    const updateImageSnapshotPath = path.join(__dirname, '__image_snapshots__', `${customSnapshotIdentifier}.png`);
 
     beforeEach(() => {
       fs.writeFileSync(updateImageSnapshotPath, imageData);

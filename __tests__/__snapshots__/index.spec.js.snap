@@ -49,7 +49,7 @@ Object {
   "failureThresholdType": "pixel",
   "receivedDir": undefined,
   "receivedImageBuffer": "pretendthisisanimagebuffer",
-  "snapshotIdentifier": "test-spec-js-test-1",
+  "snapshotIdentifier": "test-spec-js-test-1-snap",
   "snapshotsDir": "path/to/__image_snapshots__",
   "storeReceivedOnFailure": false,
   "updatePassedSnapshot": false,
