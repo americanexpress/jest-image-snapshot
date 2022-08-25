@@ -458,7 +458,6 @@ describe('diff-snapshot', () => {
         receivedImageBuffer: mockImageBuffer,
         snapshotIdentifier: mockSnapshotIdentifier,
         snapshotsDir: mockSnapshotsDir,
-        receivedDir: mockReceivedDir,
         diffDir: mockDiffDir,
         updateSnapshot: false,
         failureThreshold: 0,

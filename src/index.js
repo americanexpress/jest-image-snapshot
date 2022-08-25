@@ -193,8 +193,8 @@ function configureToMatchImageSnapshot({
     });
 
     const snapshotsDir = customSnapshotsDir || path.join(path.dirname(testPath), SNAPSHOTS_DIR);
-    const receivedDir = customReceivedDir || path.join(snapshotsDir, '__received_output__');
-    const diffDir = customDiffDir || path.join(snapshotsDir, '__diff_output__');
+    const receivedDir = customReceivedDir;
+    const diffDir = customDiffDir;
     const baselineSnapshotPath = path.join(snapshotsDir, `${snapshotIdentifier}-snap.png`);
     OutdatedSnapshotReporter.markTouchedFile(baselineSnapshotPath);
 
