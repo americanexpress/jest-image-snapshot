@@ -1,3 +1,10 @@
+## [5.1.1](https://github.com/americanexpress/jest-image-snapshot/compare/v5.1.0...v5.1.1) (2022-08-25)
+
+
+### Bug Fixes
+
+* **diff-snapshot:** make recievedDir optional ([#306](https://github.com/americanexpress/jest-image-snapshot/issues/306)) ([cd4fa73](https://github.com/americanexpress/jest-image-snapshot/commit/cd4fa734dd72f8e590e8b672c3081468a5842a20)), closes [#300](https://github.com/americanexpress/jest-image-snapshot/issues/300)
+
 # [5.1.0](https://github.com/americanexpress/jest-image-snapshot/compare/v5.0.0...v5.1.0) (2022-05-30)
 
 
