@@ -1,6 +1,9 @@
 # node & npm
 *.log
 
+# github
+.github
+
 # test
 test-results
 __diff_output__
@@ -9,6 +12,9 @@ __tests__
 
 # examples
 examples
+
+# doc assets
+images
 
 # IDE
 .idea

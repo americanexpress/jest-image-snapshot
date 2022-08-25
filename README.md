@@ -1,5 +1,5 @@
 <h1 align="center">
-  <img src='https://github.com/americanexpress/jest-image-snapshot/raw/main/jest-image-snapshot.png' alt="Jest Image Snapshot - One Amex" width='50%'/>
+  <img src='https://github.com/americanexpress/jest-image-snapshot/raw/main/images/jest-image-snapshot.png' alt="Jest Image Snapshot - One Amex" width='50%'/>
 </h1>
 
 [![npm](https://img.shields.io/npm/v/jest-image-snapshot)](https://www.npmjs.com/package/jest-image-snapshot)
@@ -53,15 +53,15 @@ it('renders correctly', async () => {
 ...
 ```
 
-<img title="Adding an image snapshot" src="./images/create-snapshot.gif" width="50%">
+<img title="Adding an image snapshot" src="https://raw.githubusercontent.com/americanexpress/jest-image-snapshot/main/images/create-snapshot.gif" width="50%">
 
 Then after a few days as I finish adding another feature to my component I notice one of my tests failing!
 
-<img title="A failing image snapshot test" src="./images/fail-snapshot.gif" width="50%">
+<img title="A failing image snapshot test" src="https://raw.githubusercontent.com/americanexpress/jest-image-snapshot/main/images/fail-snapshot.gif" width="50%">
 
 Oh no! I must have introduced a regression! Let's see what the diff looks like to identify what I need to fix:
 
-<img title="Image diff" src="./images/image-diff.png" width="50%">
+<img title="Image diff" src="https://raw.githubusercontent.com/americanexpress/jest-image-snapshot/main/images/image-diff.png" width="50%">
 
 And now that I know that I broke the card art I can fix it!
 
