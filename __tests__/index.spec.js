@@ -250,9 +250,7 @@ describe('toMatchImageSnapshot', () => {
 
     const dataArg = runDiffImageToSnapshot.mock.calls[0][0];
     // This is to make the test work on windows
-    ['snapshotsDir', 'diffDir'].forEach((key) => {
-      dataArg[key] = dataArg[key].replace(/\\/g, '/');
-    });
+    dataArg.snapshotsDir = dataArg.snapshotsDir.replace(/\\/g, '/');
 
     expect(dataArg).toMatchSnapshot();
   });
@@ -448,11 +446,9 @@ describe('toMatchImageSnapshot', () => {
       blur: 0,
       comparisonMethod: 'pixelmatch',
       customDiffConfig: {},
-      diffDir: 'path/to/__image_snapshots__/__diff_output__',
       diffDirection: 'horizontal',
       failureThreshold: 0,
       failureThresholdType: 'pixel',
-      receivedDir: 'path/to/__image_snapshots__/__received_output__',
       receivedImageBuffer: undefined,
       snapshotIdentifier: 'test-spec-js-test-1-1',
       snapshotsDir: 'path/to/__image_snapshots__',
