@@ -60,7 +60,7 @@
     "semantic-release": "^17.0.4"
   },
   "dependencies": {
-    "chalk": "^1.1.3",
+    "chalk": "^4.0.0",
     "get-stdin": "^5.0.1",
     "glur": "^1.1.2",
     "lodash": "^4.17.4",

@@ -15,7 +15,7 @@
 const kebabCase = require('lodash/kebabCase');
 const merge = require('lodash/merge');
 const path = require('path');
-const Chalk = require('chalk').constructor;
+const Chalk = require('chalk').Instance;
 const { diffImageToSnapshot, runDiffImageToSnapshot } = require('./diff-snapshot');
 const fs = require('fs');
 const OutdatedSnapshotReporter = require('./outdated-snapshot-reporter');
@@ -174,7 +174,8 @@ function configureToMatchImageSnapshot({
     } = this;
     const chalkOptions = {};
     if (typeof noColors !== 'undefined') {
-      chalkOptions.enabled = !noColors;
+      // 1 means basic ANSI 16-color support, 0 means no support
+      chalkOptions.level = noColors ? 0 : 1;
     }
     const chalk = new Chalk(chalkOptions);
 
