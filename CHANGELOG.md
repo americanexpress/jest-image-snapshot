@@ -1,3 +1,10 @@
+# [5.2.0](https://github.com/americanexpress/jest-image-snapshot/compare/v5.1.1...v5.2.0) (2022-08-31)
+
+
+### Features
+
+* remove snap suffix if use custom identifier ([#305](https://github.com/americanexpress/jest-image-snapshot/issues/305)) ([775ac0a](https://github.com/americanexpress/jest-image-snapshot/commit/775ac0a7dff33da9719b1dc36b9e382dc10a82a1))
+
 ## [5.1.1](https://github.com/americanexpress/jest-image-snapshot/compare/v5.1.0...v5.1.1) (2022-08-25)
 
 
