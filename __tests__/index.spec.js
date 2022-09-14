@@ -22,7 +22,11 @@ describe('toMatchImageSnapshot', () => {
       runDiffImageToSnapshot: jest.fn(() => diffImageToSnapshotResult),
     }));
 
-    jest.mock('supports-color', () => mockSupportsColor);
+    jest.mock('supports-color', () => ({
+      // 1 means basic ANSI 16-color support, 0 means no support
+      stdout: { level: mockSupportsColor ? 1 : 0 },
+      stderr: { level: mockSupportsColor ? 1 : 0 },
+    }));
 
     const mockFs = Object.assign({}, fs, {
       existsSync: jest.fn(),
@@ -35,12 +39,6 @@ describe('toMatchImageSnapshot', () => {
       mockFs,
     };
   }
-
-  const ChalkMock = () => ({
-    bold: {
-      red: input => input,
-    },
-  });
 
   beforeEach(() => {
     // In tests, skip reporting (skip snapshotState update to not mess with our test report)
@@ -432,10 +430,8 @@ describe('toMatchImageSnapshot', () => {
       runDiffImageToSnapshot,
     }));
 
-    const Chalk = jest.fn();
-    jest.doMock('chalk', () => ({
-      constructor: Chalk,
-    }));
+    const Chalk = require('chalk').Instance;
+    jest.mock('chalk');
     const { toMatchImageSnapshot } = require('../src/index');
     const matcherAtTest = toMatchImageSnapshot.bind(mockTestContext);
 
@@ -478,10 +474,8 @@ describe('toMatchImageSnapshot', () => {
       runDiffImageToSnapshot,
     }));
 
-    const Chalk = jest.fn();
-    jest.doMock('chalk', () => ({
-      constructor: Chalk,
-    }));
+    const Chalk = require('chalk').Instance;
+    jest.mock('chalk');
     const { configureToMatchImageSnapshot } = require('../src/index');
     const customDiffConfig = { perceptual: true };
     const customSnapshotIdentifier = ({ defaultIdentifier }) =>
@@ -526,7 +520,7 @@ describe('toMatchImageSnapshot', () => {
       comparisonMethod,
     });
     expect(Chalk).toHaveBeenCalledWith({
-      enabled: false,
+      level: 0, // noColors
     });
   });
 
@@ -549,10 +543,8 @@ describe('toMatchImageSnapshot', () => {
       diffImageToSnapshot,
     }));
 
-    const Chalk = jest.fn();
-    jest.doMock('chalk', () => ({
-      constructor: Chalk,
-    }));
+    const Chalk = require('chalk').Instance;
+    jest.mock('chalk');
     const { configureToMatchImageSnapshot } = require('../src/index');
     const customConfig = { perceptual: true };
     const toMatchImageSnapshot = configureToMatchImageSnapshot({
@@ -588,7 +580,7 @@ describe('toMatchImageSnapshot', () => {
       comparisonMethod: 'pixelmatch',
     });
     expect(Chalk).toHaveBeenCalledWith({
-      enabled: false,
+      level: 0, // noColors
     });
   });
 
@@ -698,10 +690,6 @@ describe('toMatchImageSnapshot', () => {
       const { toMatchImageSnapshot } = require('../src/index');
       expect.extend({ toMatchImageSnapshot });
 
-      jest.doMock('chalk', () => ({
-        constructor: ChalkMock,
-      }));
-
       expect(() => expect('pretendthisisanimagebuffer').toMatchImageSnapshot({ dumpDiffToConsole: true }))
         .toThrowErrorMatchingSnapshot();
     });
@@ -718,10 +706,6 @@ describe('toMatchImageSnapshot', () => {
       setupMock(mockDiffResult);
       const { toMatchImageSnapshot } = require('../src/index');
       expect.extend({ toMatchImageSnapshot });
-
-      jest.doMock('chalk', () => ({
-        constructor: ChalkMock,
-      }));
 
       expect(() => expect('pretendthisisanimagebuffer').toMatchImageSnapshot())
         .toThrowErrorMatchingSnapshot();
@@ -745,10 +729,6 @@ describe('toMatchImageSnapshot', () => {
       const { toMatchImageSnapshot } = require('../src/index');
       expect.extend({ toMatchImageSnapshot });
 
-      jest.doMock('chalk', () => ({
-        constructor: ChalkMock,
-      }));
-
       process.env.TERM_PROGRAM = 'xterm';
 
       expect(() => expect('pretendthisisanimagebuffer').toMatchImageSnapshot({ dumpInlineDiffToConsole: true }))
@@ -771,10 +751,6 @@ describe('toMatchImageSnapshot', () => {
       const { toMatchImageSnapshot } = require('../src/index');
       expect.extend({ toMatchImageSnapshot });
 
-      jest.doMock('chalk', () => ({
-        constructor: ChalkMock,
-      }));
-
       process.env.TERM_PROGRAM = 'iTerm.app';
 
       expect(() => expect('pretendthisisanimagebuffer').toMatchImageSnapshot({ dumpInlineDiffToConsole: true }))
@@ -796,10 +772,6 @@ describe('toMatchImageSnapshot', () => {
       setupMock(mockDiffResult);
       const { toMatchImageSnapshot } = require('../src/index');
       expect.extend({ toMatchImageSnapshot });
-
-      jest.doMock('chalk', () => ({
-        constructor: ChalkMock,
-      }));
 
       process.env.ENABLE_INLINE_DIFF = true;
 
