@@ -38,11 +38,11 @@ exports[`toMatchImageSnapshot dumpInlineDiffToConsole uses Inline Image Protocol
 `;
 
 exports[`toMatchImageSnapshot passes diffImageToSnapshot everything it needs to create a snapshot and compare if needed 1`] = `
-Object {
+{
   "allowSizeMismatch": false,
   "blur": 0,
   "comparisonMethod": "pixelmatch",
-  "customDiffConfig": Object {},
+  "customDiffConfig": {},
   "diffDir": undefined,
   "diffDirection": "horizontal",
   "failureThreshold": 0,
