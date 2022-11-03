@@ -1,3 +1,22 @@
+# [6.0.0](https://github.com/americanexpress/jest-image-snapshot/compare/v5.2.0...v6.0.0) (2022-11-03)
+
+
+* chore(jest)!: add support for jest v29 (#309) ([79e53fc](https://github.com/americanexpress/jest-image-snapshot/commit/79e53fc010793f574cd9da783ced895af6987712)), closes [#309](https://github.com/americanexpress/jest-image-snapshot/issues/309)
+
+
+### BREAKING CHANGES
+
+* Drop support for Node v12 and Node v17,
+                 as Jest v29 does not support these versions.
+
+* ci(release): use Node v16 for release action
+
+Node v16 is the current active LTS release of Node.JS
+
+Co-authored-by: Jamie King <hello@jamieking.me>
+
+Co-authored-by: Jamie King <hello@jamieking.me>
+
 # [5.2.0](https://github.com/americanexpress/jest-image-snapshot/compare/v5.1.1...v5.2.0) (2022-08-31)
 
 
