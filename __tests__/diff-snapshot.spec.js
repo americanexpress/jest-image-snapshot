@@ -695,6 +695,26 @@ describe('diff-snapshot', () => {
       expect(diffResult).toHaveProperty('diffOutputPath', path.join(mockSnapshotsDir, '__diff_output__', `${mockSnapshotIdentifier}-diff.png`));
     });
 
+    it('should only generate an image with the diff when onlyDiff is set to true', () => {
+      const diffImageToSnapshot = setupTest({ snapshotExists: true, pixelmatchResult: 250 });
+      const diffResult = diffImageToSnapshot({
+        receivedImageBuffer: mockFailImageBuffer,
+        snapshotIdentifier: mockSnapshotIdentifier,
+        snapshotsDir: mockSnapshotsDir,
+        receivedDir: mockReceivedDir,
+        diffDir: mockDiffDir,
+        updateSnapshot: false,
+        failureThreshold: 0,
+        failureThresholdType: 'pixel',
+        onlyDiff: true,
+      });
+
+      expect(diffResult).toHaveProperty('pass', false);
+      // White image without the baseline, nor the received (white because we mock pixelmatch)
+      expect(diffResult).toHaveProperty('imgSrcString', 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGQAAABkCAYAAABw4pVUAAAA30lEQVR4Ae3BIQEAAACDMAT9M78G4ptcilyKXIpcilyKXIpcilyKXIpcilyKXIpcilyKXIpcilyKXIpcilyKXIpcilyKXIpcilyKXIpcilyKXIpcilyKXIpcilyKXIpcilyKXIpcilyKXIpcilyKXIpcilyKXIpcilyKXIpcilyKXIpcilyKXIpcilyKXIpcilyKXIpcilyKXIpcilyKXIpcilyKXIpcilyKXIpcilyKXIpcilyKXIpcilyKXIpcilyKXIpcilyKXIpcilyKXIpcilyKXIpcilyKXIpcygA9UAGR3m7UvwAAAABJRU5ErkJggg==');
+      expect(diffResult).toHaveProperty('diffOutputPath', path.join(mockSnapshotsDir, '__diff_output__', `${mockSnapshotIdentifier}-diff.png`));
+    });
+
     it('should throw an error if an unknown threshold type is supplied', () => {
       const diffImageToSnapshot = setupTest({ snapshotExists: true });
 

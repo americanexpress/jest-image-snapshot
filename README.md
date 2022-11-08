@@ -113,6 +113,7 @@ See [the examples](./examples/README.md) for more detailed usage or read about a
 * `customReceivedDir`: A custom absolute path of a directory to keep this received image in
 * `customSnapshotIdentifier`: A custom name to give this snapshot. If not provided one is computed automatically. When a function is provided it is called with an object containing `testPath`, `currentTestName`, `counter` and `defaultIdentifier` as its first argument. The function must return an identifier to use for the snapshot. If a path is given, the path will be created inside the snapshot/diff directories.
 * `diffDirection`: (default: `horizontal`) (options `horizontal` or `vertical`) Changes diff image layout direction
+* `onlyDiff`: (default: `false`) Either only include the difference between the baseline and the received image in the diff image, or include the 3 images (following the direction set by `diffDirection`).
 * `noColors`: Removes coloring from console output, useful if storing the results in a file
 * `failureThreshold`: (default `0`) Sets the threshold that would trigger a test failure based on the `failureThresholdType` selected. This is different to the `customDiffConfig.threshold` above, that is the per pixel failure threshold, this is the failure threshold for the entire comparison.
 * `failureThresholdType`: (default `pixel`) (options `percent` or `pixel`) Sets the type of threshold that would trigger a failure.
