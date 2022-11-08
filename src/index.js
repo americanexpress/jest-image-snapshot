@@ -138,7 +138,7 @@ function configureToMatchImageSnapshot({
   storeReceivedOnFailure: commonStoreReceivedOnFailure = false,
   customReceivedDir: commonCustomReceivedDir,
   customDiffDir: commonCustomDiffDir,
-  onlyDiff: commonOnlyDiff,
+  onlyDiff: commonOnlyDiff = false,
   diffDirection: commonDiffDirection = 'horizontal',
   noColors: commonNoColors,
   failureThreshold: commonFailureThreshold = 0,
