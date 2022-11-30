@@ -192,11 +192,11 @@ function composeDiff(options) {
     direction: diffDirection,
   });
 
-  if (!onlyDiff) {
+  if (onlyDiff) {
+    composer.addImage(diffImage, imageWidth, imageHeight);
+  } else {
     composer.addImage(baselineImage, imageWidth, imageHeight);
-  }
-  composer.addImage(diffImage, imageWidth, imageHeight);
-  if (!onlyDiff) {
+    composer.addImage(diffImage, imageWidth, imageHeight);
     composer.addImage(receivedImage, imageWidth, imageHeight);
   }
   return composer;
