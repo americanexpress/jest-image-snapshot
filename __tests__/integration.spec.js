@@ -410,6 +410,45 @@ describe('toMatchImageSnapshot', () => {
         .toBe(false);
     });
 
+    it('only outputs the diff when onlyDiff is enabled', () => {
+      const failureImageData = fs.readFileSync(fromStubs('TestImageUpdate1pxOff.png'));
+      const imageFailureOnlyDiffData =
+        fs.readFileSync(fromStubs('TestImageUpdate1pxOff-onlyDiff-diff.png'));
+
+      const customSnapshotIdentifier = getIdentifierIndicatingCleanupIsRequired();
+      const pathToResultImage = path.join(__dirname, diffOutputDir(), `${customSnapshotIdentifier}-diff.png`);
+      // First we need to write a new snapshot image
+      expect(
+        () => expect(imageData)
+          .toMatchImageSnapshot({
+            customSnapshotIdentifier,
+            onlyDiff: true,
+          })
+      )
+        .not
+        .toThrowError();
+
+      // then test against a different image
+      expect(
+        () => expect(failureImageData)
+          .toMatchImageSnapshot({
+            customSnapshotIdentifier,
+            onlyDiff: true,
+            // required for coverage
+            runInProcess: true,
+          })
+      )
+        .toThrow(/Expected image to match or be a close match/);
+
+      expect(fs.existsSync(pathToResultImage))
+        .toBe(true);
+
+      expect(fs.readFileSync(pathToResultImage)).toEqual(imageFailureOnlyDiffData);
+      // just because file was written does not mean it is a png image
+      expect(sizeOf(pathToResultImage))
+        .toHaveProperty('type', 'png');
+    });
+
     it('handles diffs for large images', () => {
       const largeImageData = fs.readFileSync(fromStubs('LargeTestImage.png'));
       const largeFailureImageData = fs.readFileSync(fromStubs('LargeTestImageFailure.png'));
