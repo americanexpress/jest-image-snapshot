@@ -1,3 +1,10 @@
+# [6.1.0](https://github.com/americanexpress/jest-image-snapshot/compare/v6.0.0...v6.1.0) (2022-12-02)
+
+
+### Features
+
+* add onlyDiff in options ([#317](https://github.com/americanexpress/jest-image-snapshot/issues/317)) ([4bad752](https://github.com/americanexpress/jest-image-snapshot/commit/4bad752571bb567861ddfa2cc9073f33c4239352))
+
 # [6.0.0](https://github.com/americanexpress/jest-image-snapshot/compare/v5.2.0...v6.0.0) (2022-11-03)
 
 
