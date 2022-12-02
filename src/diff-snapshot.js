@@ -184,6 +184,24 @@ const shouldFail = ({
   };
 };
 
+function composeDiff(options) {
+  const {
+    diffDirection, baselineImage, diffImage, receivedImage, imageWidth, imageHeight, onlyDiff,
+  } = options;
+  const composer = new ImageComposer({
+    direction: diffDirection,
+  });
+
+  if (onlyDiff) {
+    composer.addImage(diffImage, imageWidth, imageHeight);
+  } else {
+    composer.addImage(baselineImage, imageWidth, imageHeight);
+    composer.addImage(diffImage, imageWidth, imageHeight);
+    composer.addImage(receivedImage, imageWidth, imageHeight);
+  }
+  return composer;
+}
+
 function diffImageToSnapshot(options) {
   const {
     receivedImageBuffer,
@@ -193,6 +211,7 @@ function diffImageToSnapshot(options) {
     receivedDir = path.join(options.snapshotsDir, '__received_output__'),
     diffDir = path.join(options.snapshotsDir, '__diff_output__'),
     diffDirection,
+    onlyDiff = false,
     updateSnapshot = false,
     updatePassedSnapshot = false,
     customDiffConfig = {},
@@ -281,13 +300,9 @@ function diffImageToSnapshot(options) {
       }
 
       mkdirp.sync(path.dirname(diffOutputPath));
-      const composer = new ImageComposer({
-        direction: diffDirection,
+      const composer = composeDiff({
+        diffDirection, baselineImage, diffImage, receivedImage, imageWidth, imageHeight, onlyDiff,
       });
-
-      composer.addImage(baselineImage, imageWidth, imageHeight);
-      composer.addImage(diffImage, imageWidth, imageHeight);
-      composer.addImage(receivedImage, imageWidth, imageHeight);
 
       const composerParams = composer.getParams();
 
@@ -334,6 +349,7 @@ function diffImageToSnapshot(options) {
   }
   return result;
 }
+
 
 function runDiffImageToSnapshot(options) {
   options.receivedImageBuffer = options.receivedImageBuffer.toString('base64');
