@@ -73,6 +73,11 @@
   "peerDependencies": {
     "jest": ">=20 <=29"
   },
+  "peerDependenciesMeta": {
+    "jest": {
+      "optional": true
+    }
+  },
   "husky": {
     "hooks": {
       "pre-commit": "npm test",
