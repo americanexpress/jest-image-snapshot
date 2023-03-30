@@ -111,6 +111,7 @@ See [the examples](./examples/README.md) for more detailed usage or read about a
 * `customDiffDir`: A custom absolute path of a directory to keep this diff in
 * `storeReceivedOnFailure`: (default: `false`) Store the received images seperately from the composed diff images on failure. This can be useful when updating baseline images from CI.
 * `customReceivedDir`: A custom absolute path of a directory to keep this received image in
+* `customReceivedPostfix`: A custom postfix which is added to the snapshot name of the received image, defaults to `-received`
 * `customSnapshotIdentifier`: A custom name to give this snapshot. If not provided one is computed automatically. When a function is provided it is called with an object containing `testPath`, `currentTestName`, `counter` and `defaultIdentifier` as its first argument. The function must return an identifier to use for the snapshot. If a path is given, the path will be created inside the snapshot/diff directories.
 * `diffDirection`: (default: `horizontal`) (options `horizontal` or `vertical`) Changes diff image layout direction
 * `onlyDiff`: (default: `false`) Either only include the difference between the baseline and the received image in the diff image, or include the 3 images (following the direction set by `diffDirection`).

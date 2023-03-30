@@ -208,6 +208,7 @@ function diffImageToSnapshot(options) {
     snapshotIdentifier,
     snapshotsDir,
     storeReceivedOnFailure,
+    receivedPostfix = '-received',
     receivedDir = path.join(options.snapshotsDir, '__received_output__'),
     diffDir = path.join(options.snapshotsDir, '__diff_output__'),
     diffDirection,
@@ -230,7 +231,7 @@ function diffImageToSnapshot(options) {
     fs.writeFileSync(baselineSnapshotPath, receivedImageBuffer);
     result = { added: true };
   } else {
-    const receivedSnapshotPath = path.join(receivedDir, `${snapshotIdentifier}-received.png`);
+    const receivedSnapshotPath = path.join(receivedDir, `${snapshotIdentifier}${receivedPostfix}.png`);
     rimraf.sync(receivedSnapshotPath);
 
     const diffOutputPath = path.join(diffDir, `${snapshotIdentifier}-diff.png`);
