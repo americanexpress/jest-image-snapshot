@@ -89,7 +89,6 @@ describe('diff-snapshot', () => {
     const mockFailImagePath = './__tests__/stubs/TestImageFailure.png';
     const mockFailImageBuffer = fs.readFileSync(mockFailImagePath);
     const mockMkdirSync = jest.fn();
-    const mockMkdirpSync = jest.fn();
     const mockWriteFileSync = jest.fn();
     const mockPixelMatch = jest.fn();
     const mockGlur = jest.fn();
@@ -109,7 +108,6 @@ describe('diff-snapshot', () => {
       });
 
       jest.mock('fs', () => mockFs);
-      jest.mock('mkdirp', () => ({ sync: mockMkdirpSync }));
       const { diffImageToSnapshot } = require('../src/diff-snapshot');
 
       mockFs.existsSync.mockImplementation((p) => {
@@ -519,7 +517,7 @@ describe('diff-snapshot', () => {
         failureThresholdType: 'pixel',
       });
 
-      expect(mockMkdirpSync).toHaveBeenCalledWith(path.join(mockSnapshotsDir, '__diff_output__'));
+      expect(mockMkdirSync).toHaveBeenCalledWith(path.join(mockSnapshotsDir, '__diff_output__'), { recursive: true });
     });
 
     it('should create diff output sub-directory if there is not one already and test is failing', () => {
@@ -539,7 +537,7 @@ describe('diff-snapshot', () => {
         failureThresholdType: 'pixel',
       });
 
-      expect(mockMkdirpSync).toHaveBeenCalledWith(path.join(mockSnapshotsDir, '__diff_output__', 'parent'));
+      expect(mockMkdirSync).toHaveBeenCalledWith(path.join(mockSnapshotsDir, '__diff_output__', 'parent'), { recursive: true });
     });
 
     it('should not create diff output directory if test passed', () => {
@@ -588,7 +586,7 @@ describe('diff-snapshot', () => {
         failureThresholdType: 'pixel',
       });
 
-      expect(mockMkdirpSync).toHaveBeenCalledWith(mockSnapshotsDir);
+      expect(mockMkdirSync).toHaveBeenCalledWith(mockSnapshotsDir, { recursive: true });
     });
 
     it('should create snapshots sub-directory if there is not one already', () => {
@@ -605,7 +603,7 @@ describe('diff-snapshot', () => {
         failureThresholdType: 'pixel',
       });
 
-      expect(mockMkdirpSync).toHaveBeenCalledWith(path.join(mockSnapshotsDir, 'parent'));
+      expect(mockMkdirSync).toHaveBeenCalledWith(path.join(mockSnapshotsDir, 'parent'), { recursive: true });
     });
 
     it('should not create snapshots directory if there already is one', () => {
@@ -826,7 +824,7 @@ describe('diff-snapshot', () => {
         failureThresholdType: 'pixel',
       });
 
-      expect(mockMkdirpSync).toHaveBeenCalledWith(path.join(mockSnapshotsDir, '__diff_output__'));
+      expect(mockMkdirSync).toHaveBeenCalledWith(path.join(mockSnapshotsDir, '__diff_output__'), { recursive: true });
     });
   });
 });
