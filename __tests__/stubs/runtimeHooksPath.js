@@ -1,0 +1,1 @@
+exports.onBeforeWriteToDisc = buffer => buffer;

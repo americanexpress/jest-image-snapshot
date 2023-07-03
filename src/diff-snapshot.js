@@ -219,14 +219,43 @@ function diffImageToSnapshot(options) {
     blur,
     allowSizeMismatch = false,
     comparisonMethod = 'pixelmatch',
+    testPath,
+    currentTestName,
+    runtimeHooksPath,
   } = options;
+
+  const writeFileSync = (pathToFile, content) => {
+    let finalContent = content;
+    if (runtimeHooksPath) {
+      let runtimeHooks;
+      try {
+        // As `diffImageToSnapshot` can be called in a worker, and as we cannot pass a function
+        // to a worker, we need to use an external file path that can be imported
+        // eslint-disable-next-line import/no-dynamic-require, global-require
+        runtimeHooks = require(runtimeHooksPath);
+      } catch (e) {
+        throw new Error(`Couldn't import ${runtimeHooksPath}: ${e.message}`);
+      }
+      try {
+        finalContent = runtimeHooks.onBeforeWriteToDisc({
+          buffer: content,
+          destination: pathToFile,
+          testPath,
+          currentTestName,
+        });
+      } catch (e) {
+        throw new Error(`Couldn't execute onBeforeWriteToDisc: ${e.message}`);
+      }
+    }
+    fs.writeFileSync(pathToFile, finalContent);
+  };
 
   const comparisonFn = comparisonMethod === 'ssim' ? ssimMatch : pixelmatch;
   let result = {};
   const baselineSnapshotPath = path.join(snapshotsDir, `${snapshotIdentifier}.png`);
   if (!fs.existsSync(baselineSnapshotPath)) {
     fs.mkdirSync(path.dirname(baselineSnapshotPath), { recursive: true });
-    fs.writeFileSync(baselineSnapshotPath, receivedImageBuffer);
+    writeFileSync(baselineSnapshotPath, receivedImageBuffer);
     result = { added: true };
   } else {
     const receivedSnapshotPath = path.join(receivedDir, `${snapshotIdentifier}-received.png`);
@@ -294,7 +323,7 @@ function diffImageToSnapshot(options) {
     if (isFailure({ pass, updateSnapshot })) {
       if (storeReceivedOnFailure) {
         fs.mkdirSync(path.dirname(receivedSnapshotPath), { recursive: true });
-        fs.writeFileSync(receivedSnapshotPath, receivedImageBuffer);
+        writeFileSync(receivedSnapshotPath, receivedImageBuffer);
         result = { receivedSnapshotPath };
       }
 
@@ -320,7 +349,7 @@ function diffImageToSnapshot(options) {
       // Set filter type to Paeth to avoid expensive auto scanline filter detection
       // For more information see https://www.w3.org/TR/PNG-Filters.html
       const pngBuffer = PNG.sync.write(compositeResultImage, { filterType: 4 });
-      fs.writeFileSync(diffOutputPath, pngBuffer);
+      writeFileSync(diffOutputPath, pngBuffer);
 
       result = {
         ...result,
@@ -334,7 +363,7 @@ function diffImageToSnapshot(options) {
       };
     } else if (shouldUpdate({ pass, updateSnapshot, updatePassedSnapshot })) {
       fs.mkdirSync(path.dirname(baselineSnapshotPath), { recursive: true });
-      fs.writeFileSync(baselineSnapshotPath, receivedImageBuffer);
+      writeFileSync(baselineSnapshotPath, receivedImageBuffer);
       result = { updated: true };
     } else {
       result = {

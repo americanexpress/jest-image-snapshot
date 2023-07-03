@@ -139,6 +139,7 @@ function configureToMatchImageSnapshot({
   customReceivedDir: commonCustomReceivedDir,
   customDiffDir: commonCustomDiffDir,
   onlyDiff: commonOnlyDiff = false,
+  runtimeHooksPath: commonRuntimeHooksPath = undefined,
   diffDirection: commonDiffDirection = 'horizontal',
   noColors: commonNoColors,
   failureThreshold: commonFailureThreshold = 0,
@@ -158,6 +159,7 @@ function configureToMatchImageSnapshot({
     customReceivedDir = commonCustomReceivedDir,
     customDiffDir = commonCustomDiffDir,
     onlyDiff = commonOnlyDiff,
+    runtimeHooksPath = commonRuntimeHooksPath,
     diffDirection = commonDiffDirection,
     customDiffConfig = {},
     noColors = commonNoColors,
@@ -220,6 +222,8 @@ function configureToMatchImageSnapshot({
         receivedDir,
         diffDir,
         diffDirection,
+        testPath,
+        currentTestName,
         onlyDiff,
         snapshotIdentifier,
         updateSnapshot: snapshotState._updateSnapshot === 'all',
@@ -230,6 +234,7 @@ function configureToMatchImageSnapshot({
         blur,
         allowSizeMismatch,
         comparisonMethod,
+        runtimeHooksPath,
       });
 
     return checkResult({

@@ -30,7 +30,7 @@
       "!test-results/**"
     ],
     "testMatch": [
-      "<rootDir>/__tests__/**/*.js"
+      "<rootDir>/__tests__/**/*.spec.js"
     ],
     "coveragePathIgnorePatterns": [
       "/node_modules/",

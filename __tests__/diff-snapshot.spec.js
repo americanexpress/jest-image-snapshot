@@ -826,6 +826,73 @@ describe('diff-snapshot', () => {
 
       expect(mockMkdirSync).toHaveBeenCalledWith(path.join(mockSnapshotsDir, '__diff_output__'), { recursive: true });
     });
+
+    it('should pass data to a file mentioned by runtimeHooksPath when writing files', () => {
+      jest.doMock(require.resolve('./stubs/runtimeHooksPath.js'), () => ({
+        onBeforeWriteToDisc: jest.fn(({ buffer }) => buffer),
+      }));
+      const { onBeforeWriteToDisc } = require('./stubs/runtimeHooksPath');
+
+      const diffImageToSnapshot = setupTest({ snapshotExists: false, pixelmatchResult: 0 });
+      const result = diffImageToSnapshot({
+        receivedImageBuffer: mockImageBuffer,
+        snapshotIdentifier: mockSnapshotIdentifier,
+        snapshotsDir: mockSnapshotsDir,
+        receivedDir: mockReceivedDir,
+        diffDir: mockDiffDir,
+        failureThreshold: 0,
+        failureThresholdType: 'pixel',
+        runtimeHooksPath: require.resolve('./stubs/runtimeHooksPath.js'),
+        testPath: 'test.spec.js',
+        currentTestName: 'test a',
+      });
+
+      expect(result).toMatchObject({
+        added: true,
+      });
+
+      expect(onBeforeWriteToDisc).toHaveBeenCalledTimes(1);
+      expect(onBeforeWriteToDisc).toHaveBeenCalledWith({
+        buffer: mockImageBuffer,
+        destination: '/path/to/snapshots/id1.png',
+        testPath: 'test.spec.js',
+        currentTestName: 'test a',
+      });
+    });
+
+    it('should work even when runtimeHooksPath is invalid', () => {
+      const diffImageToSnapshot = setupTest({ snapshotExists: false, pixelmatchResult: 0 });
+      expect(() => diffImageToSnapshot({
+        receivedImageBuffer: mockImageBuffer,
+        snapshotIdentifier: mockSnapshotIdentifier,
+        snapshotsDir: mockSnapshotsDir,
+        receivedDir: mockReceivedDir,
+        diffDir: mockDiffDir,
+        failureThreshold: 0,
+        failureThresholdType: 'pixel',
+        runtimeHooksPath: './non-existing-file.js',
+      })).toThrowError(
+        new Error("Couldn't import ./non-existing-file.js: Cannot find module './non-existing-file.js' from 'src/diff-snapshot.js'")
+      );
+
+      jest.doMock(require.resolve('./stubs/runtimeHooksPath.js'), () => ({
+        onBeforeWriteToDisc: () => {
+          throw new Error('wrong');
+        },
+      }));
+      expect(() => diffImageToSnapshot({
+        receivedImageBuffer: mockImageBuffer,
+        snapshotIdentifier: mockSnapshotIdentifier,
+        snapshotsDir: mockSnapshotsDir,
+        receivedDir: mockReceivedDir,
+        diffDir: mockDiffDir,
+        failureThreshold: 0,
+        failureThresholdType: 'pixel',
+        runtimeHooksPath: require.resolve('./stubs/runtimeHooksPath.js'),
+      })).toThrowError(
+        new Error("Couldn't execute onBeforeWriteToDisc: wrong")
+      );
+    });
   });
 });
 
