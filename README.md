@@ -125,6 +125,7 @@ See [the examples](./examples/README.md) for more detailed usage or read about a
 * `allowSizeMismatch`: (default `false`) If set to true, the build will not fail when the screenshots to compare have different sizes.
 * `runtimeHooksPath`: (default `undefined`) This needs to be set to a existing file, like `require.resolve('./runtimeHooksPath.cjs')`. This file can expose a few hooks:
   * `onBeforeWriteToDisc`: before saving any image to the disc, this function will be called (can be used to write EXIF data to images for instance)
+    `onBeforeWriteToDisc: (arguments: { buffer: Buffer; destination: string; testPath: string; currentTestName: string }) => Buffer`
 
 ```javascript
 it('should demonstrate this matcher`s usage with a custom pixelmatch config', () => {
