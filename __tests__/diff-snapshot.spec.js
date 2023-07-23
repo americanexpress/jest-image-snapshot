@@ -695,6 +695,22 @@ describe('diff-snapshot', () => {
       expect(diffResult).toHaveProperty('diffOutputPath', path.join(mockSnapshotsDir, '__diff_output__', `${mockSnapshotIdentifier}-diff.png`));
     });
 
+    describe('diffImageToSnapshot', () => {
+      it('should fail if snapshot already exists', () => {
+        const { diffImageToSnapshot } = setupTest({ snapshotExists: true });
+        const options = {
+          receivedImageBuffer: mockFailImageBuffer,
+          snapshotIdentifier: mockSnapshotIdentifier,
+          snapshotsDir: mockSnapshotsDir,
+          updateSnapshot: false,
+        };
+
+        expect(() => {
+          diffImageToSnapshot(options);
+        }).toThrow();
+      });
+    });
+
     it('should throw an error if an unknown threshold type is supplied', () => {
       const diffImageToSnapshot = setupTest({ snapshotExists: true });
 
