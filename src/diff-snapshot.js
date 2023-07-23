@@ -15,7 +15,6 @@
 const childProcess = require('child_process');
 const fs = require('fs');
 const path = require('path');
-const mkdirp = require('mkdirp');
 const pixelmatch = require('pixelmatch');
 const ssim = require('ssim.js');
 const { PNG } = require('pngjs');
@@ -225,7 +224,7 @@ function diffImageToSnapshot(options) {
   let result = {};
   const baselineSnapshotPath = path.join(snapshotsDir, `${snapshotIdentifier}.png`);
   if (!fs.existsSync(baselineSnapshotPath)) {
-    mkdirp.sync(path.dirname(baselineSnapshotPath));
+    fs.mkdirSync(path.dirname(baselineSnapshotPath), { recursive: true });
     fs.writeFileSync(baselineSnapshotPath, receivedImageBuffer);
     result = { added: true };
   } else {
@@ -293,12 +292,12 @@ function diffImageToSnapshot(options) {
 
     if (isFailure({ pass, updateSnapshot })) {
       if (storeReceivedOnFailure) {
-        mkdirp.sync(path.dirname(receivedSnapshotPath));
+        fs.mkdirSync(path.dirname(receivedSnapshotPath), { recursive: true });
         fs.writeFileSync(receivedSnapshotPath, receivedImageBuffer);
         result = { receivedSnapshotPath };
       }
 
-      mkdirp.sync(path.dirname(diffOutputPath));
+      fs.mkdirSync(path.dirname(diffOutputPath), { recursive: true });
       const composer = composeDiff({
         diffDirection, baselineImage, diffImage, receivedImage, imageWidth, imageHeight, onlyDiff,
       });
@@ -333,7 +332,7 @@ function diffImageToSnapshot(options) {
         imgSrcString: `data:image/png;base64,${pngBuffer.toString('base64')}`,
       };
     } else if (shouldUpdate({ pass, updateSnapshot, updatePassedSnapshot })) {
-      mkdirp.sync(path.dirname(baselineSnapshotPath));
+      fs.mkdirSync(path.dirname(baselineSnapshotPath), { recursive: true });
       fs.writeFileSync(baselineSnapshotPath, receivedImageBuffer);
       result = { updated: true };
     } else {

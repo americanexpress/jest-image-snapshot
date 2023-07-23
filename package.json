@@ -64,7 +64,6 @@
     "get-stdin": "^5.0.1",
     "glur": "^1.1.2",
     "lodash": "^4.17.4",
-    "mkdirp": "^0.5.1",
     "pixelmatch": "^5.1.0",
     "pngjs": "^3.4.0",
     "rimraf": "^2.6.2",
