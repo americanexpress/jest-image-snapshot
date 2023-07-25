@@ -1,3 +1,10 @@
+## [6.1.1](https://github.com/americanexpress/jest-image-snapshot/compare/v6.1.0...v6.1.1) (2023-07-25)
+
+
+### Bug Fixes
+
+* only updatePassedSnapshot if updateSnapshot is also true ([#327](https://github.com/americanexpress/jest-image-snapshot/issues/327)) ([b9d9c3f](https://github.com/americanexpress/jest-image-snapshot/commit/b9d9c3f16ab0e10a3e1320d03efb52e81675d2aa)), closes [#320](https://github.com/americanexpress/jest-image-snapshot/issues/320) [#322](https://github.com/americanexpress/jest-image-snapshot/issues/322) [#324](https://github.com/americanexpress/jest-image-snapshot/issues/324)
+
 # [6.1.0](https://github.com/americanexpress/jest-image-snapshot/compare/v6.0.0...v6.1.0) (2022-12-02)
 
 
