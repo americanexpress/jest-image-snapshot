@@ -1,3 +1,10 @@
+# [6.2.0](https://github.com/americanexpress/jest-image-snapshot/compare/v6.1.1...v6.2.0) (2023-07-25)
+
+
+### Features
+
+* allow configuration of postfix for received screenshots filename ([#328](https://github.com/americanexpress/jest-image-snapshot/issues/328)) ([bade294](https://github.com/americanexpress/jest-image-snapshot/commit/bade294ec2843c62b1dbcbf894faffd3a5708b98))
+
 ## [6.1.1](https://github.com/americanexpress/jest-image-snapshot/compare/v6.1.0...v6.1.1) (2023-07-25)
 
 
