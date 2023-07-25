@@ -137,6 +137,7 @@ function configureToMatchImageSnapshot({
   customSnapshotsDir: commonCustomSnapshotsDir,
   storeReceivedOnFailure: commonStoreReceivedOnFailure = false,
   customReceivedDir: commonCustomReceivedDir,
+  customReceivedPostfix: commonCustomReceivedPostfix,
   customDiffDir: commonCustomDiffDir,
   onlyDiff: commonOnlyDiff = false,
   diffDirection: commonDiffDirection = 'horizontal',
@@ -156,6 +157,7 @@ function configureToMatchImageSnapshot({
     customSnapshotsDir = commonCustomSnapshotsDir,
     storeReceivedOnFailure = commonStoreReceivedOnFailure,
     customReceivedDir = commonCustomReceivedDir,
+    customReceivedPostfix = commonCustomReceivedPostfix,
     customDiffDir = commonCustomDiffDir,
     onlyDiff = commonOnlyDiff,
     diffDirection = commonDiffDirection,
@@ -197,6 +199,7 @@ function configureToMatchImageSnapshot({
 
     const snapshotsDir = customSnapshotsDir || path.join(path.dirname(testPath), SNAPSHOTS_DIR);
     const receivedDir = customReceivedDir;
+    const receivedPostfix = customReceivedPostfix;
     const diffDir = customDiffDir;
     const baselineSnapshotPath = path.join(snapshotsDir, `${snapshotIdentifier}.png`);
     OutdatedSnapshotReporter.markTouchedFile(baselineSnapshotPath);
@@ -218,6 +221,7 @@ function configureToMatchImageSnapshot({
         snapshotsDir,
         storeReceivedOnFailure,
         receivedDir,
+        receivedPostfix,
         diffDir,
         diffDirection,
         onlyDiff,
