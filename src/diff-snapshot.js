@@ -147,9 +147,8 @@ const alignImagesToSameSize = (firstImage, secondImage) => {
 
 const isFailure = ({ pass, updateSnapshot }) => !pass && !updateSnapshot;
 
-const shouldUpdate = ({ pass, updateSnapshot, updatePassedSnapshot }) => (
-  (!pass && updateSnapshot) || (pass && updatePassedSnapshot)
-);
+const shouldUpdate = ({ pass, updateSnapshot, updatePassedSnapshot }) =>
+  updateSnapshot && (!pass || (pass && updatePassedSnapshot));
 
 const shouldFail = ({
   totalPixels,
