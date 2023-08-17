@@ -51,6 +51,7 @@ exports[`toMatchImageSnapshot passes diffImageToSnapshot everything it needs to 
   "onlyDiff": false,
   "receivedDir": undefined,
   "receivedImageBuffer": "pretendthisisanimagebuffer",
+  "receivedPostfix": undefined,
   "runtimeHooksPath": undefined,
   "snapshotIdentifier": "test-spec-js-test-1-snap",
   "snapshotsDir": "path/to/__image_snapshots__",

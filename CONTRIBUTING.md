@@ -47,7 +47,7 @@ Verifies that your code matches the American Express code style defined in [`esl
 
 Runs unit tests **and** verifies the format of all commit messages on the current branch.
 
-- **`npm posttest`**
+- **`npm run posttest`**
 
 Runs linting on the current branch, checks that the commits follow [conventional commits](https://www.conventionalcommits.org/) and verifies that the `package-lock.json` file includes public NPM registry URLs.
 
