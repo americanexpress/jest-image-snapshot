@@ -44,7 +44,7 @@
   "author": "Andres Escobar <andres.escobar@aexp.com> (https://github.com/anescobar1991)",
   "license": "Apache-2.0",
   "devDependencies": {
-    "@commitlint/cli": "^8.3.5",
+    "@commitlint/cli": "^17.6.5",
     "@commitlint/config-conventional": "^8.3.4",
     "@semantic-release/changelog": "^5.0.0",
     "@semantic-release/git": "^9.0.0",
