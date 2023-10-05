@@ -448,7 +448,7 @@ describe('toMatchImageSnapshot', () => {
       failureThresholdType: 'pixel',
       receivedImageBuffer: undefined,
       snapshotIdentifier: 'test-spec-js-test-1-1-snap',
-      snapshotsDir: 'path/to/__image_snapshots__',
+      snapshotsDir: process.platform === 'win32' ? 'path\\to\\__image_snapshots__' : 'path/to/__image_snapshots__',
       storeReceivedOnFailure: false,
       updatePassedSnapshot: false,
       updateSnapshot: false,
