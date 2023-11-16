@@ -907,7 +907,7 @@ describe('diff-snapshot', () => {
       expect(onBeforeWriteToDisc).toHaveBeenCalledTimes(1);
       expect(onBeforeWriteToDisc).toHaveBeenCalledWith({
         buffer: mockImageBuffer,
-        destination: '/path/to/snapshots/id1.png',
+        destination: path.normalize('/path/to/snapshots/id1.png'),
         testPath: 'test.spec.js',
         currentTestName: 'test a',
       });
