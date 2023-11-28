@@ -1,3 +1,10 @@
+# [6.3.0](https://github.com/americanexpress/jest-image-snapshot/compare/v6.2.0...v6.3.0) (2023-11-28)
+
+
+### Features
+
+* Add `runtimeHooksPath` options ([#337](https://github.com/americanexpress/jest-image-snapshot/issues/337)) ([57741a2](https://github.com/americanexpress/jest-image-snapshot/commit/57741a242cd2192c453a87c34fa89c7c35a0763c))
+
 # [6.2.0](https://github.com/americanexpress/jest-image-snapshot/compare/v6.1.1...v6.2.0) (2023-07-25)
 
 
