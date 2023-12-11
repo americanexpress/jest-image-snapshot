@@ -448,7 +448,7 @@ describe('toMatchImageSnapshot', () => {
       onlyDiff: false,
       failureThreshold: 0,
       failureThresholdType: 'pixel',
-      maxChildProcessBufferSizeInBytes: 10485760,
+      maxChildProcessBufferSizeInBytes: 10 * 1024 * 1024,
       receivedDir: undefined,
       receivedImageBuffer: undefined,
       runtimeHooksPath: undefined,
