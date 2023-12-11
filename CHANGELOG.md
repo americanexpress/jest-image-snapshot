@@ -1,3 +1,10 @@
+# [6.4.0](https://github.com/americanexpress/jest-image-snapshot/compare/v6.3.0...v6.4.0) (2023-12-11)
+
+
+### Features
+
+* add configurable maxBuffer option to runDiffImageToSnapshot ([#344](https://github.com/americanexpress/jest-image-snapshot/issues/344)) ([befad8b](https://github.com/americanexpress/jest-image-snapshot/commit/befad8ba6080be6b0a94d098334ea05258afab2e))
+
 # [6.3.0](https://github.com/americanexpress/jest-image-snapshot/compare/v6.2.0...v6.3.0) (2023-11-28)
 
 
