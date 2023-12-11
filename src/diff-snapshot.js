@@ -421,7 +421,7 @@ function runDiffImageToSnapshot(options) {
     {
       input: Buffer.from(serializedInput),
       stdio: ['pipe', 'inherit', 'inherit', 'pipe'],
-      maxBuffer: 10 * 1024 * 1024, // 10 MB
+      maxBuffer: options.maxChildProcessBufferSizeInBytes,
     }
   );
 

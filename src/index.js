@@ -151,6 +151,10 @@ function configureToMatchImageSnapshot({
   dumpDiffToConsole: commonDumpDiffToConsole = false,
   dumpInlineDiffToConsole: commonDumpInlineDiffToConsole = false,
   allowSizeMismatch: commonAllowSizeMismatch = false,
+  // Default to 10 MB instead of node's default 1 MB
+  // See https://nodejs.org/api/child_process.html#child_processspawnsynccommand-args-options
+  maxChildProcessBufferSizeInBytes:
+    commonMaxChildProcessBufferSizeInBytes = 10 * 1024 * 1024, // 10 MB
   comparisonMethod: commonComparisonMethod = 'pixelmatch',
 } = {}) {
   return function toMatchImageSnapshot(received, {
@@ -173,6 +177,7 @@ function configureToMatchImageSnapshot({
     dumpDiffToConsole = commonDumpDiffToConsole,
     dumpInlineDiffToConsole = commonDumpInlineDiffToConsole,
     allowSizeMismatch = commonAllowSizeMismatch,
+    maxChildProcessBufferSizeInBytes = commonMaxChildProcessBufferSizeInBytes,
     comparisonMethod = commonComparisonMethod,
   } = {}) {
     const {
@@ -237,6 +242,7 @@ function configureToMatchImageSnapshot({
         updatePassedSnapshot,
         blur,
         allowSizeMismatch,
+        maxChildProcessBufferSizeInBytes,
         comparisonMethod,
         runtimeHooksPath,
       });

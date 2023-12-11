@@ -48,6 +48,7 @@ exports[`toMatchImageSnapshot passes diffImageToSnapshot everything it needs to 
   "diffDirection": "horizontal",
   "failureThreshold": 0,
   "failureThresholdType": "pixel",
+  "maxChildProcessBufferSizeInBytes": 10485760,
   "onlyDiff": false,
   "receivedDir": undefined,
   "receivedImageBuffer": "pretendthisisanimagebuffer",

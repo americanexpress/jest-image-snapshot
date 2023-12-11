@@ -124,6 +124,7 @@ See [the examples](./examples/README.md) for more detailed usage or read about a
 * `dumpDiffToConsole`: (default `false`) Will output base64 string of a diff image to console in case of failed tests (in addition to creating a diff image). This string can be copy-pasted to a browser address string to preview the diff for a failed test.
 * `dumpInlineDiffToConsole`: (default `false`) Will output the image to the terminal using iTerm's [Inline Images Protocol](https://iterm2.com/documentation-images.html). If the term is not compatible, it does the same thing as `dumpDiffToConsole`.
 * `allowSizeMismatch`: (default `false`) If set to true, the build will not fail when the screenshots to compare have different sizes.
+* `maxChildProcessBufferSizeInBytes`: (default `10 * 1024 * 1024`) Sets the max number of bytes for stdout/stderr when running `diff-snapshot` in a child process.
 * `runtimeHooksPath`: (default `undefined`) This needs to be set to a existing file, like `require.resolve('./runtimeHooksPath.cjs')`. This file can expose a few hooks:
   * `onBeforeWriteToDisc`: before saving any image to the disc, this function will be called (can be used to write EXIF data to images for instance)
     `onBeforeWriteToDisc: (arguments: { buffer: Buffer; destination: string; testPath: string; currentTestName: string }) => Buffer`

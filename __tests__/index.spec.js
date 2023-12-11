@@ -448,6 +448,7 @@ describe('toMatchImageSnapshot', () => {
       onlyDiff: false,
       failureThreshold: 0,
       failureThresholdType: 'pixel',
+      maxChildProcessBufferSizeInBytes: 10485760,
       receivedDir: undefined,
       receivedImageBuffer: undefined,
       runtimeHooksPath: undefined,
@@ -500,6 +501,7 @@ describe('toMatchImageSnapshot', () => {
       failureThresholdType: 'percent',
       updatePassedSnapshot: true,
       blur: 1,
+      maxChildProcessBufferSizeInBytes: 1024 * 1024,
       comparisonMethod,
     });
     expect.extend({ toMatchImageSnapshot });
@@ -528,6 +530,7 @@ describe('toMatchImageSnapshot', () => {
       updatePassedSnapshot: true,
       failureThreshold: 1,
       failureThresholdType: 'percent',
+      maxChildProcessBufferSizeInBytes: 1024 * 1024,
       comparisonMethod,
     });
     expect(Chalk).toHaveBeenCalledWith({
@@ -590,6 +593,7 @@ describe('toMatchImageSnapshot', () => {
       testPath: path.join('path', 'to', 'test.spec.js'),
       updateSnapshot: false,
       updatePassedSnapshot: false,
+      maxChildProcessBufferSizeInBytes: 10 * 1024 * 1024,
       failureThreshold: 0,
       failureThresholdType: 'pixel',
       comparisonMethod: 'pixelmatch',
