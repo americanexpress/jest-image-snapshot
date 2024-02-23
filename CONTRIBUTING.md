@@ -29,13 +29,19 @@ This project adheres to the American Express [Code of Conduct](./CODE_OF_CONDUCT
 
    > replace `your-github-username` with your github username
 
-3. Install the dependencies by running
+3. Install and use the correct version of node (specified in `.nvmrc`)
+
+    ```bash
+    $ nvm use
+    ```
+
+4. Install the dependencies by running
 
     ```bash
     $ npm install
     ```
 
-4. You can now run any of these scripts from the root folder.
+5. You can now run any of these scripts from the root folder.
 
 #### Running tests
 
