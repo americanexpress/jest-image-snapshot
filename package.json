@@ -66,7 +66,7 @@
     "lodash": "^4.17.4",
     "pixelmatch": "^5.1.0",
     "pngjs": "^3.4.0",
-    "rimraf": "^2.6.2",
+    "rimraf": "^5.0.10",
     "ssim.js": "^3.1.1"
   },
   "peerDependencies": {
