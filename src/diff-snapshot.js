@@ -271,10 +271,10 @@ function diffImageToSnapshot(options) {
     result = { added: true };
   } else {
     const receivedSnapshotPath = path.join(receivedDir, `${snapshotIdentifier}${receivedPostfix}.png`);
-    rimrafSync(receivedSnapshotPath, { glob: true });
+    rimrafSync(receivedSnapshotPath);
 
     const diffOutputPath = path.join(diffDir, `${snapshotIdentifier}-diff.png`);
-    rimrafSync(diffOutputPath, { glob: true });
+    rimrafSync(diffOutputPath);
 
     const defaultDiffConfig = comparisonMethod !== 'ssim' ? defaultPixelmatchDiffConfig : defaultSSIMDiffConfig;
 

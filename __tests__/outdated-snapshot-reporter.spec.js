@@ -79,7 +79,7 @@ describe('OutdatedSnapshotReporter', () => {
   });
 
   afterAll(() => {
-    rimrafSync(tmpDir, { glob: true });
+    rimrafSync(tmpDir);
   });
 
   it('should write the image snapshot on first run', () => {
