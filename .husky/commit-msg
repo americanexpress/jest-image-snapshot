@@ -1,0 +1,3 @@
+# .husky/commit-msg
+
+commitlint --edit $1
