@@ -57,6 +57,7 @@
     "jest-snapshot": "^29.0.0",
     "lockfile-lint": "^4.0.0",
     "mock-spawn": "^0.2.6",
+    "rimraf": "^5.0.10",
     "semantic-release": "^17.0.4"
   },
   "dependencies": {
@@ -66,7 +67,6 @@
     "lodash": "^4.17.4",
     "pixelmatch": "^5.1.0",
     "pngjs": "^3.4.0",
-    "rimraf": "^5.0.10",
     "ssim.js": "^3.1.1"
   },
   "peerDependencies": {
