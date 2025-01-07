@@ -61,6 +61,7 @@ describe('OutdatedSnapshotReporter', () => {
       cwd: tmpDir,
       encoding: 'utf-8',
       env: { ...process.env, ...environment },
+      shell: true,
     });
     if (child.error) throw child.error;
 
