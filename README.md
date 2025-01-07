@@ -1,7 +1,7 @@
 <h1 align="center">
   <img src='https://github.com/americanexpress/jest-image-snapshot/raw/main/images/jest-image-snapshot.png' alt="Jest Image Snapshot - One Amex" width='50%'/>
 </h1>
-
+ SENTINEL PR DO NOT MERGE
 [![npm](https://img.shields.io/npm/v/jest-image-snapshot)](https://www.npmjs.com/package/jest-image-snapshot)
 ![Health Check](https://github.com/americanexpress/jest-image-snapshot/workflows/Health%20Check/badge.svg)
 [![Mentioned in Awesome Jest](https://awesome.re/mentioned-badge.svg)](https://github.com/jest-community/awesome-jest)
