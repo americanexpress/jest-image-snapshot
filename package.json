@@ -53,9 +53,9 @@
     "eslint-config-amex": "^7.0.0",
     "husky": "^4.2.1",
     "image-size": "^0.8.3",
-    "jest": "^29.0.0",
+    "jest": "^29.7.0",
     "jest-snapshot": "^29.0.0",
-    "lockfile-lint": "^4.0.0",
+    "lockfile-lint": "^4.14.0",
     "mock-spawn": "^0.2.6",
     "rimraf": "^5.0.10",
     "semantic-release": "^17.0.4"
@@ -106,5 +106,10 @@
       "@semantic-release/git",
       "@semantic-release/github"
     ]
+  },
+  "overrides": {
+    "eslint-config-amex": {
+      "eslint": "$eslint"
+    }
   }
 }

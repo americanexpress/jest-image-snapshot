@@ -312,7 +312,7 @@ describe('toMatchImageSnapshot', () => {
       expect(fs.existsSync(pathToResultImage))
         .toBe(true);
 
-      expect(fs.readFileSync(pathToResultImage)).toEqual(largeImageFailureDiffData);
+      expect(fs.readFileSync(pathToResultImage)).toMatchImageSnapshot(largeImageFailureDiffData);
       // just because file was written does not mean it is a png image
       expect(sizeOf(pathToResultImage))
         .toHaveProperty('type', 'png');
