@@ -16,7 +16,6 @@ const fs = require('fs');
 const os = require('os');
 const childProcess = require('child_process');
 const path = require('path');
-const rimraf = require('rimraf');
 
 describe('OutdatedSnapshotReporter', () => {
   const jestImageSnapshotDir = path.join(__dirname, '..');
@@ -80,7 +79,7 @@ describe('OutdatedSnapshotReporter', () => {
   });
 
   afterAll(() => {
-    rimraf.sync(tmpDir);
+    fs.rmSync(tmpDir, { recursive: true, force: true });
   });
 
   it('should write the image snapshot on first run', () => {

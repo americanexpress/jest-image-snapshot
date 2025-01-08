@@ -18,7 +18,6 @@ const path = require('path');
 const pixelmatch = require('pixelmatch');
 const ssim = require('ssim.js');
 const { PNG } = require('pngjs');
-const rimraf = require('rimraf');
 const glur = require('glur');
 const ImageComposer = require('./image-composer');
 
@@ -271,10 +270,10 @@ function diffImageToSnapshot(options) {
     result = { added: true };
   } else {
     const receivedSnapshotPath = path.join(receivedDir, `${snapshotIdentifier}${receivedPostfix}.png`);
-    rimraf.sync(receivedSnapshotPath);
+    fs.rmSync(receivedSnapshotPath, { recursive: true, force: true });
 
     const diffOutputPath = path.join(diffDir, `${snapshotIdentifier}-diff.png`);
-    rimraf.sync(diffOutputPath);
+    fs.rmSync(diffOutputPath, { recursive: true, force: true });
 
     const defaultDiffConfig = comparisonMethod !== 'ssim' ? defaultPixelmatchDiffConfig : defaultSSIMDiffConfig;
 
