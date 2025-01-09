@@ -14,7 +14,7 @@
 
 const fs = require('fs');
 const path = require('path');
-const rimraf = require('rimraf');
+const { rimrafSync } = require('rimraf');
 const uniqueId = require('lodash/uniqueId');
 const sizeOf = require('image-size');
 const { SnapshotState } = require('jest-snapshot');
@@ -37,11 +37,11 @@ describe('toMatchImageSnapshot', () => {
   });
 
   beforeEach(() => {
-    rimraf.sync(`**/${cleanupRequiredIndicator}*`);
+    rimrafSync(`**/${cleanupRequiredIndicator}*`, { glob: true });
   });
 
   afterAll(() => {
-    rimraf.sync(`**/${cleanupRequiredIndicator}*`);
+    rimrafSync(`**/${cleanupRequiredIndicator}*`, { glob: true });
   });
 
   describe('happy path', () => {
@@ -312,7 +312,7 @@ describe('toMatchImageSnapshot', () => {
       expect(fs.existsSync(pathToResultImage))
         .toBe(true);
 
-      expect(fs.readFileSync(pathToResultImage)).toEqual(largeImageFailureDiffData);
+      expect(fs.readFileSync(pathToResultImage)).toMatchImageSnapshot(largeImageFailureDiffData);
       // just because file was written does not mean it is a png image
       expect(sizeOf(pathToResultImage))
         .toHaveProperty('type', 'png');
