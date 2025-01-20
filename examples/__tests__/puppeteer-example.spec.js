@@ -29,6 +29,10 @@ describe('jest-image-snapshot usage with an image received from puppeteer', () =
     const image = await page.screenshot();
 
     expect(image).toMatchImageSnapshot();
+
+    // Since v22, Puppeteer returns Uint8Array instead of Buffer
+    // https://github.com/americanexpress/jest-image-snapshot/issues/357#issuecomment-2394529973
+    // expect(Buffer.from(image)).toMatchImageSnapshot();
   });
 
   afterAll(async () => {
