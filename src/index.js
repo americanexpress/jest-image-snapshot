@@ -24,6 +24,14 @@ const timesCalled = new Map();
 
 const SNAPSHOTS_DIR = '__image_snapshots__';
 
+function toBuffer(data) {
+  if (data == null || Buffer.isBuffer(data)) {
+    return data;
+  }
+
+  return Buffer.from(data);
+}
+
 function updateSnapshotState(originalSnapshotState, partialSnapshotState) {
   if (global.UNSTABLE_SKIP_REPORTING) {
     return originalSnapshotState;
@@ -224,7 +232,7 @@ function configureToMatchImageSnapshot({
 
     const result =
       imageToSnapshot({
-        receivedImageBuffer: received,
+        receivedImageBuffer: toBuffer(received),
         snapshotsDir,
         storeReceivedOnFailure,
         receivedDir,

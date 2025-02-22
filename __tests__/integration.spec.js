@@ -98,6 +98,11 @@ describe('toMatchImageSnapshot', () => {
 
       expect(diffExists(customSnapshotIdentifier)).toBe(false);
     });
+
+    it('should work with TypedArray', () => {
+      const imageTypedArray = new Uint8Array(imageData.buffer);
+      expect(() => expect(imageTypedArray).toMatchImageSnapshot()).not.toThrowError();
+    });
   });
 
   describe('updates', () => {
