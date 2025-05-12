@@ -1,3 +1,10 @@
+# [6.5.0](https://github.com/americanexpress/jest-image-snapshot/compare/v6.4.0...v6.5.0) (2025-05-12)
+
+
+### Features
+
+* work with TypedArray / Array / ArrayBuffer ([b419a4d](https://github.com/americanexpress/jest-image-snapshot/commit/b419a4dfbd6a34470f2833073f4f714d98a871c9))
+
 # [6.4.0](https://github.com/americanexpress/jest-image-snapshot/compare/v6.3.0...v6.4.0) (2023-12-11)
 
 
