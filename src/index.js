@@ -28,6 +28,9 @@ function toBuffer(data) {
   if (data == null || Buffer.isBuffer(data)) {
     return data;
   }
+  if (typeof data === 'string') {
+    return Buffer.from(data, 'base64');
+  }
 
   return Buffer.from(data);
 }
