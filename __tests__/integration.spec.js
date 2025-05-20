@@ -103,6 +103,11 @@ describe('toMatchImageSnapshot', () => {
       const imageTypedArray = new Uint8Array(imageData.buffer);
       expect(() => expect(imageTypedArray).toMatchImageSnapshot()).not.toThrowError();
     });
+
+    it('should work with base64 encoded strings', () => {
+      const imageString = imageData.toString('base64');
+      expect(() => expect(imageString).toMatchImageSnapshot()).not.toThrowError();
+    });
   });
 
   describe('updates', () => {
