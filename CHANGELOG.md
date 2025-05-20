@@ -1,3 +1,10 @@
+## [6.5.1](https://github.com/americanexpress/jest-image-snapshot/compare/v6.5.0...v6.5.1) (2025-05-20)
+
+
+### Bug Fixes
+
+* work with base64 strings ([#368](https://github.com/americanexpress/jest-image-snapshot/issues/368)) ([9a3ca4f](https://github.com/americanexpress/jest-image-snapshot/commit/9a3ca4f173669250a49b9a5709f8ba933b55fc78))
+
 # [6.5.0](https://github.com/americanexpress/jest-image-snapshot/compare/v6.4.0...v6.5.0) (2025-05-12)
 
 
