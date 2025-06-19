@@ -51,14 +51,14 @@ describe('toMatchImageSnapshot', () => {
 
       expect(
         () => expect(imageData).toMatchImageSnapshot({ customSnapshotIdentifier })
-      ).not.toThrowError();
+      ).not.toThrow();
       expect(
         fs.existsSync(path.join(snapshotsDir, getSnapshotFilename(customSnapshotIdentifier)))
       ).toBe(true);
     });
 
     it('matches an identical snapshot', () => {
-      expect(() => expect(imageData).toMatchImageSnapshot()).not.toThrowError();
+      expect(() => expect(imageData).toMatchImageSnapshot()).not.toThrow();
     });
 
     it('creates a snapshot in a custom directory if such is specified', () => {
@@ -67,7 +67,7 @@ describe('toMatchImageSnapshot', () => {
       // First we need to write a new snapshot image
       expect(
         () => expect(imageData).toMatchImageSnapshot({ customSnapshotIdentifier, customSnapshotsDir }) // eslint-disable-line max-len
-      ).not.toThrowError();
+      ).not.toThrow();
 
       expect(
         fs.existsSync(path.join(customSnapshotsDir, getSnapshotFilename(customSnapshotIdentifier)))
@@ -80,7 +80,7 @@ describe('toMatchImageSnapshot', () => {
       // First we need to write a new snapshot image
       expect(
         () => expect(imageData).toMatchImageSnapshot({ customSnapshotIdentifier })
-      ).not.toThrowError();
+      ).not.toThrow();
 
       expect(diffExists(customSnapshotIdentifier)).toBe(false);
     });
@@ -94,19 +94,19 @@ describe('toMatchImageSnapshot', () => {
           customSnapshotIdentifier,
           comparisonMethod: 'ssim',
         })
-      ).not.toThrowError();
+      ).not.toThrow();
 
       expect(diffExists(customSnapshotIdentifier)).toBe(false);
     });
 
     it('should work with TypedArray', () => {
       const imageTypedArray = new Uint8Array(imageData.buffer);
-      expect(() => expect(imageTypedArray).toMatchImageSnapshot()).not.toThrowError();
+      expect(() => expect(imageTypedArray).toMatchImageSnapshot()).not.toThrow();
     });
 
     it('should work with base64 encoded strings', () => {
       const imageString = imageData.toString('base64');
-      expect(() => expect(imageString).toMatchImageSnapshot()).not.toThrowError();
+      expect(() => expect(imageString).toMatchImageSnapshot()).not.toThrow();
     });
   });
 
@@ -232,12 +232,12 @@ describe('toMatchImageSnapshot', () => {
       // Write a new snapshot image
       expect(
         () => expect(imageData).toMatchImageSnapshot({ customSnapshotIdentifier })
-      ).not.toThrowError();
+      ).not.toThrow();
 
       // Test against a different image
       expect(
         () => expect(failImageData).toMatchImageSnapshot({ customSnapshotIdentifier })
-      ).toThrowError(expectedError);
+      ).toThrow(expectedError);
     });
 
     it('fails with differently sized images and outputs diff', () => {
@@ -246,12 +246,12 @@ describe('toMatchImageSnapshot', () => {
       // First we need to write a new snapshot image
       expect(
         () => expect(imageData).toMatchImageSnapshot({ customSnapshotIdentifier })
-      ).not.toThrowError();
+      ).not.toThrow();
 
       // Test against an image much larger than the snapshot.
       expect(
         () => expect(oversizeImageData).toMatchImageSnapshot({ customSnapshotIdentifier })
-      ).toThrowError(/Expected image to be the same size as the snapshot \(100x100\), but was different \(153x145\)/);
+      ).toThrow(/Expected image to be the same size as the snapshot \(100x100\), but was different \(153x145\)/);
 
       expect(diffExists(customSnapshotIdentifier))
         .toBe(true);
@@ -262,11 +262,11 @@ describe('toMatchImageSnapshot', () => {
 
       expect(
         () => expect(imageData).toMatchImageSnapshot({ customSnapshotIdentifier })
-      ).not.toThrowError();
+      ).not.toThrow();
 
       expect(
         () => expect(biggerImageData).toMatchImageSnapshot({ customSnapshotIdentifier })
-      ).toThrowError(/Expected image to be the same size as the snapshot \(100x100\), but was different \(150x150\)/);
+      ).toThrow(/Expected image to be the same size as the snapshot \(100x100\), but was different \(150x150\)/);
 
       expect(diffExists(customSnapshotIdentifier)).toBe(true);
     });
@@ -278,7 +278,7 @@ describe('toMatchImageSnapshot', () => {
       expect(
         () => expect(imageData)
           .toMatchImageSnapshot({ customSnapshotIdentifier })
-      ).not.toThrowError();
+      ).not.toThrow();
 
       // then test against a different image
       expect(
@@ -308,7 +308,7 @@ describe('toMatchImageSnapshot', () => {
           })
       )
         .not
-        .toThrowError();
+        .toThrow();
 
       // then test against a different image
       expect(
@@ -340,7 +340,7 @@ describe('toMatchImageSnapshot', () => {
           })
       )
         .not
-        .toThrowError();
+        .toThrow();
 
       // then test against a different image
       expect(
@@ -375,7 +375,7 @@ describe('toMatchImageSnapshot', () => {
           })
       )
         .not
-        .toThrowError();
+        .toThrow();
 
       // then test against a different image
       expect(
@@ -404,7 +404,7 @@ describe('toMatchImageSnapshot', () => {
       expect(
         () => expect(imageData)
           .toMatchImageSnapshot({ customSnapshotIdentifier })
-      ).not.toThrowError();
+      ).not.toThrow();
 
       // then test against a different image (to generate a results image)
       expect(
@@ -414,7 +414,7 @@ describe('toMatchImageSnapshot', () => {
       // then test against image that should not generate results image (as it is passing test)
       expect(
         () => expect(imageData).toMatchImageSnapshot({ customSnapshotIdentifier })
-      ).not.toThrowError();
+      ).not.toThrow();
 
       expect(diffExists(customSnapshotIdentifier))
         .toBe(false);
@@ -436,7 +436,7 @@ describe('toMatchImageSnapshot', () => {
           })
       )
         .not
-        .toThrowError();
+        .toThrow();
 
       // then test against a different image
       expect(
@@ -466,7 +466,7 @@ describe('toMatchImageSnapshot', () => {
       // First we need to write a new snapshot image
       expect(
         () => expect(largeImageData).toMatchImageSnapshot({ customSnapshotIdentifier })
-      ).not.toThrowError();
+      ).not.toThrow();
 
       // then test against a different image
       expect(
@@ -489,7 +489,7 @@ describe('toMatchImageSnapshot', () => {
             })
         )
           .not
-          .toThrowError();
+          .toThrow();
 
         // then test against a different image
         expect(
@@ -501,7 +501,7 @@ describe('toMatchImageSnapshot', () => {
             })
         )
           .not
-          .toThrowError();
+          .toThrow();
       });
       it('to throw at 1pct with SSIM', () => {
         const largeImageData = fs.readFileSync(fromStubs('Desktop 1_082.png'));
@@ -518,7 +518,7 @@ describe('toMatchImageSnapshot', () => {
             })
         )
           .not
-          .toThrowError();
+          .toThrow();
 
         // then test against a different image
         expect(
