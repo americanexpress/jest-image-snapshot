@@ -47,7 +47,7 @@ describe('diff-snapshot', () => {
 
       expect(runDiffImageToSnapshot(fakeRequest)).toEqual({ add: true, updated: false });
 
-      expect(mockSpawnSync).toBeCalled();
+      expect(mockSpawnSync).toHaveBeenCalled();
     });
 
     it.each`
@@ -60,7 +60,7 @@ describe('diff-snapshot', () => {
   ({ spawnReturn }) => {
     const runDiffImageToSnapshot = setupTest(spawnReturn);
 
-    expect(() => runDiffImageToSnapshot(fakeRequest)).toThrowError(
+    expect(() => runDiffImageToSnapshot(fakeRequest)).toThrow(
       new Error('Error running image diff: Unknown Error')
     );
   }
@@ -71,7 +71,7 @@ describe('diff-snapshot', () => {
         status: 1,
         error: new Error('🦖'),
       });
-      expect(() => runDiffImageToSnapshot(fakeRequest)).toThrowError(
+      expect(() => runDiffImageToSnapshot(fakeRequest)).toThrow(
         new Error('Error running image diff: 🦖')
       );
     });
@@ -924,7 +924,7 @@ describe('diff-snapshot', () => {
         failureThreshold: 0,
         failureThresholdType: 'pixel',
         runtimeHooksPath: './non-existing-file.js',
-      })).toThrowError(
+      })).toThrow(
         new Error("Couldn't import ./non-existing-file.js: Cannot find module './non-existing-file.js' from 'src/diff-snapshot.js'")
       );
 
@@ -942,7 +942,7 @@ describe('diff-snapshot', () => {
         failureThreshold: 0,
         failureThresholdType: 'pixel',
         runtimeHooksPath: require.resolve('./stubs/runtimeHooksPath.js'),
-      })).toThrowError(
+      })).toThrow(
         new Error("Couldn't execute onBeforeWriteToDisc: wrong")
       );
     });
