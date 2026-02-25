@@ -5,7 +5,7 @@
     "reporters": [ "default", "<rootDir>/image-reporter.js" ]
  */
 
-const chalk = require('chalk');
+const pc = require('picocolors');
 const fs = require('fs');
 const AWS = require('aws-sdk/global');
 const S3 = require('aws-sdk/clients/s3');
@@ -35,7 +35,7 @@ class ImageReporter {
           if (err) {
             console.log(err, err.stack);
           } else {
-            console.log(chalk.red.bold(`Uploaded image diff file to https://${UPLOAD_BUCKET}.s3.amazonaws.com/${path}`));
+            console.log(pc.red(pc.bold(`Uploaded image diff file to https://${UPLOAD_BUCKET}.s3.amazonaws.com/${path}`)));
           }
         });
       });
