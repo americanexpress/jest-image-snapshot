@@ -1,3 +1,10 @@
+## [6.5.2](https://github.com/americanexpress/jest-image-snapshot/compare/v6.5.1...v6.5.2) (2026-03-09)
+
+
+### Bug Fixes
+
+* update readme ([88ca523](https://github.com/americanexpress/jest-image-snapshot/commit/88ca5235b68207a6e3e44388d290387e2f43d9ab))
+
 ## [6.5.1](https://github.com/americanexpress/jest-image-snapshot/compare/v6.5.0...v6.5.1) (2025-05-20)
 
 
