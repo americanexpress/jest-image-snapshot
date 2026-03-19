@@ -12,13 +12,33 @@
  * the License.
  */
 /* eslint-disable no-underscore-dangle */
-const kebabCase = require('lodash/kebabCase');
-const merge = require('lodash/merge');
 const path = require('path');
-const Chalk = require('chalk').Instance;
+const { createColors } = require('picocolors');
 const { diffImageToSnapshot, runDiffImageToSnapshot } = require('./diff-snapshot');
 const fs = require('fs');
 const OutdatedSnapshotReporter = require('./outdated-snapshot-reporter');
+
+/**
+ * Converts a string to kebab-case.
+ * Handles camelCase, PascalCase, spaces, dots, underscores, and hyphens.
+ * Equivalent to lodash/kebabCase for snapshot identifier generation.
+ */
+function kebabCase(str) {
+  return String(str)
+    // Insert a hyphen between a lowercase letter and an uppercase letter (camelCase boundary)
+    .replace(/([a-z])([A-Z])/g, '$1-$2')
+    // Insert a hyphen between consecutive uppercase letters followed by a lowercase (e.g. "XMLParser" -> "XML-Parser")
+    .replace(/([A-Z]+)([A-Z][a-z])/g, '$1-$2')
+    // Insert a hyphen between a letter and a digit (e.g. "test1" -> "test-1")
+    .replace(/([a-zA-Z])(\d)/g, '$1-$2')
+    // Insert a hyphen between a digit and a letter (e.g. "1test" -> "1-test")
+    .replace(/(\d)([a-zA-Z])/g, '$1-$2')
+    .toLowerCase()
+    // Replace any non-alphanumeric character (or sequence) with a single hyphen
+    .replace(/[^a-z0-9]+/g, '-')
+    // Trim leading/trailing hyphens
+    .replace(/^-|-$/g, '');
+}
 
 const timesCalled = new Map();
 
@@ -39,7 +59,7 @@ function updateSnapshotState(originalSnapshotState, partialSnapshotState) {
   if (global.UNSTABLE_SKIP_REPORTING) {
     return originalSnapshotState;
   }
-  return merge(originalSnapshotState, partialSnapshotState);
+  return Object.assign(originalSnapshotState, partialSnapshotState);
 }
 
 function checkResult({
@@ -85,7 +105,7 @@ function checkResult({
           failure = `Expected image to match or be a close match to snapshot but was ${differencePercentage}% different from snapshot (${result.diffPixelCount} differing pixels).\n`;
         }
 
-        failure += `${chalk.bold.red('See diff for details:')} ${chalk.red(result.diffOutputPath)}`;
+        failure += `${chalk.bold(chalk.red('See diff for details:'))} ${chalk.red(result.diffOutputPath)}`;
 
         const supportedInlineTerms = [
           'iTerm.app',
@@ -95,7 +115,7 @@ function checkResult({
         if (dumpInlineDiffToConsole && (supportedInlineTerms.includes(process.env.TERM_PROGRAM) || 'ENABLE_INLINE_DIFF' in process.env)) {
           failure += `\n\n\t\x1b]1337;File=name=${Buffer.from(result.diffOutputPath).toString('base64')};inline=1;width=40:${result.imgSrcString.replace('data:image/png;base64,', '')}\x07\x1b\n\n`;
         } else if (dumpDiffToConsole || dumpInlineDiffToConsole) {
-          failure += `\n${chalk.bold.red('Or paste below image diff string to your browser`s URL bar.')}\n ${result.imgSrcString}`;
+          failure += `\n${chalk.bold(chalk.red('Or paste below image diff string to your browser`s URL bar.'))}\n ${result.imgSrcString}`;
         }
 
         return failure;
@@ -194,12 +214,9 @@ function configureToMatchImageSnapshot({
     const {
       testPath, currentTestName, isNot, snapshotState,
     } = this;
-    const chalkOptions = {};
-    if (typeof noColors !== 'undefined') {
-      // 1 means basic ANSI 16-color support, 0 means no support
-      chalkOptions.level = noColors ? 0 : 1;
-    }
-    const chalk = new Chalk(chalkOptions);
+    const chalk = typeof noColors !== 'undefined'
+      ? createColors(!noColors)
+      : createColors();
 
     const retryTimes = parseInt(global[Symbol.for('RETRY_TIMES')], 10) || 0;
 
@@ -225,7 +242,7 @@ function configureToMatchImageSnapshot({
     if (snapshotState._updateSnapshot === 'none' && !fs.existsSync(baselineSnapshotPath)) {
       return {
         pass: false,
-        message: () => `New snapshot was ${chalk.bold.red('not written')}. The update flag must be explicitly ` +
+        message: () => `New snapshot was ${chalk.bold(chalk.red('not written'))}. The update flag must be explicitly ` +
         'passed to write a new snapshot.\n\n + This is likely because this test is run in a continuous ' +
         'integration (CI) environment in which snapshots are not written by default.\n\n',
       };

@@ -22,11 +22,14 @@ describe('toMatchImageSnapshot', () => {
       runDiffImageToSnapshot: jest.fn(() => diffImageToSnapshotResult),
     }));
 
-    jest.mock('supports-color', () => ({
-      // 1 means basic ANSI 16-color support, 0 means no support
-      stdout: { level: mockSupportsColor ? 1 : 0 },
-      stderr: { level: mockSupportsColor ? 1 : 0 },
-    }));
+    // Control picocolors color detection via FORCE_COLOR / NO_COLOR env vars
+    if (mockSupportsColor) {
+      process.env.FORCE_COLOR = '1';
+      delete process.env.NO_COLOR;
+    } else {
+      process.env.NO_COLOR = '1';
+      delete process.env.FORCE_COLOR;
+    }
 
     const mockFs = Object.assign({}, fs, {
       existsSync: jest.fn(),
@@ -40,6 +43,9 @@ describe('toMatchImageSnapshot', () => {
     };
   }
 
+  const originalForceColor = process.env.FORCE_COLOR;
+  const originalNoColor = process.env.NO_COLOR;
+
   beforeEach(() => {
     // In tests, skip reporting (skip snapshotState update to not mess with our test report)
     global.UNSTABLE_SKIP_REPORTING = true;
@@ -49,7 +55,18 @@ describe('toMatchImageSnapshot', () => {
 
   afterEach(() => {
     jest.unmock('fs');
-    jest.unmock('chalk');
+    jest.unmock('picocolors');
+    // Restore original color env vars
+    if (originalForceColor !== undefined) {
+      process.env.FORCE_COLOR = originalForceColor;
+    } else {
+      delete process.env.FORCE_COLOR;
+    }
+    if (originalNoColor !== undefined) {
+      process.env.NO_COLOR = originalNoColor;
+    } else {
+      delete process.env.NO_COLOR;
+    }
   });
 
   it('should throw an error if used with .not matcher', () => {
@@ -430,8 +447,8 @@ describe('toMatchImageSnapshot', () => {
       runDiffImageToSnapshot,
     }));
 
-    const Chalk = require('chalk').Instance;
-    jest.mock('chalk');
+    const { createColors } = require('picocolors');
+    jest.mock('picocolors');
     const { toMatchImageSnapshot } = require('../src/index');
     const matcherAtTest = toMatchImageSnapshot.bind(mockTestContext);
 
@@ -459,7 +476,7 @@ describe('toMatchImageSnapshot', () => {
       updatePassedSnapshot: false,
       updateSnapshot: false,
     });
-    expect(Chalk).toHaveBeenCalledWith({});
+    expect(createColors).toHaveBeenCalledWith();
   });
 
   it('can provide custom defaults', () => {
@@ -481,8 +498,8 @@ describe('toMatchImageSnapshot', () => {
       runDiffImageToSnapshot,
     }));
 
-    const Chalk = require('chalk').Instance;
-    jest.mock('chalk');
+    const { createColors } = require('picocolors');
+    jest.mock('picocolors');
     const { configureToMatchImageSnapshot } = require('../src/index');
     const customDiffConfig = { perceptual: true };
     const customSnapshotIdentifier = ({ defaultIdentifier }) =>
@@ -533,9 +550,7 @@ describe('toMatchImageSnapshot', () => {
       maxChildProcessBufferSizeInBytes: 1024 * 1024,
       comparisonMethod,
     });
-    expect(Chalk).toHaveBeenCalledWith({
-      level: 0, // noColors
-    });
+    expect(createColors).toHaveBeenCalledWith(false);
   });
 
   it('can run in process', () => {
@@ -557,8 +572,8 @@ describe('toMatchImageSnapshot', () => {
       diffImageToSnapshot,
     }));
 
-    const Chalk = require('chalk').Instance;
-    jest.mock('chalk');
+    const { createColors } = require('picocolors');
+    jest.mock('picocolors');
     const { configureToMatchImageSnapshot } = require('../src/index');
     const customConfig = { perceptual: true };
     const toMatchImageSnapshot = configureToMatchImageSnapshot({
@@ -599,9 +614,7 @@ describe('toMatchImageSnapshot', () => {
       comparisonMethod: 'pixelmatch',
       currentTestName: 'test1',
     });
-    expect(Chalk).toHaveBeenCalledWith({
-      level: 0, // noColors
-    });
+    expect(createColors).toHaveBeenCalledWith(false);
   });
 
   it('should only increment matched when test passed', () => {

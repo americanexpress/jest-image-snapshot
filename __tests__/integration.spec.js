@@ -15,7 +15,8 @@
 const fs = require('fs');
 const path = require('path');
 const { rimrafSync } = require('rimraf');
-const uniqueId = require('lodash/uniqueId');
+let uniqueCounter = 0;
+const uniqueId = (prefix = '') => `${prefix}${++uniqueCounter}`; // eslint-disable-line no-plusplus
 const sizeOf = require('image-size');
 const { SnapshotState } = require('jest-snapshot');
 const { toMatchImageSnapshot } = require('../src');
