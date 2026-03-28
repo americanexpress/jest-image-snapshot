@@ -106,6 +106,9 @@ function checkResult({
   return {
     message,
     pass,
+    baselinePath: result.snapshot,
+    receivedPath: result.receivedImagePath,
+    diffPath: result.diffOutputPath,
   };
 }
 
