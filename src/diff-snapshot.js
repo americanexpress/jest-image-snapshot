@@ -419,7 +419,9 @@ function runDiffImageToSnapshot(options) {
     process.execPath, [`${__dirname}/diff-process.js`],
     {
       input: Buffer.from(serializedInput),
-      stdio: ['pipe', 'inherit', 'inherit', 'pipe'],
+      // Pipe (rather than inherit) stderr so the child's actual error can be surfaced in the
+      // thrown error instead of the opaque "Unknown Error" that non-zero exits produced before.
+      stdio: ['pipe', 'inherit', 'pipe', 'pipe'],
       maxBuffer: options.maxChildProcessBufferSizeInBytes,
     }
   );
@@ -428,7 +430,16 @@ function runDiffImageToSnapshot(options) {
     const output = writeDiffProcess.output[3].toString();
     result = JSON.parse(output);
   } else {
-    throw new Error(`Error running image diff: ${(writeDiffProcess.error && writeDiffProcess.error.message) || 'Unknown Error'}`);
+    // `spawnSync` only populates `.error` for process-level failures (e.g. ENOBUFS); when the
+    // child runs but exits non-zero, the real cause is on its stderr stream. Prefer that.
+    const stderr = writeDiffProcess.stderr ? writeDiffProcess.stderr.toString().trim() : '';
+    const spawnErrorMessage = writeDiffProcess.error && writeDiffProcess.error.message;
+    let message = `Error running image diff: ${stderr || spawnErrorMessage || 'Unknown Error'}`;
+    if (writeDiffProcess.error && writeDiffProcess.error.code === 'ENOBUFS') {
+      message += '\nThe diff output likely exceeded maxChildProcessBufferSizeInBytes. '
+        + 'Increase it or set runInProcess: true.';
+    }
+    throw new Error(message);
   }
 
   return result;
