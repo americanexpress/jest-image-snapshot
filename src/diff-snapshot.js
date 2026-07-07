@@ -437,4 +437,5 @@ function runDiffImageToSnapshot(options) {
 module.exports = {
   diffImageToSnapshot,
   runDiffImageToSnapshot,
+  writeFileWithHooks,
 };

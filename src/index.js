@@ -16,7 +16,7 @@ const kebabCase = require('lodash/kebabCase');
 const merge = require('lodash/merge');
 const path = require('path');
 const Chalk = require('chalk').Instance;
-const { diffImageToSnapshot, runDiffImageToSnapshot } = require('./diff-snapshot');
+const { diffImageToSnapshot, runDiffImageToSnapshot, writeFileWithHooks } = require('./diff-snapshot');
 const fs = require('fs');
 const OutdatedSnapshotReporter = require('./outdated-snapshot-reporter');
 
@@ -142,6 +142,49 @@ function createSnapshotIdentifier({
   return snapshotIdentifier;
 }
 
+// Builds the failing matcher result for a brand-new snapshot encountered in CI (where snapshots
+// are never written). When `storeReceivedOnFailure` is set, the received image is still persisted
+// so it can be downloaded from CI and reviewed/committed. See #331.
+function newSnapshotInCiResult({
+  received,
+  storeReceivedOnFailure,
+  snapshotIdentifier,
+  snapshotsDir,
+  customReceivedDir,
+  customReceivedPostfix,
+  runtimeHooksPath,
+  testPath,
+  currentTestName,
+  chalk,
+}) {
+  let receivedSnapshotPath;
+  if (storeReceivedOnFailure) {
+    // Mirror the received-image path convention used by `diffImageToSnapshot`.
+    const receivedDir = customReceivedDir || path.join(snapshotsDir, '__received_output__');
+    const receivedPostfix = customReceivedPostfix || '-received';
+    receivedSnapshotPath = path.join(receivedDir, `${snapshotIdentifier}${receivedPostfix}.png`);
+    fs.mkdirSync(path.dirname(receivedSnapshotPath), { recursive: true });
+    writeFileWithHooks({
+      pathToFile: receivedSnapshotPath,
+      content: toBuffer(received),
+      runtimeHooksPath,
+      testPath,
+      currentTestName,
+    });
+  }
+  return {
+    pass: false,
+    message: () => {
+      const notWritten = `New snapshot was ${chalk.bold.red('not written')}. The update flag must be explicitly ` +
+        'passed to write a new snapshot.\n\n + This is likely because this test is run in a continuous ' +
+        'integration (CI) environment in which snapshots are not written by default.\n\n';
+      return receivedSnapshotPath
+        ? `${notWritten}The received image was stored at ${chalk.red(receivedSnapshotPath)}.\n\n`
+        : notWritten;
+    },
+  };
+}
+
 function configureToMatchImageSnapshot({
   customDiffConfig: commonCustomDiffConfig = {},
   customSnapshotIdentifier: commonCustomSnapshotIdentifier,
@@ -223,12 +266,18 @@ function configureToMatchImageSnapshot({
     OutdatedSnapshotReporter.markTouchedFile(baselineSnapshotPath);
 
     if (snapshotState._updateSnapshot === 'none' && !fs.existsSync(baselineSnapshotPath)) {
-      return {
-        pass: false,
-        message: () => `New snapshot was ${chalk.bold.red('not written')}. The update flag must be explicitly ` +
-        'passed to write a new snapshot.\n\n + This is likely because this test is run in a continuous ' +
-        'integration (CI) environment in which snapshots are not written by default.\n\n',
-      };
+      return newSnapshotInCiResult({
+        received,
+        storeReceivedOnFailure,
+        snapshotIdentifier,
+        snapshotsDir,
+        customReceivedDir,
+        customReceivedPostfix,
+        runtimeHooksPath,
+        testPath,
+        currentTestName,
+        chalk,
+      });
     }
 
     const imageToSnapshot = runInProcess ? diffImageToSnapshot : runDiffImageToSnapshot;
