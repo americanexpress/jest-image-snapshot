@@ -799,6 +799,81 @@ describe('toMatchImageSnapshot', () => {
         .toThrowErrorMatchingSnapshot();
     });
   });
+
+  describe('failureThresholdType "percent" guard-rail (#99)', () => {
+    const passingDiffResult = {
+      pass: true,
+      diffOutputPath: 'path/to/result.png',
+      diffRatio: 0,
+      diffPixelCount: 0,
+    };
+
+    it('warns when failureThresholdType is "percent" and failureThreshold is greater than 1', () => {
+      setupMock(passingDiffResult);
+      const { toMatchImageSnapshot } = require('../src/index');
+      expect.extend({ toMatchImageSnapshot });
+      const warnSpy = jest.spyOn(console, 'warn').mockImplementation(() => {});
+
+      expect('pretendthisisanimagebuffer').toMatchImageSnapshot({
+        failureThreshold: 5,
+        failureThresholdType: 'percent',
+      });
+
+      expect(warnSpy).toHaveBeenCalledTimes(1);
+      expect(warnSpy.mock.calls[0][0]).toMatch(/failureThreshold/);
+      expect(warnSpy.mock.calls[0][0]).toMatch(/percent/);
+      warnSpy.mockRestore();
+    });
+
+    it('does not warn when failureThresholdType is "percent" and failureThreshold is 1 or less', () => {
+      setupMock(passingDiffResult);
+      const { toMatchImageSnapshot } = require('../src/index');
+      expect.extend({ toMatchImageSnapshot });
+      const warnSpy = jest.spyOn(console, 'warn').mockImplementation(() => {});
+
+      expect('pretendthisisanimagebuffer').toMatchImageSnapshot({
+        failureThreshold: 0.01,
+        failureThresholdType: 'percent',
+      });
+
+      expect(warnSpy).not.toHaveBeenCalled();
+      warnSpy.mockRestore();
+    });
+
+    it('does not warn when failureThresholdType is "pixel" regardless of threshold value', () => {
+      setupMock(passingDiffResult);
+      const { toMatchImageSnapshot } = require('../src/index');
+      expect.extend({ toMatchImageSnapshot });
+      const warnSpy = jest.spyOn(console, 'warn').mockImplementation(() => {});
+
+      expect('pretendthisisanimagebuffer').toMatchImageSnapshot({
+        failureThreshold: 100,
+        failureThresholdType: 'pixel',
+      });
+
+      expect(warnSpy).not.toHaveBeenCalled();
+      warnSpy.mockRestore();
+    });
+
+    it('warns only once for the same misconfigured threshold across multiple calls', () => {
+      setupMock(passingDiffResult);
+      const { toMatchImageSnapshot } = require('../src/index');
+      expect.extend({ toMatchImageSnapshot });
+      const warnSpy = jest.spyOn(console, 'warn').mockImplementation(() => {});
+
+      expect('pretendthisisanimagebuffer').toMatchImageSnapshot({
+        failureThreshold: 5,
+        failureThresholdType: 'percent',
+      });
+      expect('pretendthisisanimagebuffer').toMatchImageSnapshot({
+        failureThreshold: 5,
+        failureThresholdType: 'percent',
+      });
+
+      expect(warnSpy).toHaveBeenCalledTimes(1);
+      warnSpy.mockRestore();
+    });
+  });
 });
 
 describe('updateSnapshotState', () => {

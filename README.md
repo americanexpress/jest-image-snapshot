@@ -117,7 +117,7 @@ See [the examples](./examples/README.md) for more detailed usage or read about a
 * `onlyDiff`: (default: `false`) Either only include the difference between the baseline and the received image in the diff image, or include the 3 images (following the direction set by `diffDirection`).
 * `noColors`: Removes coloring from console output, useful if storing the results in a file
 * `failureThreshold`: (default `0`) Sets the threshold that would trigger a test failure based on the `failureThresholdType` selected. This is different to the `customDiffConfig.threshold` above, that is the per pixel failure threshold, this is the failure threshold for the entire comparison.
-* `failureThresholdType`: (default `pixel`) (options `percent` or `pixel`) Sets the type of threshold that would trigger a failure.
+* `failureThresholdType`: (default `pixel`) (options `percent` or `pixel`) Sets the type of threshold that would trigger a failure. When set to `percent`, `failureThreshold` is a **ratio between `0` and `1`** (e.g. `0.01` means 1% of pixels may differ), _not_ a `0`–`100` percentage. A value greater than `1` exceeds 100%, so the comparison can never fail — jest-image-snapshot will emit a warning if it detects this.
 * `updatePassedSnapshot`: (default `false`) Updates a snapshot even if it passed the threshold against the existing one.
 * `blur`: (default `0`) Applies Gaussian Blur on compared images, accepts radius in pixels as value. Useful when you have noise after scaling images per different resolutions on your target website, usually setting its value to 1-2 should be enough to solve that problem.
 * `runInProcess`: (default `false`) Runs the diff in process without spawning a child process.
