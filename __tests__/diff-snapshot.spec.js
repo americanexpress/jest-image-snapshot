@@ -75,6 +75,26 @@ describe('diff-snapshot', () => {
         new Error('Error running image diff: 🦖')
       );
     });
+
+    it('surfaces the child process stderr when it exits non-zero', () => {
+      const runDiffImageToSnapshot = setupTest({
+        status: 1,
+        stderr: Buffer.from('Error: Invalid file signature\n'),
+      });
+      expect(() => runDiffImageToSnapshot(fakeRequest)).toThrow(
+        new Error('Error running image diff: Error: Invalid file signature')
+      );
+    });
+
+    it('hints at maxChildProcessBufferSizeInBytes when the diff process runs out of buffer', () => {
+      const runDiffImageToSnapshot = setupTest({
+        status: null,
+        error: Object.assign(new Error('spawnSync ENOBUFS'), { code: 'ENOBUFS' }),
+      });
+      expect(() => runDiffImageToSnapshot(fakeRequest)).toThrow(
+        /maxChildProcessBufferSizeInBytes/
+      );
+    });
   });
 
   describe('diffImageToSnapshot', () => {
