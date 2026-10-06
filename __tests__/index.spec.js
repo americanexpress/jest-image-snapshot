@@ -391,6 +391,85 @@ describe('toMatchImageSnapshot', () => {
     expect(mockDiff).not.toHaveBeenCalled();
   });
 
+  it('should store the received image when a new snapshot fails in ci and storeReceivedOnFailure is true (#331)', () => {
+    const mockTestContext = {
+      testPath: 'path/to/test.spec.js',
+      currentTestName: 'test1',
+      isNot: false,
+      snapshotState: {
+        _counters: new Map(),
+        update: false,
+        _updateSnapshot: 'none',
+        updated: undefined,
+        added: true,
+      },
+    };
+
+    const mockWriteFileWithHooks = jest.fn();
+    jest.doMock('../src/diff-snapshot', () => ({
+      diffImageToSnapshot: jest.fn(),
+      writeFileWithHooks: mockWriteFileWithHooks,
+    }));
+
+    const mockFs = Object.assign({}, fs, {
+      existsSync: jest.fn(() => false),
+      mkdirSync: jest.fn(),
+    });
+    jest.mock('fs', () => mockFs);
+
+    const { toMatchImageSnapshot } = require('../src/index');
+    const matcherAtTest = toMatchImageSnapshot.bind(mockTestContext);
+    const result = matcherAtTest('pretendthisisanimagebuffer', { storeReceivedOnFailure: true });
+
+    expect(result).toHaveProperty('pass', false);
+    expect(mockWriteFileWithHooks).toHaveBeenCalledTimes(1);
+    const writeArgs = mockWriteFileWithHooks.mock.calls[0][0];
+    expect(Buffer.isBuffer(writeArgs.content)).toBe(true);
+    expect(writeArgs.pathToFile).toContain('__received_output__');
+    expect(writeArgs.pathToFile.endsWith('-received.png')).toBe(true);
+    expect(result.message()).toContain('received image was stored');
+  });
+
+  it('should store the received image under a custom received dir/postfix in ci (#331)', () => {
+    const mockTestContext = {
+      testPath: 'path/to/test.spec.js',
+      currentTestName: 'test1',
+      isNot: false,
+      snapshotState: {
+        _counters: new Map(),
+        update: false,
+        _updateSnapshot: 'none',
+        updated: undefined,
+        added: true,
+      },
+    };
+
+    const mockWriteFileWithHooks = jest.fn();
+    jest.doMock('../src/diff-snapshot', () => ({
+      diffImageToSnapshot: jest.fn(),
+      writeFileWithHooks: mockWriteFileWithHooks,
+    }));
+
+    const mockFs = Object.assign({}, fs, {
+      existsSync: jest.fn(() => false),
+      mkdirSync: jest.fn(),
+    });
+    jest.mock('fs', () => mockFs);
+
+    const { toMatchImageSnapshot } = require('../src/index');
+    const matcherAtTest = toMatchImageSnapshot.bind(mockTestContext);
+    matcherAtTest('pretendthisisanimagebuffer', {
+      storeReceivedOnFailure: true,
+      customReceivedDir: '/tmp/custom-received',
+      customReceivedPostfix: '-actual',
+    });
+
+    expect(mockWriteFileWithHooks).toHaveBeenCalledTimes(1);
+    const writeArgs = mockWriteFileWithHooks.mock.calls[0][0];
+    expect(writeArgs.pathToFile).toContain('custom-received');
+    expect(writeArgs.pathToFile.endsWith('-actual.png')).toBe(true);
+  });
+
   it('should work when a snapshot is updated', () => {
     const mockTestContext = {
       testPath: 'path/to/test.spec.js',
