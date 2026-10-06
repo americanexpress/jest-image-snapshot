@@ -24,6 +24,27 @@ const timesCalled = new Map();
 
 const SNAPSHOTS_DIR = '__image_snapshots__';
 
+// Tracks percent thresholds we have already warned about so a single misconfiguration
+// does not emit a warning on every one of (potentially hundreds of) image assertions.
+const warnedPercentThresholds = new Set();
+
+// A `percent` failureThreshold is compared against a 0..1 ratio, so any value greater
+// than 1 means "more than 100% of pixels" and the comparison can never fail. Users
+// frequently set a whole number here expecting 0-100 semantics, silently disabling the
+// assertion. Warn (rather than throw, which would be breaking) to surface the mistake.
+function warnOnMisusedPercentThreshold(failureThresholdType, failureThreshold) {
+  if (failureThresholdType !== 'percent' || failureThreshold <= 1) return;
+  if (warnedPercentThresholds.has(failureThreshold)) return;
+  warnedPercentThresholds.add(failureThreshold);
+  const msg = 'jest-image-snapshot: `failureThreshold` is set to '
+    + `${failureThreshold} while \`failureThresholdType\` is 'percent'. `
+    + 'Percent thresholds are a ratio between 0 and 1 (e.g. 0.01 for 1%), '
+    + 'so a value greater than 1 exceeds 100% and the comparison can never fail. '
+    + `Did you mean ${failureThreshold / 100}?`;
+  // eslint-disable-next-line no-console
+  console.warn(msg);
+}
+
 function toBuffer(data) {
   if (data == null || Buffer.isBuffer(data)) {
     return data;
@@ -200,6 +221,8 @@ function configureToMatchImageSnapshot({
       chalkOptions.level = noColors ? 0 : 1;
     }
     const chalk = new Chalk(chalkOptions);
+
+    warnOnMisusedPercentThreshold(failureThresholdType, failureThreshold);
 
     const retryTimes = parseInt(global[Symbol.for('RETRY_TIMES')], 10) || 0;
 
