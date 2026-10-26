@@ -947,5 +947,55 @@ describe('diff-snapshot', () => {
       );
     });
   });
-});
 
+  describe('diffImageToSnapshot with a size mismatch', () => {
+    // Uses the real fs, pngjs and pixelmatch so the padding added to the
+    // smaller image is what actually gets compared.
+    let snapshotsDir;
+
+    beforeEach(() => {
+      jest.unmock('fs');
+      jest.unmock('pixelmatch');
+      jest.unmock('glur');
+      snapshotsDir = fs.mkdtempSync(path.join(require('os').tmpdir(), 'jest-image-snapshot-'));
+    });
+
+    afterEach(() => {
+      fs.rmSync(snapshotsDir, { recursive: true, force: true });
+    });
+
+    const whiteImage = (width, height) => {
+      const { PNG } = require('pngjs');
+      const image = new PNG({ width, height });
+      image.data.fill(255);
+      return PNG.sync.write(image);
+    };
+
+    it.each`
+      receivedWidth | receivedHeight | expectedDiffPixels
+      ${3}          | ${2}           | ${2}
+      ${2}          | ${3}           | ${2}
+      ${4}          | ${4}           | ${12}
+    `(
+  'counts every pixel outside the 2x2 baseline as different for a $receivedWidth x $receivedHeight image',
+  ({ receivedWidth, receivedHeight, expectedDiffPixels }) => {
+    const { diffImageToSnapshot } = require('../src/diff-snapshot');
+    fs.writeFileSync(path.join(snapshotsDir, 'padding.png'), whiteImage(2, 2));
+
+    const result = diffImageToSnapshot({
+      receivedImageBuffer: whiteImage(receivedWidth, receivedHeight),
+      snapshotIdentifier: 'padding',
+      snapshotsDir,
+      updateSnapshot: false,
+      failureThreshold: 0,
+      failureThresholdType: 'pixel',
+      allowSizeMismatch: true,
+    });
+
+    expect(result.pass).toBe(false);
+    expect(result.diffSize).toBe(true);
+    expect(result.diffPixelCount).toBe(expectedDiffPixels);
+  }
+);
+  });
+});

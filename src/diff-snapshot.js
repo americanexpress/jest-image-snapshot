@@ -35,7 +35,7 @@ const createImageResizer = (width, height) => (source) => {
  */
 /* eslint-disable no-plusplus, no-param-reassign, no-bitwise */
 const fillSizeDifference = (width, height) => (image) => {
-  const inArea = (x, y) => y > height || x > width;
+  const inArea = (x, y) => y >= height || x >= width;
   for (let y = 0; y < image.height; y++) {
     for (let x = 0; x < image.width; x++) {
       if (inArea(x, y)) {
