@@ -107,10 +107,10 @@ See [the examples](./examples/README.md) for more detailed usage or read about a
   * SSIM specific options
     * By default we set `ssim` to 'bezkrovny'.  It is the fastest option and best option most of the time.  In cases where, higher precision is needed,  this can be set to 'fast'.  See [SSIM Performance Consideration](#ssim-performance-considerations) for a better understanding of how to use this feature.
 * `comparisonMethod`: (default: `pixelmatch`) (options `pixelmatch` or `ssim`) The method by which images are compared.  `pixelmatch` does a pixel by pixel comparison, whereas `ssim` does a structural similarity comparison.  `ssim` is a new experimental feature for jest-image-snapshot, but may become the default comparison method in the future.  For a better understanding of how to use SSIM, see [Recommendations when using SSIM Comparison](#recommendations-when-using-ssim-comparison).
-* `customSnapshotsDir`: A custom absolute path of a directory to keep this snapshot in
-* `customDiffDir`: A custom absolute path of a directory to keep this diff in
+* `customSnapshotsDir`: A custom absolute path of a directory to keep this snapshot in. When a function is provided, it is called with `{ testPath, currentTestName, counter, defaultIdentifier }` and must return a directory path.
+* `customDiffDir`: A custom absolute path of a directory to keep this diff in. When a function is provided, it is called with `{ testPath, currentTestName, counter, defaultIdentifier }` and must return a directory path.
 * `storeReceivedOnFailure`: (default: `false`) Store the received images seperately from the composed diff images on failure. This can be useful when updating baseline images from CI.
-* `customReceivedDir`: A custom absolute path of a directory to keep this received image in
+* `customReceivedDir`: A custom absolute path of a directory to keep this received image in. When a function is provided, it is called with `{ testPath, currentTestName, counter, defaultIdentifier }` and must return a directory path.
 * `customReceivedPostfix`: A custom postfix which is added to the snapshot name of the received image, defaults to `-received`
 * `customSnapshotIdentifier`: A custom name to give this snapshot. If not provided one is computed automatically. When a function is provided it is called with an object containing `testPath`, `currentTestName`, `counter` and `defaultIdentifier` as its first argument. The function must return an identifier to use for the snapshot. If a path is given, the path will be created inside the snapshot/diff directories.
 * `diffDirection`: (default: `horizontal`) (options `horizontal` or `vertical`) Changes diff image layout direction
