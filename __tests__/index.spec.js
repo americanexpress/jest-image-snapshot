@@ -604,6 +604,103 @@ describe('toMatchImageSnapshot', () => {
     });
   });
 
+  it('should support customSnapshotsDir, customReceivedDir, and customDiffDir as callback functions', () => {
+    const mockTestContext = {
+      testPath: 'path/to/test.spec.js',
+      currentTestName: 'test1',
+      isNot: false,
+      snapshotState: {
+        _counters: new Map(),
+        _updateSnapshot: 'new',
+        updated: undefined,
+        added: undefined,
+      },
+    };
+    setupMock({ updated: true });
+
+    const diffImageToSnapshot = jest.fn(() => ({}));
+    jest.doMock('../src/diff-snapshot', () => ({
+      diffImageToSnapshot,
+    }));
+
+    const customSnapshotsDirFn = jest.fn(({ currentTestName, defaultIdentifier }) => (
+      path.join('custom-dir', currentTestName, defaultIdentifier)
+    ));
+    const customReceivedDirFn = jest.fn(({ currentTestName }) => (
+      path.join('custom-received', currentTestName)
+    ));
+    const customDiffDirFn = jest.fn(({ currentTestName }) => (
+      path.join('custom-diff', currentTestName)
+    ));
+
+    const { toMatchImageSnapshot } = require('../src/index');
+    const matcherAtTest = toMatchImageSnapshot.bind(mockTestContext);
+
+    matcherAtTest('pretendthisisanimagebuffer', {
+      customSnapshotsDir: customSnapshotsDirFn,
+      customReceivedDir: customReceivedDirFn,
+      customDiffDir: customDiffDirFn,
+      runInProcess: true,
+    });
+
+    expect(customSnapshotsDirFn).toHaveBeenCalledWith({
+      testPath: 'path/to/test.spec.js',
+      currentTestName: 'test1',
+      counter: 1,
+      defaultIdentifier: 'test-spec-js-test-1-1',
+    });
+    expect(customReceivedDirFn).toHaveBeenCalledWith({
+      testPath: 'path/to/test.spec.js',
+      currentTestName: 'test1',
+      counter: 1,
+      defaultIdentifier: 'test-spec-js-test-1-1',
+    });
+    expect(customDiffDirFn).toHaveBeenCalledWith({
+      testPath: 'path/to/test.spec.js',
+      currentTestName: 'test1',
+      counter: 1,
+      defaultIdentifier: 'test-spec-js-test-1-1',
+    });
+
+    expect(diffImageToSnapshot).toHaveBeenCalledWith(expect.objectContaining({
+      snapshotsDir: path.join('custom-dir', 'test1', 'test-spec-js-test-1-1'),
+      receivedDir: path.join('custom-received', 'test1'),
+      diffDir: path.join('custom-diff', 'test1'),
+    }));
+  });
+
+  it('should fallback to default snapshots directory if customSnapshotsDir function returns falsy', () => {
+    const mockTestContext = {
+      testPath: 'path/to/test.spec.js',
+      currentTestName: 'test1',
+      isNot: false,
+      snapshotState: {
+        _counters: new Map(),
+        _updateSnapshot: 'new',
+        updated: undefined,
+        added: undefined,
+      },
+    };
+    setupMock({ updated: true });
+
+    const diffImageToSnapshot = jest.fn(() => ({}));
+    jest.doMock('../src/diff-snapshot', () => ({
+      diffImageToSnapshot,
+    }));
+
+    const { toMatchImageSnapshot } = require('../src/index');
+    const matcherAtTest = toMatchImageSnapshot.bind(mockTestContext);
+
+    matcherAtTest('pretendthisisanimagebuffer', {
+      customSnapshotsDir: () => null,
+      runInProcess: true,
+    });
+
+    expect(diffImageToSnapshot).toHaveBeenCalledWith(expect.objectContaining({
+      snapshotsDir: path.join('path', 'to', '__image_snapshots__'),
+    }));
+  });
+
   it('should only increment matched when test passed', () => {
     global.UNSTABLE_SKIP_REPORTING = false;
 

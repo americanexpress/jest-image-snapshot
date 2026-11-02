@@ -109,6 +109,10 @@ function checkResult({
   };
 }
 
+function resolveDir(dir, context) {
+  return typeof dir === 'function' ? dir(context) : dir;
+}
+
 function createSnapshotIdentifier({
   retryTimes,
   testPath,
@@ -207,6 +211,12 @@ function configureToMatchImageSnapshot({
 
     updateSnapshotState(snapshotState, { _counters: snapshotState._counters.set(currentTestName, (snapshotState._counters.get(currentTestName) || 0) + 1) }); // eslint-disable-line max-len
 
+    const counter = snapshotState._counters.get(currentTestName);
+    const defaultIdentifier = kebabCase(`${path.basename(testPath)}-${currentTestName}-${counter}`);
+    const dirContext = {
+      testPath, currentTestName, counter, defaultIdentifier,
+    };
+
     const snapshotIdentifier = createSnapshotIdentifier({
       retryTimes,
       testPath,
@@ -215,10 +225,11 @@ function configureToMatchImageSnapshot({
       snapshotState,
     });
 
-    const snapshotsDir = customSnapshotsDir || path.join(path.dirname(testPath), SNAPSHOTS_DIR);
-    const receivedDir = customReceivedDir;
+    const snapshotsDir = resolveDir(customSnapshotsDir, dirContext)
+      || path.join(path.dirname(testPath), SNAPSHOTS_DIR);
+    const receivedDir = resolveDir(customReceivedDir, dirContext);
     const receivedPostfix = customReceivedPostfix;
-    const diffDir = customDiffDir;
+    const diffDir = resolveDir(customDiffDir, dirContext);
     const baselineSnapshotPath = path.join(snapshotsDir, `${snapshotIdentifier}.png`);
     OutdatedSnapshotReporter.markTouchedFile(baselineSnapshotPath);
 
